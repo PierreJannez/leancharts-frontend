@@ -1,0 +1,116 @@
+{
+    "clients": [
+      {
+        "id": 1,
+        "firstName": "John",
+        "lastName": "Doe",
+        "email": "john.doe@example.com",
+        "password": "hashed_password",
+        "bundles": [
+          {
+            "id": 101,
+            "shortName": "Quality",
+            "longName": "Quality Management",
+            "icon": "bug",
+            "charts": [
+              {
+                "id": 2001,
+                "name": "Stock of bugs",
+                "icon": "bug",
+                "xLabel": "Month",
+                "yLabel": "# of bugs",
+                "mainTarget": 2.0,
+                "isMonthly": true,
+                "isCumulative": false,
+                "isPositiveColorAbove": false,
+                "positiveColor": "#00FF00",
+                "negativeColor": "#FF0000",
+                "values": [
+                  {
+                    "id_Chart": 2001,
+                    "date": "2025-01-01",
+                    "target": 2.0,
+                    "value": 2.5,
+                    "comment": "Above target, needs improvement"
+                  },
+                  {
+                    "id_Chart": 2001,
+                    "date": "2025-02-01",
+                    "target": 2.0,
+                    "value": 1.8,
+                    "comment": "Below target, good performance"
+                  }
+                ]
+              },
+              {
+                "id": 2002,
+                "name": "New bugs",
+                "icon": "trending-up",
+                "xLabel": "Month",
+                "yLabel": "Volume of new bugs",
+                "mainTarget": 2.0,
+                "isMonthly": false,
+                "isCumulative": false,
+                "isPositiveColorAbove": false,
+                "positiveColor": "#00FF00",
+                "negativeColor": "#FF0000",
+                "values": [
+                  {
+                    "id_Chart": 2001,
+                    "date": "2025-01-01",
+                    "target": 2.0,
+                    "value": 2.5,
+                    "comment": "Above target, needs improvement"
+                  },
+                  {
+                    "id_Chart": 2001,
+                    "date": "2025-02-01",
+                    "target": 2.0,
+                    "value": 1.8,
+                    "comment": "Below target, good performance"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": 102,
+            "shortName": "Delivery",
+            "longName": "Delivery Performance",
+            "icon": "clock-3",
+            "charts": [
+              {
+                "id": 2002,
+                "name": "On-time Delivery",
+                "icon": "bug",
+                "xLabel": "Month",
+                "yLabel": "On-time Percentage",
+                "mainTarget": 95,
+                "isMonthly": true,
+                "isCumulative": false,
+                "isPositiveColorAbove": true,
+                "positiveColor": "#00FF00",
+                "negativeColor": "#FF0000",
+                "values": [
+                  {
+                    "id_Chart": 2002,
+                    "date": "2025-01-01",
+                    "target": 95,
+                    "value": 93,
+                    "comment": "Slightly below target"
+                  },
+                  {
+                    "id_Chart": 2002,
+                    "date": "2025-02-01",
+                    "target": 95,
+                    "value": 97,
+                    "comment": "Exceeded target"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
