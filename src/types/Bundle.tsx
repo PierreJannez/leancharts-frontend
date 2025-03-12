@@ -1,6 +1,7 @@
 export interface Bundle {
   id: number;
+  icon: string;
   shortName: string;
   longName: string;
-  icon: string;
+  displayOrder: number;
 }

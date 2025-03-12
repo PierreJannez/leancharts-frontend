@@ -46,7 +46,7 @@ const Header: React.FC<HeaderProps> = ({ menuItems, onSelectBundle: onSelectBund
                       className="flex text-black items-center gap-2 py-2 px-4 hover:bg-blue-50 rounded w-full text-left"
                       onClick={() => {
                         onSelectBundle(bundle.id, bundle.shortName);
-                        navigate(`/bundle/${bundle.shortName.toLowerCase()}`); // Navigate to the correct route
+                        navigate(`/bundle/${bundle.shortName}`); // Navigate to the correct route
                         setIsMenuOpen(false);
                       }}
                     >

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { fetchCharts } from "../services/chartService"; // Import service
-import ChartTabs from "./ChartTabs";
-import { Chart } from "../types/Chart";
+import { fetchLeanCharts } from "../services/leanChartService"; // Import service
+import LeanChartTabs from "./LeanChartTabs";
+import { LeanChart } from "../types/LeanChart";
 import Main from "./Main";
 
 interface BundleProps {
@@ -11,10 +11,12 @@ interface BundleProps {
 }
 
 const Bundle: React.FC<BundleProps> = ({ bundleName: bundleName, selectedBundleId: selectedBundleId }) => {
-  const [charts, setCharts] = useState<Chart[]>([]);
+  const [leanCharts, setCharts] = useState<LeanChart[]>([]);
 
   useEffect(() => {
-    setCharts(fetchCharts(selectedBundleId)); // Use the chart service
+    if (selectedBundleId !== null) {
+      fetchLeanCharts(selectedBundleId).then((charts) => setCharts(charts));
+    }
   }, [selectedBundleId]);
 
   return (
@@ -22,7 +24,7 @@ const Bundle: React.FC<BundleProps> = ({ bundleName: bundleName, selectedBundleI
       <h2 className="text-2xl font-bold text-left">{bundleName}</h2>
 
       {/* Tabs for the selected bundle */}
-      {selectedBundleId ? <ChartTabs charts={charts} /> : <p className="text-center text-gray-500">Sélectionnez un bundle</p>}
+      {selectedBundleId ? <LeanChartTabs leanCharts={leanCharts} /> : <p className="text-center text-gray-500">Sélectionnez un bundle</p>}
     </div>
   );
 };

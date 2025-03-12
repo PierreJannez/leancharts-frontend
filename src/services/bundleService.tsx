@@ -1,11 +1,19 @@
-import configData from "../config.json";
-import { Bundle } from "../types/Bundle"; // Import the shared interface
+import axios from 'axios';
+import { Bundle } from '../types/Bundle'; // Import the shared interface
 
 /**
- * Fetch all bundles for the client.
- * @returns An array of Bundles
+ * Fetch all bundles for a specific client from the API.
+ * @param clientId The ID of the client
+ * @returns A promise resolving to an array of Bundles
  */
-export const fetchBundles = (): Bundle[] => {
-  const client = configData.clients?.[0];
-  return client?.bundles || []; // Return bundles or an empty array
+export const fetchBundles = async (clientId: number): Promise<Bundle[]> => {
+    try {
+        const response = await axios.get(`http://localhost:3000/clients/${clientId}/bundles`);
+        console.log("Réponse de l'API :", response.data.bundles); // Vérifie ce que l'API retourne
+
+        return response.data.bundles || [];
+    } catch (error) {
+        console.error(`Erreur lors de la récupération des bundles pour le client ${clientId}:`, error);
+        return [];
+    }
 };

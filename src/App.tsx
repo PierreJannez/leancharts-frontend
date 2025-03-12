@@ -12,7 +12,11 @@ const App: React.FC = () => {
   const [bundles, setBundles] = useState<Bundle[]>([]);
 
   useEffect(() => {
-    setBundles(fetchBundles()); // Fetch bundles using the service
+    async function fetchData() {
+      const bundles = await fetchBundles(1); // Fetch bundles using the service
+      setBundles(bundles);
+    }
+    fetchData();
   }, []);
 
   return (
