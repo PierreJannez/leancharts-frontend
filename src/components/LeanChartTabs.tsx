@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getIcon } from "../utils/icons"; // Import the icon utility
 import { LeanChart } from "../types/LeanChart";
-import ChartComponent from "./"; // Import the ChartComponent
-
+import LongTermChartComponent from "./leanchart/LongTermChartComponent"; // Import the ChartComponent
 
 interface TabsProps {
   leanCharts: LeanChart[];
@@ -21,11 +20,15 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
     return <p className="text-center text-gray-500">Aucun graphique disponible</p>;
   }
 
+  let test: number = 1;
+
   return (
     <div className="w-full p-4">
       {/* Tabs Navigation - Styled as real tabs */}
       <div className="flex border-b border-gray-300">
+
         {leanCharts.map((leanChart) => {
+          
           const IconComponent = getIcon(leanChart.icon); // Get the icon dynamically
 
           return (
@@ -50,9 +53,12 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
       <div className="mt-0 p-4 border border-gray-300 rounded-b-lg bg-white shadow-md">
         {leanCharts.map((leanChart) =>
           activeTab === leanChart.id ? (
+            console.log("Affichage du graphique long terme : ", leanChart.id, test ),
+            test=test+1,
             <div key={leanChart.id} className="text-center">
               <h2 className="text-xl font-semibold">{leanChart.name}</h2>
-              <ChartComponent /> {/* Use the ChartComponent here */}
+              <p className="text-gray-500">Graphique long terme</p>
+              <LongTermChartComponent longTermChartId={leanChart.id_LongTerm_Chart} /> {/* Use the ChartComponent here - longTermChartId={leanChart.id_LongTerm_Chart}*/}
             </div>
           ) : null
         )}
