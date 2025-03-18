@@ -5,7 +5,7 @@ export interface ChartData {
     comment: string;
   }
   
-  export interface LongTermChart {
+  export interface ChartDescription {
     id: number;
     title: string;
     xLabel: string;
@@ -13,3 +13,9 @@ export interface ChartData {
     mainTarget: number;
     values: ChartData[];
   }
+
+  export interface LeanChartData {
+    longTermChart: ChartDescription;
+    shortTermChart: ChartDescription;
+  }
+  

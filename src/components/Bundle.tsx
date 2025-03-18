@@ -11,18 +11,17 @@ interface BundleProps {
 }
 
 const Bundle: React.FC<BundleProps> = ({ bundleName: bundleName, selectedBundleId: selectedBundleId }) => {
-  const [leanCharts, setCharts] = useState<LeanChart[]>([]);
+  const [leanCharts, setLeanCharts] = useState<LeanChart[]>([]);
 
   useEffect(() => {
     if (selectedBundleId !== null) {
-      fetchLeanCharts(selectedBundleId).then((charts) => setCharts(charts));
+      fetchLeanCharts(selectedBundleId).then((leanCharts) => setLeanCharts(leanCharts));
     }
   }, [selectedBundleId]);
 
   return (
     <div className="w-full px-4 py-6 shadow-md rounded-lg bg-gray-100">
       <h2 className="text-2xl font-bold text-left">{bundleName}</h2>
-
       {/* Tabs for the selected bundle */}
       {selectedBundleId ? <LeanChartTabs leanCharts={leanCharts} /> : <p className="text-center text-gray-500">Sélectionnez un bundle</p>}
     </div>
