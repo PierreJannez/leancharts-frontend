@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getIcon } from "../utils/icons"; // Import the icon utility
 import { LeanChart } from "../types/LeanChart";
-import { LeanChartData, ChartData } from '../types/LeanChartData'; // Import the shared interface
+import { LeanChartData, ChartDescription, ChartData } from '../types/LeanChartData'; // Import the shared interface
 import { fetchLeanChartData } from "../services/leanChartDataService"; // Import the service
 import LongTermChartComponent from "./leanchart/LongTermChartComponent"; // Import the ChartComponent
 import ShortTermChartComponent from "./leanchart/ShortTermChartComponent";
@@ -72,15 +72,26 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
         { leanCharts.map((leanChart) =>
           activeTab === leanChart.id ? (
             <div key={leanChart.id} className="text-center">
-              <h2 className="text-xl font-semibold">{leanChart.name}</h2>
               <div className="flex justify-center gap-4">
-                <div className="w-1/3 bg-gray-100 rounded-lg shadow p-4">
-                  <p className="text-gray-500">Trois derniers mois</p>
-                  <LongTermChartComponent data={leanChartData?.longTermChart.values as ChartData[]} /> {/* Pass the data as a prop */}
+                <div className="w-1/4 bg-gray-100 rounded-lg shadow p-4 border-1 border-gray-300">
+                  <p className="font-semibold"
+                      style={{
+                      fontSize: 14, // Taille de la police
+                      fontFamily: "system-ui", // Définir la police sur system-ui
+                      color: "#333", // Couleur du texte
+                    }}>Trois derniers mois
+                  </p>
+                <LongTermChartComponent chartDescription={leanChartData?.longTermChart as ChartDescription} /> {/* Pass the data as a prop */}
                 </div>
-                <div className="w-2/3 bg-gray-100 rounded-lg shadow p-4">
-                  <p className="text-gray-500">{getCurrentMonth()}</p>
-                  <ShortTermChartComponent data={leanChartData?.shortTermChart.values as ChartData[]} /> {/* Pass the data as a prop */}
+                <div className="w-3/4 bg-gray-100 rounded-lg shadow p-4 border-1 border-gray-300">
+                  <p className="font-semibold"
+                      style={{
+                      fontSize: 14, // Taille de la police
+                      fontFamily: "system-ui", // Définir la police sur system-ui
+                      color: "#333", // Couleur du texte
+                    }}>{leanChartData?.shortTermChart.title} - {getCurrentMonth()}
+                  </p>
+                  <ShortTermChartComponent chartDescription={leanChartData?.shortTermChart as ChartDescription} /> {/* Pass the data as a prop */}
                 </div>
               </div>
             </div>
