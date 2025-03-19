@@ -8,7 +8,7 @@ import { Bundle } from '../types/Bundle'; // Import the shared interface
  */
 export const fetchBundles = async (clientId: number): Promise<Bundle[]> => {
     try {
-        const response = await axios.get(`http://localhost:3000/clients/${clientId}/bundles`);
+        const response = await axios.get(`/api/clients/${clientId}/bundles`);
         return response.data.bundles || [];
     } catch (error) {
         console.error(`Erreur lors de la récupération des bundles pour le client ${clientId}:`, error);

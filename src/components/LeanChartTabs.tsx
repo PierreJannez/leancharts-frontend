@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { getIcon } from "../utils/icons"; // Import the icon utility
 import { LeanChart } from "../types/LeanChart";
-import { LeanChartData, ChartDescription } from '../types/LeanChartData'; // Import the shared interface
+import { LeanChartData, ChartDescription, ChartData } from '../types/LeanChartData'; // Import the shared interface
 import { fetchLeanChartData } from "../services/leanChartDataService"; // Import the service
 import ShortTermChartComponent from "./leanchart/ShortTermChartComponent"; // Import the ChartComponent
 import LongTermChartComponent from "./leanchart/LongTermChartComponent"; // Import the ChartComponent
+import InputTable from "./leanchart/InpuTable"; // Import du composant InputTable
+import { updateChartValue } from "../services/leanChartDataService"; // Import du service
 
 interface TabsProps {
   leanCharts: LeanChart[];
@@ -34,6 +36,29 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
   if (leanCharts.length === 0) {
     return <p className="text-center text-gray-500">Aucun graphique disponible</p>;
   }
+
+  const handleValueChange = async (chartData: ChartData, newValue: number) => {
+    if (leanChartData && leanChartData.shortTermChart) {
+      const updatedValues = leanChartData.shortTermChart.values.map((entry) =>
+        entry.date === chartData.date ? { ...entry, value: newValue } : entry
+      );
+      setLeanChartData({
+        ...leanChartData,
+        shortTermChart: {
+          ...leanChartData.shortTermChart,
+          values: updatedValues,
+        },
+      });
+
+      // Appeler le service pour mettre à jour la base de données
+      try {
+        await updateChartValue(activeTab!, chartData.date, chartData.target, newValue, chartData.comment); // Utilise activeTab comme chartId
+        console.log(`Value for ${chartData.date} updated successfully to ${newValue}`);
+      } catch (error) {
+        console.error(`Failed to update value for ${chartData.date}:`, error);
+      }
+    }
+  };
 
   return (
     <div className="w-full p-4">
@@ -66,16 +91,28 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
           activeTab === leanChart.id ? (
             <div key={leanChart.id} className="text-center">
               <div className="flex justify-center gap-4">
-                <div className="w-1/4 bg-gray-100 rounded-lg shadow p-4 border-1 border-gray-300">
+                <div className="w-1/4 bg-gray-100 rounded-md shadow p-4 border-1 border-gray-300">
                   <LongTermChartComponent
                     chartDescription={leanChartData?.longTermChart as ChartDescription}
                     title="Trois derniers mois"
                   />
                 </div>
-                <div className="w-3/4 bg-gray-100 rounded-lg shadow p-4 border-1 border-gray-300">
+                <div className="w-3/4 bg-gray-100 rounded-md shadow p-4 border-1 border-gray-300">
                   <ShortTermChartComponent
                     chartDescription={leanChartData?.shortTermChart as ChartDescription}
                   />
+                </div>
+              </div>
+              <div className="flex justify-center mt-2 gap-4 ">
+                <div className="w-1/4 bg-gray-100 rounded-md shadow p-4 border-1 border-gray-300">
+                </div>
+                <div className="w-3/4 bg-gray-100 rounded-md shadow p-4 border-1 border-gray-300">
+                  {leanChartData?.shortTermChart && (
+                    <InputTable
+                      shortTermChart={leanChartData?.shortTermChart}
+                      onValueChange={handleValueChange} // Connecte la fonction de gestion des changements
+                    />
+                  )}
                 </div>
               </div>
             </div>

@@ -48,10 +48,14 @@ const ShortTermChartComponent: React.FC<ShortTermChartComponentProps> = ({ chart
     return existingData || { date, target: mainTarget, value: 0, comment: "" };
   });
 
+  // Remplacer le tableau values de chartDescription par mergedData
+  // const updatedChartDescription = { ...chartDescription, values: mergedData };
+  chartDescription.values = mergedData;
+
   // Pass the preprocessed data to the generic chart component
   return (
     <GenericChartComponent
-      chartDescription={{ ...chartDescription, values: mergedData }}
+      chartDescription={chartDescription}
       title={`${chartDescription.title} - ${getCurrentMonth()}`}
       tickFormatter={(date) => date.split('-')[0]} // Affiche uniquement le jour
     />

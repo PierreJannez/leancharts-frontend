@@ -1,2 +1,13 @@
 @import "tailwindcss";
+/* Supprimer les spinners pour Chrome, Safari, Edge et Opera */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 
+/* Supprimer les flèches pour Firefox */
+input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}

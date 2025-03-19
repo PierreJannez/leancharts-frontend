@@ -8,7 +8,7 @@ import { LeanChart } from '../types/LeanChart'; // Import the shared interface
  */
 export const fetchLeanCharts = async (bundleId: number): Promise<LeanChart[]> => {
     try {
-        const response = await axios.get(`http://localhost:3000/bundles/${bundleId}/leancharts`);
+        const response = await axios.get(`/api/bundles/${bundleId}/leancharts`);
         console.log("Réponse de l'API :", response.data.leancharts); // Vérifie ce que l'API retourne
 
         return response.data.leancharts || [];
