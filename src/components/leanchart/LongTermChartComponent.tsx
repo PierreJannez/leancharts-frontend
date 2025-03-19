@@ -6,7 +6,7 @@ interface LongTermChartComponentProps {
   chartDescription: ChartDescription;
 }
 
-const LongTermChartComponent: React.FC<LongTermChartComponentProps> = ({ chartDescription }) => {
+const LongTermChartComponent: React.FC<LongTermChartComponentProps> = ({ chartDescription, title }) => {
   if (!chartDescription || !Array.isArray(chartDescription.values)) {
     return <p className="text-center text-gray-500">Aucun graphique disponible</p>;
   }
@@ -15,7 +15,7 @@ const LongTermChartComponent: React.FC<LongTermChartComponentProps> = ({ chartDe
   return (
     <GenericChartComponent
       chartDescription={chartDescription}
-      title="Long Term Chart"
+      title={title}
       tickFormatter={(date) => {
         const [, month] = date.split('-');
         return `${month}`; // Affiche le mois et l'année
