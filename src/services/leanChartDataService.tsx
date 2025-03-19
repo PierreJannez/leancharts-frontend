@@ -16,7 +16,7 @@ export const fetchLeanChartData = async (leanChartId: number): Promise<LeanChart
     }
 };
 
-export const updateChartValue = async (chartId: number, date: string, newTarget:number, newValue: number, newComment: string) => {
+export const updateShortTermChartValue = async (chartId: number, date: string, newTarget:number, newValue: number, newComment: string) => {
     try {
       const response = await axios.post(`/api/shortTermValues`, { 
         chartId,
@@ -27,7 +27,23 @@ export const updateChartValue = async (chartId: number, date: string, newTarget:
       });
       return response.data;
     } catch (error) {
-      console.error("Error updating chart value:", error);
+      console.error("Error updating short term chart value:", error);
+      throw error;
+    }
+  };
+
+  export const updateLongTermChartValue = async (chartId: number, date: string, newTarget:number, newValue: number, newComment: string) => {
+    try {
+      const response = await axios.post(`/api/longTermValues`, { 
+        chartId,
+        date,
+        target: newTarget,
+        value: newValue,
+        comment: newComment,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating long term chart value:", error);
       throw error;
     }
   };

@@ -4,9 +4,10 @@ import { LeanChart } from "../types/LeanChart";
 import { LeanChartData, ChartDescription, ChartData } from '../types/LeanChartData'; // Import the shared interface
 import { fetchLeanChartData } from "../services/leanChartDataService"; // Import the service
 import ShortTermChartComponent from "./leanchart/ShortTermChartComponent"; // Import the ChartComponent
+import InputTableShortTermValues from "./leanchart/InputTableShortTermValues"; // Import du composant InputTable
 import LongTermChartComponent from "./leanchart/LongTermChartComponent"; // Import the ChartComponent
-import InputTable from "./leanchart/InpuTable"; // Import du composant InputTable
-import { updateChartValue } from "../services/leanChartDataService"; // Import du service
+import InputTableLongTermValues from "./leanchart/InputTableLongTermValues"; // Import du composant InputTable
+import { updateShortTermChartValue, updateLongTermChartValue } from "../services/leanChartDataService"; // Import du service
 
 interface TabsProps {
   leanCharts: LeanChart[];
@@ -37,7 +38,7 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
     return <p className="text-center text-gray-500">Aucun graphique disponible</p>;
   }
 
-  const updateChartField = async (
+  const updateShortTermChartField = async (
     chartData: ChartData,
     field: "value" | "target" | "comment",
     newValue: number | string
@@ -58,7 +59,42 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
   
       // Appeler le service pour mettre à jour la base de données
       try {
-        await updateChartValue(
+        await updateShortTermChartValue(
+          activeTab!,
+          chartData.date,
+          field === "target" ? newValue as number : chartData.target,
+          field === "value" ? newValue as number : chartData.value,
+          field === "comment" ? newValue as string : chartData.comment
+        );
+        console.log(`${field} for ${chartData.date} updated successfully to ${newValue}`);
+      } catch (error) {
+        console.error(`Failed to update ${field} for ${chartData.date}:`, error);
+      }
+    }
+  };
+
+  const updateLongTermChartField = async (
+    chartData: ChartData,
+    field: "value" | "target" | "comment",
+    newValue: number | string
+  ) => {
+    if (leanChartData && leanChartData.longTermChart) {
+      // Mettre à jour localement le champ spécifié
+      const updatedValues = leanChartData.longTermChart.values.map((entry) =>
+        entry.date === chartData.date ? { ...entry, [field]: newValue } : entry
+      );
+  
+      setLeanChartData({
+        ...leanChartData,
+        longTermChart: {
+          ...leanChartData.longTermChart,
+          values: updatedValues,
+        },
+      });
+  
+      // Appeler le service pour mettre à jour la base de données
+      try {
+        await updateLongTermChartValue(
           activeTab!,
           chartData.date,
           field === "target" ? newValue as number : chartData.target,
@@ -72,18 +108,6 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
     }
   };
   
-  const handleValueChange = (chartData: ChartData, newValue: number) => {
-    updateChartField(chartData, "value", newValue);
-  };
-  
-  const handleTargetChange = (chartData: ChartData, newTarget: number) => {
-    updateChartField(chartData, "target", newTarget);
-  };
-  
-  const handleCommentChange = (chartData: ChartData, newComment: string) => {
-    updateChartField(chartData, "comment", newComment);
-  };
-
   return (
     <div className="w-full p-4">
       {/* Tabs Navigation - Styled as real tabs */}
@@ -129,14 +153,22 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
               </div>
               <div className="flex justify-center mt-2 gap-4 ">
                 <div className="w-1/4 bg-gray-100 rounded-md shadow p-4 border-1 border-gray-300">
+                {leanChartData?.shortTermChart && (
+                    <InputTableLongTermValues
+                      longTermChart={leanChartData?.longTermChart}
+                      onValueChange={(chartData, newValue) => updateLongTermChartField(chartData, "value", newValue)} // Connecte la fonction de gestion des changements de valeur
+                      onTargetChange={(chartData, newTarget) => updateLongTermChartField(chartData, "target", newTarget)} // Connecte la fonction de gestion des changements de target
+                      onCommentChange={(chartData, newComment) => updateLongTermChartField(chartData, "comment", newComment)} // Connecte la fonction de gestion des changements de comment
+                    />                  
+                  )}
                 </div>
                 <div className="w-3/4 bg-gray-100 rounded-md shadow p-4 border-1 border-gray-300">
                   {leanChartData?.shortTermChart && (
-                    <InputTable
+                    <InputTableShortTermValues
                       shortTermChart={leanChartData?.shortTermChart}
-                      onValueChange={handleValueChange} // Connecte la fonction de gestion des changements de valeur
-                      onTargetChange={handleTargetChange} // Connecte la fonction de gestion des changements de target
-                      onCommentChange={handleCommentChange} // Connecte la fonction de gestion des changements de comment
+                      onValueChange={(chartData, newValue) => updateShortTermChartField(chartData, "value", newValue)} // Connecte la fonction de gestion des changements de valeur
+                      onTargetChange={(chartData, newTarget) => updateShortTermChartField(chartData, "target", newTarget)} // Connecte la fonction de gestion des changements de target
+                      onCommentChange={(chartData, newComment) => updateShortTermChartField(chartData, "comment", newComment)} // Connecte la fonction de gestion des changements de comment
                     />                  
                   )}
                 </div>
