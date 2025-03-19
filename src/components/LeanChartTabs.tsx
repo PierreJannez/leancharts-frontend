@@ -1,21 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { getIcon } from "../utils/icons"; // Import the icon utility
 import { LeanChart } from "../types/LeanChart";
-import { LeanChartData, ChartDescription, ChartData } from '../types/LeanChartData'; // Import the shared interface
+import { LeanChartData, ChartDescription } from '../types/LeanChartData'; // Import the shared interface
 import { fetchLeanChartData } from "../services/leanChartDataService"; // Import the service
+import ShortTermChartComponent from "./leanchart/ShortTermChartComponent"; // Import the ChartComponent
 import LongTermChartComponent from "./leanchart/LongTermChartComponent"; // Import the ChartComponent
-import ShortTermChartComponent from "./leanchart/ShortTermChartComponent";
 
 interface TabsProps {
   leanCharts: LeanChart[];
 }
-
-const getCurrentMonth = () => {
-  const date = new Date();
-  const month = date.toLocaleString('default', { month: 'long' });
-  const year = date.getFullYear();
-  return `${month.charAt(0).toUpperCase() + month.slice(1)} ${year}`;
-};
 
 const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
   const [activeTab, setActiveTab] = useState<number | null>(leanCharts.length > 0 ? leanCharts[0].id : null);
@@ -74,24 +67,15 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
             <div key={leanChart.id} className="text-center">
               <div className="flex justify-center gap-4">
                 <div className="w-1/4 bg-gray-100 rounded-lg shadow p-4 border-1 border-gray-300">
-                  <p className="font-semibold"
-                      style={{
-                      fontSize: 14, // Taille de la police
-                      fontFamily: "system-ui", // Définir la police sur system-ui
-                      color: "#333", // Couleur du texte
-                    }}>Trois derniers mois
-                  </p>
-                <LongTermChartComponent chartDescription={leanChartData?.longTermChart as ChartDescription} /> {/* Pass the data as a prop */}
+                  <LongTermChartComponent
+                    chartDescription={leanChartData?.longTermChart as ChartDescription}
+                    title="Trois derniers mois"
+                  />
                 </div>
                 <div className="w-3/4 bg-gray-100 rounded-lg shadow p-4 border-1 border-gray-300">
-                  <p className="font-semibold"
-                      style={{
-                      fontSize: 14, // Taille de la police
-                      fontFamily: "system-ui", // Définir la police sur system-ui
-                      color: "#333", // Couleur du texte
-                    }}>{leanChartData?.shortTermChart.title} - {getCurrentMonth()}
-                  </p>
-                  <ShortTermChartComponent chartDescription={leanChartData?.shortTermChart as ChartDescription} /> {/* Pass the data as a prop */}
+                  <ShortTermChartComponent
+                    chartDescription={leanChartData?.shortTermChart as ChartDescription}
+                  />
                 </div>
               </div>
             </div>
