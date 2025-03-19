@@ -4,6 +4,7 @@ import { ChartDescription } from "../../types/LeanChartData";
 
 interface LongTermChartComponentProps {
   chartDescription: ChartDescription;
+  title: string;
 }
 
 const LongTermChartComponent: React.FC<LongTermChartComponentProps> = ({ chartDescription, title }) => {
