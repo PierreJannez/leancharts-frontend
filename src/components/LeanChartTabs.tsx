@@ -37,11 +37,17 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
     return <p className="text-center text-gray-500">Aucun graphique disponible</p>;
   }
 
-  const handleValueChange = async (chartData: ChartData, newValue: number) => {
+  const updateChartField = async (
+    chartData: ChartData,
+    field: "value" | "target" | "comment",
+    newValue: number | string
+  ) => {
     if (leanChartData && leanChartData.shortTermChart) {
+      // Mettre à jour localement le champ spécifié
       const updatedValues = leanChartData.shortTermChart.values.map((entry) =>
-        entry.date === chartData.date ? { ...entry, value: newValue } : entry
+        entry.date === chartData.date ? { ...entry, [field]: newValue } : entry
       );
+  
       setLeanChartData({
         ...leanChartData,
         shortTermChart: {
@@ -49,15 +55,33 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
           values: updatedValues,
         },
       });
-
+  
       // Appeler le service pour mettre à jour la base de données
       try {
-        await updateChartValue(activeTab!, chartData.date, chartData.target, newValue, chartData.comment); // Utilise activeTab comme chartId
-        console.log(`Value for ${chartData.date} updated successfully to ${newValue}`);
+        await updateChartValue(
+          activeTab!,
+          chartData.date,
+          field === "target" ? newValue as number : chartData.target,
+          field === "value" ? newValue as number : chartData.value,
+          field === "comment" ? newValue as string : chartData.comment
+        );
+        console.log(`${field} for ${chartData.date} updated successfully to ${newValue}`);
       } catch (error) {
-        console.error(`Failed to update value for ${chartData.date}:`, error);
+        console.error(`Failed to update ${field} for ${chartData.date}:`, error);
       }
     }
+  };
+  
+  const handleValueChange = (chartData: ChartData, newValue: number) => {
+    updateChartField(chartData, "value", newValue);
+  };
+  
+  const handleTargetChange = (chartData: ChartData, newTarget: number) => {
+    updateChartField(chartData, "target", newTarget);
+  };
+  
+  const handleCommentChange = (chartData: ChartData, newComment: string) => {
+    updateChartField(chartData, "comment", newComment);
   };
 
   return (
@@ -110,8 +134,10 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
                   {leanChartData?.shortTermChart && (
                     <InputTable
                       shortTermChart={leanChartData?.shortTermChart}
-                      onValueChange={handleValueChange} // Connecte la fonction de gestion des changements
-                    />
+                      onValueChange={handleValueChange} // Connecte la fonction de gestion des changements de valeur
+                      onTargetChange={handleTargetChange} // Connecte la fonction de gestion des changements de target
+                      onCommentChange={handleCommentChange} // Connecte la fonction de gestion des changements de comment
+                    />                  
                   )}
                 </div>
               </div>
