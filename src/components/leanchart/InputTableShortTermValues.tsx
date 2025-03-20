@@ -36,7 +36,9 @@ const InputTableShortTermValues: React.FC<InputTableShortTermValuesProps> = ({ s
     }
     const dayName = date.toLocaleDateString("fr-FR", { weekday: "short" }); // Nom du jour (ex: lun., mar.)
     const dayNumber = date.getDate(); // Numéro dans le mois
-    return `${dayName} ${dayNumber}`;
+    const capitalizedDay = dayName.charAt(0).toUpperCase() + dayName.slice(1);
+  
+    return `${capitalizedDay} \n ${dayNumber}`;
   };
 
   // Fonction pour ouvrir la modale

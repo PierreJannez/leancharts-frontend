@@ -111,22 +111,22 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
   return (
     <div className="w-full p-4">
       {/* Tabs Navigation - Styled as real tabs */}
-      <div className="flex border-b border-gray-300">
+      <div className="flex border-b-0">
         {leanCharts.map((leanChart) => {
           console.log("3-LeanChart:", leanChart);
           const IconComponent = getIcon(leanChart.icon); // Get the icon dynamically
           return (
             <button
               key={leanChart.id}
-              className={`flex items-center gap-2 px-6 py-2 text-sm font-medium transition-all rounded-t-lg border 
+              className={`flex items-center gap-2 px-6 py-2 text-sm font-medium transition-all rounded-t-lg border bg-white 
                 ${
                   activeTab === leanChart.id
-                    ? "bg-white border-b-transparent text-blue-600 font-bold"
-                    : "bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300"
+                    ? "border-gray-400 text-blue-600 font-bold"
+                    : "text-gray-700 border-gray-400 hover:bg-gray-100"
                 }`}
               onClick={() => setActiveTab(leanChart.id)}
             >
-              <IconComponent size={16} className="text-gray-600" /> {/* Render icon */}
+              <IconComponent size={16} className={`${activeTab === leanChart.id ? "text-blue-600" : "text-gray-600"}`} />
               {leanChart.name}
             </button>
           );
