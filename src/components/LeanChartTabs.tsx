@@ -1,13 +1,10 @@
+// LeanChartTabs.tsx
 import React, { useState, useEffect } from "react";
-import { getIcon } from "../utils/icons"; // Import the icon utility
-import { LeanChart } from "../types/LeanChart";
-import { LeanChartData, ChartDescription, ChartData } from '../types/LeanChartData'; // Import the shared interface
-import { fetchLeanChartData } from "../services/leanChartDataService"; // Import the service
-import ShortTermChartComponent from "./leanchart/ShortTermChartComponent"; // Import the ChartComponent
-import InputTableShortTermValues from "./leanchart/InputTableShortTermValues"; // Import du composant InputTable
-import LongTermChartComponent from "./leanchart/LongTermChartComponent"; // Import the ChartComponent
-import InputTableLongTermValues from "./leanchart/InputTableLongTermValues"; // Import du composant InputTable
-import { updateShortTermChartValue, updateLongTermChartValue } from "../services/leanChartDataService"; // Import du service
+import { getIcon } from "../utils/icons";
+import { LeanChart, LeanChartData, ChartData } from '../types/LeanChart';
+import { fetchLeanChartData, updateShortTermChartValue, updateLongTermChartValue } from "../services/leanChartDataService";
+import { StandardLeanChart } from "./leanchart/StandardLeanChart";
+import { CumulativeLeanChart } from "./leanchart/CumulativeLeanChart";
 
 interface TabsProps {
   leanCharts: LeanChart[];
@@ -15,7 +12,7 @@ interface TabsProps {
 
 const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
   const [activeTab, setActiveTab] = useState<number | null>(leanCharts.length > 0 ? leanCharts[0].id : null);
-  const [leanChartData, setLeanChartData] = useState<LeanChartData>();
+  const [currentLeanChart, setCurrentLeanChart] = useState<LeanChart | undefined>(leanCharts.length > 0 ? leanCharts[0] : undefined);
 
   useEffect(() => {
     if (leanCharts.length > 0) {
@@ -25,39 +22,35 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
 
   useEffect(() => {
     if (activeTab !== null) {
-        fetchLeanChartData(activeTab).then((leanChartData: LeanChartData) => {
-        setLeanChartData(leanChartData);
-      }).catch((error) => {
-        console.error("Error fetching chart data:", error);
-        setLeanChartData(undefined); // Ensure chart doesn't break on error
-      });
+      fetchLeanChartData(activeTab)
+        .then((data: LeanChartData) => {
+          const selectedChart = leanCharts.find(chart => chart.id === activeTab);
+          if (selectedChart) {
+            setCurrentLeanChart({
+              ...selectedChart,
+              longTermData: [...data.longTermValues],
+              shortTermData: [...data.shortTermValues]
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching chart data:", error);
+          setCurrentLeanChart(undefined);
+        });
     }
-  }, [activeTab]);
+  }, [activeTab, leanCharts]);
 
   if (leanCharts.length === 0) {
     return <p className="text-center text-gray-500">Aucun graphique disponible</p>;
   }
 
-  const updateShortTermChartField = async (
-    chartData: ChartData,
-    field: "value" | "target" | "comment",
-    newValue: number | string
-  ) => {
-    if (leanChartData && leanChartData.shortTermChart) {
-      // Mettre à jour localement le champ spécifié
-      const updatedValues = leanChartData.shortTermChart.values.map((entry) =>
+  const updateShortTermChartField = async (chartData: ChartData, field: "value" | "target" | "comment", newValue: number | string) => {
+    if (currentLeanChart && currentLeanChart.shortTermData) {
+      const updatedValues = currentLeanChart.shortTermData.map((entry) =>
         entry.date === chartData.date ? { ...entry, [field]: newValue } : entry
       );
-  
-      setLeanChartData({
-        ...leanChartData,
-        shortTermChart: {
-          ...leanChartData.shortTermChart,
-          values: updatedValues,
-        },
-      });
-  
-      // Appeler le service pour mettre à jour la base de données
+      setCurrentLeanChart({ ...currentLeanChart, shortTermData: updatedValues });
+
       try {
         await updateShortTermChartValue(
           activeTab!,
@@ -66,33 +59,19 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
           field === "value" ? newValue as number : chartData.value,
           field === "comment" ? newValue as string : chartData.comment
         );
-        console.log(`${field} for ${chartData.date} updated successfully to ${newValue}`);
       } catch (error) {
         console.error(`Failed to update ${field} for ${chartData.date}:`, error);
       }
     }
   };
 
-  const updateLongTermChartField = async (
-    chartData: ChartData,
-    field: "value" | "target" | "comment",
-    newValue: number | string
-  ) => {
-    if (leanChartData && leanChartData.longTermChart) {
-      // Mettre à jour localement le champ spécifié
-      const updatedValues = leanChartData.longTermChart.values.map((entry) =>
+  const updateLongTermChartField = async (chartData: ChartData, field: "value" | "target" | "comment", newValue: number | string) => {
+    if (currentLeanChart && currentLeanChart.longTermData) {
+      const updatedValues = currentLeanChart.longTermData.map((entry) =>
         entry.date === chartData.date ? { ...entry, [field]: newValue } : entry
       );
-  
-      setLeanChartData({
-        ...leanChartData,
-        longTermChart: {
-          ...leanChartData.longTermChart,
-          values: updatedValues,
-        },
-      });
-  
-      // Appeler le service pour mettre à jour la base de données
+      setCurrentLeanChart({ ...currentLeanChart, longTermData: updatedValues });
+
       try {
         await updateLongTermChartValue(
           activeTab!,
@@ -101,29 +80,46 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
           field === "value" ? newValue as number : chartData.value,
           field === "comment" ? newValue as string : chartData.comment
         );
-        console.log(`${field} for ${chartData.date} updated successfully to ${newValue}`);
       } catch (error) {
         console.error(`Failed to update ${field} for ${chartData.date}:`, error);
       }
     }
   };
-  
+
+  const renderChartComponent = () => {
+    if (!currentLeanChart) return null;
+    switch (currentLeanChart.UXComponent) {
+      case "StandardLeanChart":
+        return (
+          <StandardLeanChart
+            leanChart={currentLeanChart}
+            onUpdateShortTerm={updateShortTermChartField}
+            onUpdateLongTerm={updateLongTermChartField}
+          />
+        );
+      case "CumulativeLeanChart":
+        return (
+          <CumulativeLeanChart
+            leanChart={currentLeanChart}
+            onUpdateShortTerm={updateShortTermChartField}
+            onUpdateLongTerm={updateLongTermChartField}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="w-full p-4">
-      {/* Tabs Navigation - Styled as real tabs */}
       <div className="flex border-b-0">
         {leanCharts.map((leanChart) => {
-          console.log("3-LeanChart:", leanChart);
-          const IconComponent = getIcon(leanChart.icon); // Get the icon dynamically
+          const IconComponent = getIcon(leanChart.icon);
           return (
             <button
               key={leanChart.id}
               className={`flex items-center gap-2 px-6 py-2 text-sm font-medium transition-all rounded-t-lg border bg-white 
-                ${
-                  activeTab === leanChart.id
-                    ? "border-gray-400 text-blue-600 font-bold"
-                    : "text-gray-700 border-gray-400 hover:bg-gray-100"
-                }`}
+                ${activeTab === leanChart.id ? "border-gray-400 text-blue-600 font-bold" : "text-gray-700 border-gray-400 hover:bg-gray-100"}`}
               onClick={() => setActiveTab(leanChart.id)}
             >
               <IconComponent size={16} className={`${activeTab === leanChart.id ? "text-blue-600" : "text-gray-600"}`} />
@@ -133,49 +129,8 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
         })}
       </div>
 
-      {/* Tab Content - Connected to Active Tab */}
       <div className="mt-0 p-4 border border-gray-300 rounded-b-lg bg-white shadow-md">
-        { leanCharts.map((leanChart) =>
-          activeTab === leanChart.id ? (
-            <div key={leanChart.id} className="text-center">
-              <div className="flex justify-center gap-4">
-                <div className="w-1/4 bg-gray-100 rounded-md shadow p-4 border-1 border-gray-300">
-                  <LongTermChartComponent
-                    chartDescription={leanChartData?.longTermChart as ChartDescription}
-                    title="Trois derniers mois"
-                  />
-                </div>
-                <div className="w-3/4 bg-gray-100 rounded-md shadow p-4 border-1 border-gray-300">
-                  <ShortTermChartComponent
-                    chartDescription={leanChartData?.shortTermChart as ChartDescription}
-                  />
-                </div>
-              </div>
-              <div className="flex justify-center mt-2 gap-4 ">
-                <div className="w-1/4 bg-gray-100 rounded-md shadow p-4 border-1 border-gray-300">
-                {leanChartData?.shortTermChart && (
-                    <InputTableLongTermValues
-                      longTermChart={leanChartData?.longTermChart}
-                      onValueChange={(chartData, newValue) => updateLongTermChartField(chartData, "value", newValue)} // Connecte la fonction de gestion des changements de valeur
-                      onTargetChange={(chartData, newTarget) => updateLongTermChartField(chartData, "target", newTarget)} // Connecte la fonction de gestion des changements de target
-                      onCommentChange={(chartData, newComment) => updateLongTermChartField(chartData, "comment", newComment)} // Connecte la fonction de gestion des changements de comment
-                    />                  
-                  )}
-                </div>
-                <div className="w-3/4 bg-gray-100 rounded-md shadow p-4 border-1 border-gray-300">
-                  {leanChartData?.shortTermChart && (
-                    <InputTableShortTermValues
-                      shortTermChart={leanChartData?.shortTermChart}
-                      onValueChange={(chartData, newValue) => updateShortTermChartField(chartData, "value", newValue)} // Connecte la fonction de gestion des changements de valeur
-                      onTargetChange={(chartData, newTarget) => updateShortTermChartField(chartData, "target", newTarget)} // Connecte la fonction de gestion des changements de target
-                      onCommentChange={(chartData, newComment) => updateShortTermChartField(chartData, "comment", newComment)} // Connecte la fonction de gestion des changements de comment
-                    />                  
-                  )}
-                </div>
-              </div>
-            </div>
-          ) : null
-        )}
+        {renderChartComponent()}
       </div>
     </div>
   );

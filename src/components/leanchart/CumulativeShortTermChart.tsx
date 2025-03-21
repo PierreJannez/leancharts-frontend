@@ -1,9 +1,11 @@
 import React from "react";
+import { LeanChart, ChartData } from "../../types/LeanChart";
 import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, Cell, LabelList } from "recharts";
 import { GenericChartInfo } from './GenericChartInfo';
 
-interface GenericChartComponentProps {
-  genericChartInfo: GenericChartInfo;
+
+interface CumulativeShortTermChartProps {
+  leanChart: LeanChart;
   tickFormatter: (value: string) => string; // Fonction pour formater les ticks de l'axe X
 }
 
@@ -24,10 +26,45 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-const GenericChartComponent: React.FC<GenericChartComponentProps> = ({ genericChartInfo, tickFormatter }) => {
-  if (!genericChartInfo) {
+const getCurrentMonth = () => {
+  const date = new Date();
+  const month = date.toLocaleString('default', { month: 'long' });
+  const year = date.getFullYear();
+  return `${month.charAt(0).toUpperCase() + month.slice(1)} ${year}`;
+};
+
+const CumulativeShortTermChart: React.FC<CumulativeShortTermChartProps> = ({ leanChart, tickFormatter }) => {
+  if (!leanChart || !leanChart.shortTermData || leanChart.shortTermData.length === 0) {
     return <p className="text-center text-gray-500">Aucun graphique disponible</p>;
   }
+
+  const genericChartInfo: GenericChartInfo = {
+    title: leanChart.shortTermTitle + " " + getCurrentMonth(),
+    xLabel: leanChart.shortTermxLabel,
+    yLabel: leanChart.shortTermyLabel,
+    values: leanChart.shortTermData
+  };
+
+  // Fonction utilitaire pour calculer les valeurs miroir-sommées
+  const cumulativeValues = (values: ChartData[]): number[] => {
+    const result: number[] = [];
+    const len = values.length;
+    let previous = Number(values[0].value);
+    result.push(previous);
+
+    for (let i = 1; i < len; i++) {
+      const current = Number(values[i].value) + previous;
+      previous = current;
+      result.push(current);
+    }
+    return result;
+  };
+
+  const cumulative = cumulativeValues(genericChartInfo.values);
+  genericChartInfo.values = genericChartInfo.values.map((entry, index) => ({
+    ...entry,
+    value: cumulative[index] ?? 0,
+  }));
 
   const axisTickStyle = {
     fontSize: 12,
@@ -138,4 +175,4 @@ const GenericChartComponent: React.FC<GenericChartComponentProps> = ({ genericCh
   );
 };
 
-export default GenericChartComponent;
+export default CumulativeShortTermChart;

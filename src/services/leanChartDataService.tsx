@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { LeanChartData } from '../types/LeanChartData'; // Import the shared interface
+import { LeanChartData } from '../types/LeanChart'; // Import the shared interface
 
 /**
  * Fetch LongTermChart data from the API.
