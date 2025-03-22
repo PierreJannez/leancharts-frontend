@@ -1,7 +1,7 @@
 import React from "react";
-import GenericChartComponent from "./GenericChartComponent"; // Import the generic chart component
+import GenericChartComponent from "./GenericChartComponent";
 import { LeanChart } from "../../types/LeanChart";
-import { GenericChartInfo} from "./GenericChartInfo";
+import { GenericChartInfo } from "./GenericChartInfo";
 
 interface LongTermChartComponentProps {
   leanChart: LeanChart;
@@ -19,16 +19,18 @@ const LongTermChartComponent: React.FC<LongTermChartComponentProps> = ({ leanCha
     title: title,
     xLabel: leanChart.longTermxLabel,
     yLabel: leanChart.longTermyLabel,
-    values: leanChart.longTermData
+    values: leanChart.longTermData,
+    nbDecimal: leanChart.nbDecimal,
+    positiveColor: leanChart.positiveColor,
+    negativeColor: leanChart.negativeColor,
   };
 
-  // Passer les données prétraitées au composant générique
   return (
     <GenericChartComponent
       genericChartInfo={genericChartInfo}
       tickFormatter={(date) => {
-        const [, month] = date.split('-');
-        return `${month}`; // Affiche le mois et l'année
+        const [, month] = date.split("-");
+        return month;
       }}
     />
   );

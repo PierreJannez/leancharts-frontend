@@ -5,4 +5,7 @@ export interface GenericChartInfo {
     xLabel: string;
     yLabel: string;
     values: ChartData[];
+    nbDecimal: number;
+    positiveColor: string;
+    negativeColor: string;
 }

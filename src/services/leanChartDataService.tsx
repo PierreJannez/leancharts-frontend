@@ -1,5 +1,27 @@
 import axios from 'axios';
-import { LeanChartData } from '../types/LeanChart'; // Import the shared interface
+import { LeanChartData, ChartData} from '../types/LeanChart'; // Import the shared interface
+
+const getLastThreeMonthsData = (): ChartData[] => {
+  const result: ChartData[] = [];
+  const now = new Date();
+
+  for (let i = 2; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+
+    const day = String(d.getDate()).padStart(2, "0");      // toujours "01" ici
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+
+    result.push({
+      date: `${day}-${month}-${year}`, // ← format dd-mm-yyyy
+      value: 0,
+      target: 0,
+      comment: "",
+    });
+  }
+
+  return result;
+};
 
 /**
  * Fetch LongTermChart data from the API.
@@ -9,7 +31,11 @@ import { LeanChartData } from '../types/LeanChart'; // Import the shared interfa
 export const fetchLeanChartData = async (leanChartId: number): Promise<LeanChartData> => {
     try {
         const response = await axios.get(`/api/leanChartData/${leanChartId}/leanChartData`);
-        return response.data as LeanChartData;
+        const leanChartData : LeanChartData = response.data;
+        if (leanChartData.longTermValues.length === 0 ) {
+          leanChartData.longTermValues = getLastThreeMonthsData();
+        };
+        return leanChartData;
     } catch (error) {
         console.error(`Erreur lors de la récupération des données pour le graphique ${leanChartId}:`, error);
         return {} as LeanChartData;
@@ -40,7 +66,7 @@ export const updateShortTermChartValue = async (chartId: number, date: string, n
         target: newTarget,
         value: newValue,
         comment: newComment,
-      });
+      });      
       return response.data;
     } catch (error) {
       console.error("Error updating long term chart value:", error);

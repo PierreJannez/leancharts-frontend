@@ -97,7 +97,11 @@ const StandardLongTermInputTable: React.FC<StandardLongTermeInputTableProps> = (
                 <div key={entry.date} className="text-center">
                   <input
                     type="number"
-                    value={Number(entry.target).toFixed(0)}
+                    value={
+                      leanChart.nbDecimal === 0
+                      ? Number(entry.target).toFixed(leanChart.nbDecimal)
+                      : entry.target
+                    }
                     onChange={(e) => onTargetChange(entry, Number(e.target.value))} // Appelle onTargetChange
                     className="w-full px-1 py-0.5 text-xs text-center border border-gray-300 rounded bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                     style={{
@@ -121,7 +125,11 @@ const StandardLongTermInputTable: React.FC<StandardLongTermeInputTableProps> = (
                 <div key={entry.date} className="text-center">
                   <input
                     type="number"
-                    value={Number(entry.value).toFixed(0)}
+                    value={
+                      leanChart.nbDecimal === 0
+                      ? Number(entry.value).toFixed(leanChart.nbDecimal)
+                      : entry.value
+                   }
                     onChange={(e) => onValueChange(entry, Number(e.target.value))} // Appelle onValueChange
                     className="w-full px-1 py-0.5 text-xs text-center border border-gray-300 rounded bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                     style={{

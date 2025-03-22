@@ -15,6 +15,7 @@ export interface LeanChart {
   isPositiveColorAboveTarget:boolean;
   negativeColor:string;
   positiveColor:string;
+  nbDecimal:number;
   longTermTitle:string;
   longTermxLabel:string;
   longTermyLabel:string;

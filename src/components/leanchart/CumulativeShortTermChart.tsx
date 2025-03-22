@@ -2,7 +2,7 @@ import React from "react";
 import { LeanChart, ChartData } from "../../types/LeanChart";
 import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, Cell, LabelList } from "recharts";
 import { GenericChartInfo } from './GenericChartInfo';
-
+import { colord } from "colord";
 
 interface CumulativeShortTermChartProps {
   leanChart: LeanChart;
@@ -16,8 +16,8 @@ const CustomTooltip = ({ active, payload }: any) => {
     return (
       <div className="bg-white border border-gray-300 rounded-lg shadow-lg p-2 text-sm text-gray-700">
         <p><strong>Date:</strong> {date}</p>
-        <p><strong>Value:</strong> {Number(value).toFixed(0)}</p>
-        <p><strong>Target:</strong> {Number(target).toFixed(0)}</p>
+        <p><strong>Value:</strong> {Number(value).toFixed(1)}</p>
+        <p><strong>Target:</strong> {Number(target).toFixed(1)}</p>
         <p><strong>Comment:</strong> {comment || "No comment"}</p>
       </div>
     );
@@ -42,7 +42,10 @@ const CumulativeShortTermChart: React.FC<CumulativeShortTermChartProps> = ({ lea
     title: leanChart.shortTermTitle + " " + getCurrentMonth(),
     xLabel: leanChart.shortTermxLabel,
     yLabel: leanChart.shortTermyLabel,
-    values: leanChart.shortTermData
+    values: leanChart.shortTermData,
+    nbDecimal: leanChart.nbDecimal,
+    positiveColor: leanChart.positiveColor,
+    negativeColor: leanChart.negativeColor,
   };
 
   // Fonction utilitaire pour calculer les valeurs miroir-sommées
@@ -79,10 +82,10 @@ const CumulativeShortTermChart: React.FC<CumulativeShortTermChartProps> = ({ lea
     fontWeight: "bold",
   };
 
-  const COLOR_FILL_ABOVE_TARGET = "rgba(239, 68, 68,0.5)"; // Soft red
-  const COLOR_FILL_BELOW_TARGET = "rgba(34, 197, 94, 0.5)"; // Soft green
-  const COLOR_TEXT_ABOVE_TARGET = "rgb(239, 68, 68)";
-  const COLOR_TEXT_BELOW_TARGET = "rgb(34, 197, 94)";
+  const COLOR_FILL_ABOVE_TARGET = colord(genericChartInfo.negativeColor).alpha(0.5).toRgbString(); // "rgba(239, 68, 68,0.5)"; // Soft red
+  const COLOR_FILL_BELOW_TARGET = colord(genericChartInfo.positiveColor).alpha(0.5).toRgbString(); // "rgba(34, 197, 94, 0.5)"; // Soft green
+  const COLOR_TEXT_ABOVE_TARGET = colord(genericChartInfo.negativeColor).alpha(1).toRgbString();
+  const COLOR_TEXT_BELOW_TARGET = colord(genericChartInfo.positiveColor).alpha(1).toRgbString();
 
   const maxTarget = Math.max(...genericChartInfo.values.map((entry) => entry.target));
   const yAxisMax = Math.ceil(maxTarget * 1.1); // Add 10% margin above the max target
@@ -136,7 +139,7 @@ const CumulativeShortTermChart: React.FC<CumulativeShortTermChartProps> = ({ lea
               content={({ x, y, width, value, index }) => {
                 const isAboveTarget = index !== undefined && Number(genericChartInfo.values[index]?.value || 0) >= Number(genericChartInfo.values[index]?.target || 0);
                 const color = isAboveTarget ? COLOR_TEXT_ABOVE_TARGET : COLOR_TEXT_BELOW_TARGET;
-                const roundedValue = Math.round(Number(value));
+                const roundedValue = Number(value).toFixed(genericChartInfo.nbDecimal);
 
                 const centeredX = (Number(x) || 0) + Number(width) / 2;
                 const adjustedY = Number(y) - 5;

@@ -86,7 +86,11 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
                 <div key={entry.date} className="text-center">
                   <input
                     type="number"
-                    value={Number(entry.target).toFixed(0)}
+                    value={
+                      leanChart.nbDecimal === 0
+                      ? Number(entry.target).toFixed(leanChart.nbDecimal)
+                      : entry.target
+                    }
                     onChange={(e) => onTargetChange(entry, Number(e.target.value))}
                     className="w-full text-xs text-center border border-gray-300 rounded bg-white"
                   />
@@ -103,7 +107,11 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
                 <div key={entry.date} className="text-center">
                   <input
                     type="number"
-                    value={Number(entry.value).toFixed(0)}
+                    value={
+                      leanChart.nbDecimal === 0
+                      ? Number(entry.value).toFixed(leanChart.nbDecimal)
+                      : entry.value
+                    }
                     onChange={(e) => handleValueChange(entry, Number(e.target.value))}
                     className="w-full text-xs text-center border border-gray-300 rounded bg-white"
                   />
