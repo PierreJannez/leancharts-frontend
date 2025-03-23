@@ -172,7 +172,7 @@ const CumulativeShortTermChart: React.FC<CumulativeShortTermChartProps> = ({ lea
                 );
               }}
             />
-            {genericChartInfo.values.map((entry, index) => {
+            {genericChartInfo.values.map((_entry, index) => {
               const isAboveTarget = index !== undefined && Number(genericChartInfo.values[index]?.value || 0) >= Number(genericChartInfo.values[index]?.target || 0);
               let fillColor =  COLOR_FILL_POSITIVE_TARGET;
               let strokeColor = "green";
