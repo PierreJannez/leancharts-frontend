@@ -55,10 +55,10 @@ console.log("genericChartInfo.nbDecimal=", genericChartInfo.nbDecimal);
     fontWeight: "bold",
   };
 
-  const COLOR_FILL_ABOVE_TARGET = colord(genericChartInfo.negativeColor).alpha(0.5).toRgbString();
-  const COLOR_FILL_BELOW_TARGET = colord(genericChartInfo.positiveColor).alpha(0.5).toRgbString();
-  const COLOR_TEXT_ABOVE_TARGET = colord(genericChartInfo.negativeColor).alpha(1).toRgbString();
-  const COLOR_TEXT_BELOW_TARGET = colord(genericChartInfo.positiveColor).alpha(1).toRgbString();
+  const COLOR_FILL_NEGATIVE_TARGET= colord(genericChartInfo.negativeColor).alpha(0.5).toRgbString();
+  const COLOR_FILL_POSITIVE_TARGET = colord(genericChartInfo.positiveColor).alpha(0.5).toRgbString();
+  const COLOR_TEXT_NEGATIVE_TARGET = colord(genericChartInfo.negativeColor).alpha(1).toRgbString();
+  const COLOR_TEXT_POSITIVE_TARGET = colord(genericChartInfo.positiveColor).alpha(1).toRgbString();
 
   const maxTarget = Math.max(...genericChartInfo.values.map((entry) => entry.target));
   const yAxisMax = Math.ceil(maxTarget * 1.1);
@@ -103,7 +103,22 @@ console.log("genericChartInfo.nbDecimal=", genericChartInfo.nbDecimal);
               style={{ fontSize: "12px", fontWeight: "bold", fontFamily: "system-ui" }}
               content={({ x, y, width, value, index }) => {
                 const isAboveTarget = index !== undefined && Number(genericChartInfo.values[index]?.value || 0) >= Number(genericChartInfo.values[index]?.target || 0);
-                const color = isAboveTarget ? COLOR_TEXT_ABOVE_TARGET : COLOR_TEXT_BELOW_TARGET;
+                let color =  COLOR_TEXT_POSITIVE_TARGET;
+                if (genericChartInfo.isPositiveColorAboveTarget)
+                {
+                  if (isAboveTarget) {
+                    color = COLOR_TEXT_POSITIVE_TARGET}
+                  else {
+                    color = COLOR_TEXT_NEGATIVE_TARGET;
+                  }
+                }
+                else {
+                  if (isAboveTarget) {
+                    color = COLOR_TEXT_NEGATIVE_TARGET}
+                  else {
+                    color = COLOR_TEXT_POSITIVE_TARGET;
+                  }  
+                }
                 const roundedValue = Number(value).toFixed(nbDecimal);
                 const centeredX = (Number(x) || 0) + Number(width) / 2;
                 const adjustedY = Number(y) - 5;
@@ -121,9 +136,31 @@ console.log("genericChartInfo.nbDecimal=", genericChartInfo.nbDecimal);
               }}
             />
             {genericChartInfo.values.map((entry, index) => {
-              const isAboveTarget = Number(entry.value) >= Number(entry.target);
-              const fillColor = isAboveTarget ? COLOR_FILL_ABOVE_TARGET : COLOR_FILL_BELOW_TARGET;
-              const strokeColor = isAboveTarget ? "red" : "green";
+              const isAboveTarget = index !== undefined && Number(genericChartInfo.values[index]?.value || 0) >= Number(genericChartInfo.values[index]?.target || 0);
+              let fillColor =  COLOR_FILL_POSITIVE_TARGET;
+              let strokeColor = "green";
+
+              if (genericChartInfo.isPositiveColorAboveTarget)
+              {
+                if (isAboveTarget) {
+                  fillColor = COLOR_FILL_POSITIVE_TARGET;
+                  strokeColor = "green";
+                }
+                else {
+                  fillColor = COLOR_FILL_NEGATIVE_TARGET;
+                  strokeColor = "red";
+                }
+              }
+              else {
+                if (isAboveTarget) {
+                  fillColor = COLOR_FILL_NEGATIVE_TARGET
+                  strokeColor = "red";
+                }
+                else {
+                  fillColor = COLOR_FILL_POSITIVE_TARGET;
+                  strokeColor = "green";
+                }
+              }
               return (
                 <Cell
                   key={`cell-${index}`}

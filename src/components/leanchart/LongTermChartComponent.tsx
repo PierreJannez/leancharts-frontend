@@ -23,6 +23,7 @@ const LongTermChartComponent: React.FC<LongTermChartComponentProps> = ({ leanCha
     nbDecimal: leanChart.nbDecimal,
     positiveColor: leanChart.positiveColor,
     negativeColor: leanChart.negativeColor,
+    isPositiveColorAboveTarget: leanChart.isPositiveColorAboveTarget
   };
 
   return (

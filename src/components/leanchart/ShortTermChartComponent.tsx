@@ -26,7 +26,8 @@ const ShortTermChartComponent: React.FC<ShortTermChartComponentProps> = ({ leanC
     values: leanChart.shortTermData,
     nbDecimal: leanChart.nbDecimal,
     positiveColor: leanChart.positiveColor,
-    negativeColor: leanChart.negativeColor
+    negativeColor: leanChart.negativeColor,
+    isPositiveColorAboveTarget: leanChart.isPositiveColorAboveTarget,
   };
 
   // Pass the preprocessed data to the generic chart component

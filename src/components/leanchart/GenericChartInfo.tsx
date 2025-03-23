@@ -8,4 +8,5 @@ export interface GenericChartInfo {
     nbDecimal: number;
     positiveColor: string;
     negativeColor: string;
+    isPositiveColorAboveTarget: boolean;
 }
