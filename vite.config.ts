@@ -12,6 +12,12 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+    port: 5173, // Port dev par défaut (utile mais optionnel)
   },
+  preview: {
+    port: parseInt(process.env.PORT || '8080'), // Pour Render (prod)
+  },
+  build: {
+    chunkSizeWarningLimit: 1000 // Optionnel : supprime warning de taille
+  }
 })
-
