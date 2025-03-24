@@ -15,7 +15,8 @@ export default defineConfig({
     port: 5173, // Port dev par défaut (utile mais optionnel)
   },
   preview: {
-    port: 8080, // Pour Render (prod)
+    port: 8080, // Pour Render (prod) 
+    host: '0.0.0.0', // 🔥 Indispensable pour Render
   },
   build: {
     chunkSizeWarningLimit: 1000 // Optionnel : supprime warning de taille
