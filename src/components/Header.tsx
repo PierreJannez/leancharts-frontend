@@ -32,7 +32,7 @@ const Header: React.FC<HeaderProps> = ({ menuItems, onSelectBundle, onLogout }) 
           >
             <Menu className="w-6 h-6 text-gray-600" />
           </button>
-          <h1 className="px-2 font-bold">Lean Graph</h1>
+          <h1 className="px-2 font-bold">Lean Charts</h1>
         </div>
 
         {/* Right side: logout */}

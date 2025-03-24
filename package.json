@@ -1,5 +1,5 @@
 {
-  "name": "opta-graph",
+  "name": "lean-charts",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -13,6 +13,7 @@
     "@tailwindcss/vite": "^4.0.9",
     "axios": "^1.8.1",
     "colord": "^2.9.3",
+    "lucide-react": "^0.483.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.2.0",
