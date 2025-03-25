@@ -48,7 +48,7 @@ const Header: React.FC<HeaderProps> = ({ menuItems, onSelectBundle, onLogout }) 
 
       {/* Dropdown menu */}
       {isMenuOpen && (
-        <div className="absolute border border-gray-200 bg-white w-36 shadow-lg rounded-md z-50 mt-2">
+        <div className="absolute border border-gray-200 bg-white w-40 shadow-lg rounded-md z-50 mt-2">
           <nav>
             <ul>
               {menuItems.map((bundle) => {
@@ -58,6 +58,7 @@ const Header: React.FC<HeaderProps> = ({ menuItems, onSelectBundle, onLogout }) 
                     <button
                       className="flex text-black items-center gap-2 py-2 px-4 hover:bg-blue-50 rounded w-full text-left"
                       onClick={() => {
+                        console.log(`Selected bundle: ${bundle.shortName}`);
                         onSelectBundle(bundle.id, bundle.shortName);
                         navigate(`/bundle/${bundle.shortName}`);
                         setIsMenuOpen(false);
