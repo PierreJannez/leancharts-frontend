@@ -1,23 +1,19 @@
 // services/authService.ts
-    export interface LoginCredentials {
+  import { User } from "../types/User";
+
+  export interface LoginCredentials {
         email: string;
         password: string;
-    }
+  }
 
-    export interface User {
-        id: number;
-        name: string;
-        email: string;
-    }
-  
-    export interface AuthResponse {
+  export interface AuthResponse {
         token: string;
         user: {
             id: number;
             name: string;
             email: string;
         };
-    }
+  }
   
   const API_URL = "/api"; // à adapter
   
@@ -36,6 +32,9 @@
     const data: AuthResponse = await response.json();
     localStorage.setItem("token", data.token);
     localStorage.setItem("currentUser", JSON.stringify(data.user));
+
+    console.log("User data stored in localStorage:", data.user);
+    
     return data;
   }
   
@@ -44,10 +43,10 @@
     localStorage.removeItem("currentUser");
   }
   
-  export function getCurrentUser() {
+  export const getCurrentUser = (): User | null => {
     const user = localStorage.getItem("currentUser");
     return user ? JSON.parse(user) : null;
-  }
+  };
   
   export function getToken() {
     return localStorage.getItem("token");

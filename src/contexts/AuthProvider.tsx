@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { getCurrentUser, logout as logoutService } from "../services/authService";
+import { getCurrentUser, logout as logoutService } from "../services/authService.ts";
 import { User } from "../types/User";
-import { AuthContext } from "./AuhContext";
+import { AuthContext } from "./AuthContext"; // Importez le contexte depuis le nouveau fichier
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(getCurrentUser());
@@ -12,7 +12,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, logout, setUser }}>
+    <AuthContext.Provider value={{ user, setUser, logout}}>
       {children}
     </AuthContext.Provider>
   );
