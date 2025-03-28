@@ -22,6 +22,7 @@
   const API_URL = "/api"; // à adapter
   
   export async function login(credentials: LoginCredentials): Promise<AuthResponse> {
+
     const response = await fetch(`${API_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

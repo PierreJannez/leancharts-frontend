@@ -14,11 +14,12 @@ export default defineConfig({
     },
     port: 5173, // Port dev par défaut (utile mais optionnel)
   },
-  preview: {
+/*  preview: {
     port: parseInt(process.env.PORT || '8080'), // Pour Render (prod)
     host: '0.0.0.0', // 🔥 Indispensable pour Render
     allowedHosts: ['leancharts-frontend.onrender.com']
   },
+*/
   build: {
     chunkSizeWarningLimit: 1000 // Optionnel : supprime warning de taille
   }

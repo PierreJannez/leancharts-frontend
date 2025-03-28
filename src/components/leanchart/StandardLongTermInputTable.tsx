@@ -29,6 +29,8 @@ const StandardLongTermInputTable: React.FC<StandardLongTermeInputTableProps> = (
     return <p className="text-center text-gray-500">Aucun graphique disponible</p>;
   }
 
+  console.log("StandardLongTermeInputTableProps->leanchart.nbDecimal", leanChart.nbDecimal);
+
   // Fonction pour normaliser la date (dd-mm-yyyy -> yyyy-mm-dd)
   const getMonthYear = (dateString: string) => {
     const [, month, year] = dateString.split("-");
@@ -98,7 +100,7 @@ const StandardLongTermInputTable: React.FC<StandardLongTermeInputTableProps> = (
                   <input
                     type="number"
                     value={
-                      leanChart.nbDecimal === 0
+                      Number(leanChart.nbDecimal) === 0
                       ? Number(entry.target).toFixed(leanChart.nbDecimal)
                       : entry.target
                     }
@@ -126,7 +128,7 @@ const StandardLongTermInputTable: React.FC<StandardLongTermeInputTableProps> = (
                   <input
                     type="number"
                     value={
-                      leanChart.nbDecimal === 0
+                      Number(leanChart.nbDecimal) === 0
                       ? Number(entry.value).toFixed(leanChart.nbDecimal)
                       : entry.value
                    }

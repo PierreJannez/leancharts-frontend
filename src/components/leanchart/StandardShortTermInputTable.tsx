@@ -30,8 +30,6 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
       comment: entry.comment,
     }));
   }, [leanChart]);
-
-
   
   if (!leanChart) {
     return <p className="text-center text-gray-500">Aucun graphique disponible</p>;
@@ -87,7 +85,7 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
                   <input
                     type="number"
                     value={
-                      leanChart.nbDecimal === 0
+                      Number(leanChart.nbDecimal) === 0
                       ? Number(entry.target).toFixed(leanChart.nbDecimal)
                       : entry.target
                     }
@@ -108,7 +106,7 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
                   <input
                     type="number"
                     value={
-                      leanChart.nbDecimal === 0
+                      Number(leanChart.nbDecimal) === 0
                       ? Number(entry.value).toFixed(leanChart.nbDecimal)
                       : entry.value
                     }
