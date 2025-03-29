@@ -5,6 +5,7 @@ import { LeanChart, LeanChartData, ChartData } from '../types/LeanChart';
 import { fetchLeanChartData, updateShortTermChartValue, updateLongTermChartValue } from "../services/leanChartDataService";
 import { StandardLeanChart } from "./leanchart/StandardLeanChart";
 import { CumulativeLeanChart } from "./leanchart/CumulativeLeanChart";
+import { Edit3 } from "lucide-react"; // Importez l'icône de crayon
 
 interface TabsProps {
   leanCharts: LeanChart[];
@@ -113,24 +114,28 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
   return (
     <div className="w-full p-4">
       <div className="flex border-b-0">
-        {leanCharts.map((leanChart) => {
-          const IconComponent = getIcon(leanChart.icon);
-          return (
-            <button
-              key={leanChart.id}
-              className={`flex items-center gap-2 px-6 py-2 text-sm font-medium transition-all rounded-t-lg border bg-white 
-                ${activeTab === leanChart.id ? "border-gray-400 text-blue-600 font-bold" : "text-gray-700 border-gray-400 hover:bg-gray-100"}`}
-              onClick={() => setActiveTab(leanChart.id)}
-            >
-              <IconComponent size={16} className={`${activeTab === leanChart.id ? "text-blue-600" : "text-gray-600"}`} />
-              {leanChart.name}
-            </button>
-          );
-        })}
+      {leanCharts.map((leanChart) => {
+      const IconComponent = getIcon(leanChart.icon);
+      return (
+        <div key={leanChart.id} className="flex items-center w-full">
+          <button
+            className={`flex items-center gap-2 px-6 py-2 text-sm font-medium transition-all rounded-t-lg border bg-white 
+              ${activeTab === leanChart.id ? "border-gray-400 text-blue-600 font-bold" : "text-gray-700 border-gray-400 hover:bg-gray-100"}`}
+            onClick={() => setActiveTab(leanChart.id)}
+          >
+            <IconComponent size={16} className={`${activeTab === leanChart.id ? "text-blue-600" : "text-gray-600"}`} />
+            {leanChart.name}
+          </button>
+          {activeTab === leanChart.id && (
+            <Edit3 size={20} className="ml-auto text-gray-500 cursor-pointer hover:text-blue-600" />
+          )}
+        </div>
+      );
+    })}
       </div>
 
-      <div className="mt-0 p-4 border border-gray-300 rounded-b-lg bg-white shadow-md">
-        {renderChartComponent()}
+      <div className="mt-0 p-4 border border-gray-300 rounded-b-lg bg-white shadow-md relative">
+      {renderChartComponent()}
       </div>
     </div>
   );
