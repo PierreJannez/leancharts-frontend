@@ -6,6 +6,9 @@ import { fetchLeanChartData, updateShortTermChartValue, updateLongTermChartValue
 import { StandardLeanChart } from "./leanchart/StandardLeanChart";
 import { CumulativeLeanChart } from "./leanchart/CumulativeLeanChart";
 import { Edit3 } from "lucide-react"; // Importez l'icône de crayon
+import LeanChartEditor from "./leanchart/LeanChartEditor";
+import { Dialog, DialogContent } from "@/components/ui/dialog"; // shadcn-ui modale
+import { Toaster } from "sonner";
 
 interface TabsProps {
   leanCharts: LeanChart[];
@@ -14,6 +17,7 @@ interface TabsProps {
 const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
   const [activeTab, setActiveTab] = useState<number | null>(leanCharts.length > 0 ? leanCharts[0].id : null);
   const [currentLeanChart, setCurrentLeanChart] = useState<LeanChart | undefined>(leanCharts.length > 0 ? leanCharts[0] : undefined);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (leanCharts.length > 0) {
@@ -113,32 +117,61 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
 
   return (
     <div className="w-full p-4">
-      <div className="flex border-b-0">
-      {leanCharts.map((leanChart) => {
-      const IconComponent = getIcon(leanChart.icon);
-      return (
-        <div key={leanChart.id} className="flex items-center w-full">
-          <button
-            className={`flex items-center gap-2 px-6 py-2 text-sm font-medium transition-all rounded-t-lg border bg-white 
-              ${activeTab === leanChart.id ? "border-gray-400 text-blue-600 font-bold" : "text-gray-700 border-gray-400 hover:bg-gray-100"}`}
-            onClick={() => setActiveTab(leanChart.id)}
-          >
-            <IconComponent size={16} className={`${activeTab === leanChart.id ? "text-blue-600" : "text-gray-600"}`} />
-            {leanChart.name}
-          </button>
-          {activeTab === leanChart.id && (
-            <Edit3 size={20} className="ml-auto text-gray-500 cursor-pointer hover:text-blue-600" />
-          )}
+    <>
+      {/* ton app ici */}
+      <Toaster position="top-right" richColors closeButton />
+    </>
+      {/* Conteneur pour les onglets et l'icône Edit3 */}
+      <div className="flex items-center justify-between border-b-0">
+        {/* Boucle pour afficher les onglets */}
+        <div className="flex">
+          {leanCharts.map((leanChart) => {
+            const IconComponent = getIcon(leanChart.icon);
+            return (
+              <button
+                key={leanChart.id}
+                className={`flex items-center gap-2 px-6 py-2 text-sm font-medium transition-all rounded-t-lg border bg-white 
+                  ${activeTab === leanChart.id ? "border-gray-400 text-blue-600 font-bold" : "text-gray-700 border-gray-400 hover:bg-gray-100"}`}
+                onClick={() => setActiveTab(leanChart.id)}
+              >
+                <IconComponent size={16} className={`${activeTab === leanChart.id ? "text-blue-600" : "text-gray-600"}`} />
+                {leanChart.name}
+              </button>
+            );
+          })}
         </div>
-      );
-    })}
+  
+        {/* Icône Edit3 alignée à droite */}
+        <div className="flex items-center justify-center w-12 h-8 bg-white border border-gray-300 rounded-md cursor-pointer hover:bg-gray-200 shadow-md">
+          <Edit3
+            size={16}
+            className="text-gray-500 hover:text-blue-600"
+            onClick={() => setIsEditing(true)}
+            />
+        </div>
       </div>
-
+  
+      {/* Contenu de l'onglet actif */}
       <div className="mt-0 p-4 border border-gray-300 rounded-b-lg bg-white shadow-md relative">
-      {renderChartComponent()}
+        {renderChartComponent()}
       </div>
-    </div>
+      <>
+      <Dialog open={isEditing} onOpenChange={setIsEditing}>
+        <DialogContent className="max-w-4xl w-full">
+          {currentLeanChart && (
+            <LeanChartEditor
+              initialData={currentLeanChart}
+              onSave={(updated) => {
+                // Optionnel : mets à jour le LeanChart dans le state
+                setCurrentLeanChart(updated);
+                setIsEditing(false);
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>      
+      </>
+      </div>
   );
-};
-
+} 
 export default LeanChartTabs;

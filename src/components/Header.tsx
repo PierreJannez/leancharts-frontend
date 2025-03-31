@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu } from "lucide-react";
+import { Menu, UserCircle, LogOut, Settings } from "lucide-react";
 import { getIcon } from "../utils/icons";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/contexts/AuthContext"; // ✅ Ton hook personnalisé
 
-// Define the Group interface
 interface Bundle {
   id: number;
   shortName: string;
@@ -14,12 +20,18 @@ interface Bundle {
 interface HeaderProps {
   menuItems: Bundle[];
   onSelectBundle: (bundleId: number, bundleName: string) => void;
-  onLogout: () => void; // 👈 Ajout de la prop
+  onLogout: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ menuItems, onSelectBundle, onLogout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { isAuthenticated, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();       // 🧠 supprime le token + change l'état auth
+    onLogout();     // 👈 côté app si tu veux rediriger ou nettoyer autre chose
+  };
 
   return (
     <header className="relative bg-white text-black p-4 shadow-md">
@@ -35,18 +47,31 @@ const Header: React.FC<HeaderProps> = ({ menuItems, onSelectBundle, onLogout }) 
           <h1 className="px-2 font-bold">Lean Charts</h1>
         </div>
 
-        {/* Right side: logout */}
+        {/* Right side: user menu */}
         <div className="flex items-center space-x-4">
-          <button
-            onClick={onLogout}
-            className="px-3 py-1 text-sm text-white bg-red-500 rounded hover:bg-red-600"
-          >
-            Déconnexion
-          </button>
+          {isAuthenticated && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="p-2 rounded hover:bg-gray-100 transition-colors">
+                  <UserCircle className="w-6 h-6 text-gray-600" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => navigate("/admin")}>
+                  <Settings className="w-4 h-4 mr-2 text-muted-foreground" />
+                  Configuration
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="w-4 h-4 mr-2 text-muted-foreground" />
+                  Déconnexion
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </div>
 
-      {/* Dropdown menu */}
+      {/* Dropdown menu (bundles) */}
       {isMenuOpen && (
         <div className="absolute border border-gray-200 bg-white w-40 shadow-lg rounded-md z-50 mt-2">
           <nav>
@@ -58,7 +83,6 @@ const Header: React.FC<HeaderProps> = ({ menuItems, onSelectBundle, onLogout }) 
                     <button
                       className="flex text-black items-center gap-2 py-2 px-4 hover:bg-blue-50 rounded w-full text-left"
                       onClick={() => {
-                        console.log(`Selected bundle: ${bundle.shortName}`);
                         onSelectBundle(bundle.id, bundle.shortName);
                         navigate(`/bundle/${bundle.shortName}`);
                         setIsMenuOpen(false);

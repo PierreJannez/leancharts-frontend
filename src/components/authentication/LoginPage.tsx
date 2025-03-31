@@ -1,24 +1,23 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { login } from "../../services/authService"; // Assurez-vous que le chemin est correct
-import { useAuth } from "../../hooks/useAuth"; // Assurez-vous que le chemin est correct
+import { useAuth } from "../../contexts/AuthContext"; // Assurez-vous que le chemin est correct
 
 const LoginPage: React.FC = () => {
+
+  const { login } = useAuth(); // ✅ ici en haut
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { setUser } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const authResponse = await login({ email, password }); // Appelle le service d'authentification
-      console.log("Login Page Auth response:", authResponse.user);
-      setUser(authResponse.user); // Met à jour le contexte utilisateur
-      navigate("/main"); // Redirige vers la page principale
+      await login(email, password); // 👈 appel réel à l'authentification
+      navigate("/main");           // ✅ redirection après connexion
     } catch (err) {
-      setError("Email ou mot de passe incorrect." + err);
+      setError("Email ou mot de passe incorrect. " + err);
     }
   };
 

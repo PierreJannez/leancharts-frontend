@@ -7,45 +7,44 @@ import { fetchBundles } from "./services/bundleService";
 import { BundleWrapper } from "./components/Bundle";
 import LoginPage from "./components/authentication/LoginPage";
 import PrivateRoute from "./components/PrivateRoute";
-import Main from "./components/Main"; // Importez le composant Main
-import { useAuth } from "./hooks/useAuth"; // Importez le contexte d'authentification
+import Main from "./components/Main";
+import { useAuth } from "./contexts/AuthContext";
+import AdminPage from "@/components/admin/AdminPage";
 
 const AppContent: React.FC = () => {
   const [selectedBundleId, setSelectedBundleId] = useState<number | null>(null);
   const [bundles, setBundles] = useState<Bundle[]>([]);
-  const { user, setUser, logout } = useAuth(); // Utilisez le contexte d'authentification
+  const { isAuthenticated, logout, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
-      console.log("Fetching bundles...")
-      if (user && user.id) { // Vérifiez que l'utilisateur est connecté et que l'ID est disponible
-        console.log("User ID:", user.id);
-        const bundles = await fetchBundles(user.id); // Utilisez l'ID du client pour rechercher les bundles
-        console.log("User bundles:", bundles);
+      if (isAuthenticated && user && user.id) {
+        // 🔁 Appelle l’API avec un ID ou autre info stockée côté client si nécessaire
+        const bundles = await fetchBundles(user?.id); // Remplacer 1 par un ID réel si besoin
         setBundles(bundles);
       }
     }
     fetchData();
-  }, [user]); // Ajoutez `user` comme dépendance pour recharger les bundles après la connexion
-
+  }, [isAuthenticated, user]);
 
   const handleLogout = () => {
-    logout(); // Supprime l'utilisateur du contexte
-    setUser(null); // Réinitialise l'utilisateur
-    setBundles([]); // Réinitialise les bundles
-    navigate("/login"); // Redirige vers la page de login
+    logout();
+    setBundles([]);
+    navigate("/login");
   };
 
   return (
     <div className="flex flex-col min-h-screen w-screen bg-gray-100 font-sans">
       <div className="px-4 py-6">
         <div className="bg-white rounded-lg shadow-lg">
-          <Header
-            menuItems={bundles}
-            onSelectBundle={(id) => setSelectedBundleId(id)}
-            onLogout={handleLogout} // Passe la fonction de déconnexion
-          />
+          {isAuthenticated && (
+            <Header
+              menuItems={bundles}
+              onSelectBundle={(id) => setSelectedBundleId(id)}
+              onLogout={handleLogout}
+            />
+          )}
 
           <div className="flex-1 flex p-4 justify-center">
             <Routes>
@@ -55,6 +54,14 @@ const AppContent: React.FC = () => {
                 element={
                   <PrivateRoute>
                     <BundleWrapper selectedBundleId={selectedBundleId} />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  <PrivateRoute>
+                    <AdminPage />
                   </PrivateRoute>
                 }
               />
@@ -78,9 +85,7 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
-  return (
-    <AppContent />
-  );
+  return <AppContent />;
 };
 
 export default App;
