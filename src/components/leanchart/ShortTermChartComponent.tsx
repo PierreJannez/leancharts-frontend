@@ -1,26 +1,27 @@
 import React from "react";
-import GenericChartComponent from "./GenericChartComponent"; // Import the generic chart component
+import GenericChartComponent from "./GenericChartComponent";
 import { LeanChart } from "../../types/LeanChart";
 import { GenericChartInfo } from "./GenericChartInfo";
+import { parse, format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 interface ShortTermChartComponentProps {
   leanChart: LeanChart;
+  currentMonth: string; // format "YYYY-MM"
 }
 
-const getCurrentMonth = () => {
-  const date = new Date();
-  const month = date.toLocaleString('default', { month: 'long' });
-  const year = date.getFullYear();
-  return `${month.charAt(0).toUpperCase() + month.slice(1)} ${year}`;
+const formatMonthKeyToLabel = (monthKey: string): string => {
+  const date = parse(monthKey, "yyyy-MM", new Date());
+  return format(date, "MMMM yyyy", { locale: fr });
 };
 
-const ShortTermChartComponent: React.FC<ShortTermChartComponentProps> = ({ leanChart }) => {
+const ShortTermChartComponent: React.FC<ShortTermChartComponentProps> = ({ leanChart, currentMonth }) => {
   if (!leanChart || !leanChart.shortTermData || leanChart.shortTermData.length === 0) {
     return <p className="text-center text-gray-500">Aucun graphique disponible</p>;
   }
 
   const genericChartInfo: GenericChartInfo = {
-    title: leanChart.shortTermTitle + " " + getCurrentMonth(),
+    title: `${leanChart.shortTermTitle} ${formatMonthKeyToLabel(currentMonth)}`,
     xLabel: leanChart.shortTermxLabel,
     yLabel: leanChart.shortTermyLabel,
     values: leanChart.shortTermData,
@@ -30,7 +31,6 @@ const ShortTermChartComponent: React.FC<ShortTermChartComponentProps> = ({ leanC
     isPositiveColorAboveTarget: leanChart.isPositiveColorAboveTarget,
   };
 
-  // Pass the preprocessed data to the generic chart component
   return (
     <GenericChartComponent
       genericChartInfo={genericChartInfo}

@@ -3,9 +3,12 @@ import { LeanChart, ChartData } from "../../types/LeanChart";
 import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, Cell, LabelList } from "recharts";
 import { GenericChartInfo } from './GenericChartInfo';
 import { colord } from "colord";
+import { parse, format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 interface CumulativeShortTermChartProps {
   leanChart: LeanChart;
+  currentMonth: string; // format "YYYY-MM"
   tickFormatter: (value: string) => string; // Fonction pour formater les ticks de l'axe X
 }
 
@@ -26,20 +29,19 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-const getCurrentMonth = () => {
-  const date = new Date();
-  const month = date.toLocaleString('default', { month: 'long' });
-  const year = date.getFullYear();
-  return `${month.charAt(0).toUpperCase() + month.slice(1)} ${year}`;
+const formatMonthKeyToLabel = (monthKey: string): string => {
+  const date = parse(monthKey, "yyyy-MM", new Date());
+  return format(date, "MMMM yyyy", { locale: fr });
 };
 
-const CumulativeShortTermChart: React.FC<CumulativeShortTermChartProps> = ({ leanChart, tickFormatter }) => {
+
+const CumulativeShortTermChart: React.FC<CumulativeShortTermChartProps> = ({ leanChart, currentMonth, tickFormatter }) => {
   if (!leanChart || !leanChart.shortTermData || leanChart.shortTermData.length === 0) {
     return <p className="text-center text-gray-500">Aucun graphique disponible</p>;
   }
 
   const genericChartInfo: GenericChartInfo = {
-    title: leanChart.shortTermTitle + " " + getCurrentMonth(),
+    title: `${leanChart.shortTermTitle} ${formatMonthKeyToLabel(currentMonth)}`,
     xLabel: leanChart.shortTermxLabel,
     yLabel: leanChart.shortTermyLabel,
     values: leanChart.shortTermData,

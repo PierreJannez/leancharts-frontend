@@ -1,13 +1,12 @@
-// LeanChartTabs.tsx
 import React, { useState, useEffect } from "react";
 import { getIcon } from "../utils/icons";
 import { LeanChart, LeanChartData, ChartData } from '../types/LeanChart';
 import { fetchLeanChartData, updateShortTermChartValue, updateLongTermChartValue } from "../services/leanChartDataService";
 import { StandardLeanChart } from "./leanchart/StandardLeanChart";
 import { CumulativeLeanChart } from "./leanchart/CumulativeLeanChart";
-import LeanChartEditor from "./leanchart/LeanChartEditor";
-import { Dialog, DialogContent } from "@/components/ui/dialog"; // shadcn-ui modale
 import { Toaster } from "sonner";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { addMonths, format } from "date-fns";
 
 interface TabsProps {
   leanCharts: LeanChart[];
@@ -16,7 +15,14 @@ interface TabsProps {
 const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
   const [activeTab, setActiveTab] = useState<number | null>(leanCharts.length > 0 ? leanCharts[0].id : null);
   const [currentLeanChart, setCurrentLeanChart] = useState<LeanChart | undefined>(leanCharts.length > 0 ? leanCharts[0] : undefined);
-  const [isEditing, setIsEditing] = useState(false);
+  const [monthOffset, setMonthOffset] = useState(0);
+
+  const getCurrentMonthKey = () => {
+    const targetDate = addMonths(new Date(), monthOffset);
+    return format(targetDate, "yyyy-MM"); // Ex: "2025-04"
+  };
+
+  const currentMonthKey = getCurrentMonthKey();
 
   useEffect(() => {
     if (leanCharts.length > 0) {
@@ -26,7 +32,9 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
 
   useEffect(() => {
     if (activeTab !== null) {
-      fetchLeanChartData(activeTab)
+      const month = getCurrentMonthKey();
+
+      fetchLeanChartData(activeTab, month)
         .then((data: LeanChartData) => {
           const selectedChart = leanCharts.find(chart => chart.id === activeTab);
           if (selectedChart) {
@@ -42,7 +50,7 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
           setCurrentLeanChart(undefined);
         });
     }
-  }, [activeTab, leanCharts]);
+  }, [activeTab, monthOffset, leanCharts]);
 
   if (leanCharts.length === 0) {
     return <p className="text-center text-gray-500">Aucun graphique disponible</p>;
@@ -92,23 +100,19 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
 
   const renderChartComponent = () => {
     if (!currentLeanChart) return null;
+
+    const props = {
+      leanChart: currentLeanChart,
+      currentMonth: currentMonthKey,
+      onUpdateShortTerm: updateShortTermChartField,
+      onUpdateLongTerm: updateLongTermChartField,
+    };
+
     switch (currentLeanChart.UXComponent) {
       case "StandardLeanChart":
-        return (
-          <StandardLeanChart
-            leanChart={currentLeanChart}
-            onUpdateShortTerm={updateShortTermChartField}
-            onUpdateLongTerm={updateLongTermChartField}
-          />
-        );
+        return <StandardLeanChart {...props} />;
       case "CumulativeLeanChart":
-        return (
-          <CumulativeLeanChart
-            leanChart={currentLeanChart}
-            onUpdateShortTerm={updateShortTermChartField}
-            onUpdateLongTerm={updateLongTermChartField}
-          />
-        );
+        return <CumulativeLeanChart {...props} />;
       default:
         return null;
     }
@@ -116,13 +120,8 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
 
   return (
     <div className="w-full p-4">
-    <>
-      {/* ton app ici */}
       <Toaster position="top-right" richColors closeButton />
-    </>
-      {/* Conteneur pour les onglets et l'icône Edit3 */}
       <div className="flex items-center justify-between border-b-0">
-        {/* Boucle pour afficher les onglets */}
         <div className="flex">
           {leanCharts.map((leanChart) => {
             const IconComponent = getIcon(leanChart.icon);
@@ -133,35 +132,34 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
                   ${activeTab === leanChart.id ? "border-gray-400 text-blue-600 font-bold" : "text-gray-700 border-gray-400 hover:bg-gray-100"}`}
                 onClick={() => setActiveTab(leanChart.id)}
               >
-                <IconComponent size={16} className={`${activeTab === leanChart.id ? "text-blue-600" : "text-gray-600"}`} />
+                <IconComponent size={16} className={activeTab === leanChart.id ? "text-blue-600" : "text-gray-600"} />
                 {leanChart.name}
               </button>
             );
           })}
         </div>
+
+        <div className="flex gap-2 ml-auto">
+          <button
+            onClick={() => setMonthOffset((prev) => prev - 1)}
+            className="bg-white border border-gray-300 rounded-full p-1 shadow hover:bg-gray-100"
+          >
+            <ChevronLeft className="w-5 h-5 text-gray-700" />
+          </button>
+          <button
+            onClick={() => setMonthOffset((prev) => prev + 1)}
+            className="bg-white border border-gray-300 rounded-full p-1 shadow hover:bg-gray-100"
+          >
+            <ChevronRight className="w-5 h-5 text-gray-700" />
+          </button>
+        </div>
       </div>
-  
-      {/* Contenu de l'onglet actif */}
+
       <div className="mt-0 p-4 border border-gray-300 rounded-b-lg bg-white shadow-md relative">
         {renderChartComponent()}
       </div>
-      <>
-      <Dialog open={isEditing} onOpenChange={setIsEditing}>
-        <DialogContent className="max-w-4xl w-full">
-          {currentLeanChart && (
-            <LeanChartEditor
-              initialLeanChart={currentLeanChart}
-              onSave={(updated) => {
-                // Optionnel : mets à jour le LeanChart dans le state
-                setCurrentLeanChart(updated);
-                setIsEditing(false);
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>      
-      </>
-      </div>
+    </div>
   );
-} 
+};
+
 export default LeanChartTabs;

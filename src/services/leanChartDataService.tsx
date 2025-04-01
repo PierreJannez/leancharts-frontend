@@ -28,18 +28,23 @@ const getLastThreeMonthsData = (): ChartData[] => {
  * @param leanChartId The ID of the lean chart
  * @returns A promise resolving to a LongTermChart object
  */
-export const fetchLeanChartData = async (leanChartId: number): Promise<LeanChartData> => {
-    try {
-        const response = await axios.get(`/api/leanChartData/${leanChartId}/leanChartData`);
-        const leanChartData : LeanChartData = response.data;
-        if (leanChartData.longTermValues.length === 0 ) {
-          leanChartData.longTermValues = getLastThreeMonthsData();
-        };
-        return leanChartData;
-    } catch (error) {
-        console.error(`Erreur lors de la récupération des données pour le graphique ${leanChartId}:`, error);
-        return {} as LeanChartData;
+export const fetchLeanChartData = async (
+  leanChartId: number,
+  month: string // <-- nouveau paramètre au format "2024-04"
+): Promise<LeanChartData> => {
+  try {
+    const response = await axios.get(`/api/leanChartData/${leanChartId}/leanChartData`, {
+      params: { month }
+    });
+    const leanChartData: LeanChartData = response.data;
+    if (leanChartData.longTermValues.length === 0) {
+      leanChartData.longTermValues = getLastThreeMonthsData();
     }
+    return leanChartData;
+  } catch (error) {
+    console.error(`Erreur lors de la récupération des données pour le graphique ${leanChartId}:`, error);
+    return {} as LeanChartData;
+  }
 };
 
 export const updateShortTermChartValue = async (chartId: number, date: string, newTarget:number, newValue: number, newComment: string) => {

@@ -8,11 +8,12 @@ import StandardShortTermInputTable from "./StandardShortTermInputTable";
 
 interface Props {
   leanChart: LeanChart;
+  currentMonth: string; // format "YYYY-MM"
   onUpdateShortTerm: (chartData: ChartData, field: "value" | "target" | "comment", newValue: number | string) => void;
   onUpdateLongTerm: (chartData: ChartData, field: "value" | "target" | "comment", newValue: number | string) => void;
 }
 
-export const StandardLeanChart: React.FC<Props> = ({ leanChart, onUpdateShortTerm, onUpdateLongTerm }) => {
+export const StandardLeanChart: React.FC<Props> = ({ leanChart, currentMonth,  onUpdateShortTerm, onUpdateLongTerm }) => {
   return (
     <div key={leanChart.id} className="text-center">
       <div className="flex justify-center gap-4">
@@ -20,7 +21,7 @@ export const StandardLeanChart: React.FC<Props> = ({ leanChart, onUpdateShortTer
           <LongTermChartComponent leanChart={leanChart} title="Trois derniers mois" />
         </div>
         <div className="w-3/4 bg-gray-100 rounded-md shadow p-4 border-1 border-gray-300">
-          <ShortTermChartComponent leanChart={leanChart} />
+          <ShortTermChartComponent leanChart={leanChart } currentMonth={currentMonth} />
         </div>
       </div>
       <div className="flex justify-center mt-2 gap-4 ">
