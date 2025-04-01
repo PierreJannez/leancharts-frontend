@@ -5,7 +5,6 @@ import { LeanChart, LeanChartData, ChartData } from '../types/LeanChart';
 import { fetchLeanChartData, updateShortTermChartValue, updateLongTermChartValue } from "../services/leanChartDataService";
 import { StandardLeanChart } from "./leanchart/StandardLeanChart";
 import { CumulativeLeanChart } from "./leanchart/CumulativeLeanChart";
-import { Edit3 } from "lucide-react"; // Importez l'icône de crayon
 import LeanChartEditor from "./leanchart/LeanChartEditor";
 import { Dialog, DialogContent } from "@/components/ui/dialog"; // shadcn-ui modale
 import { Toaster } from "sonner";
@@ -140,15 +139,6 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
             );
           })}
         </div>
-  
-        {/* Icône Edit3 alignée à droite */}
-        <div className="flex items-center justify-center w-12 h-8 bg-white border border-gray-300 rounded-md cursor-pointer hover:bg-gray-200 shadow-md">
-          <Edit3
-            size={16}
-            className="text-gray-500 hover:text-blue-600"
-            onClick={() => setIsEditing(true)}
-            />
-        </div>
       </div>
   
       {/* Contenu de l'onglet actif */}
@@ -160,7 +150,7 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
         <DialogContent className="max-w-4xl w-full">
           {currentLeanChart && (
             <LeanChartEditor
-              initialData={currentLeanChart}
+              initialLeanChart={currentLeanChart}
               onSave={(updated) => {
                 // Optionnel : mets à jour le LeanChart dans le state
                 setCurrentLeanChart(updated);

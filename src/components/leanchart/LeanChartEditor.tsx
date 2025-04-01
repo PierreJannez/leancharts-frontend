@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
 import { Switch } from "../ui/switch"
@@ -8,20 +8,27 @@ import { LeanChart } from "@/types/LeanChart"
 import { toast } from "sonner"
 
 interface Props {
-  initialData: LeanChart
+  initialLeanChart: LeanChart
   onSave: (data: LeanChart) => void
 }
 
-const LeanChartEditorLite: React.FC<Props> = ({ initialData, onSave }) => {
-  const [form, setForm] = useState<LeanChart>(initialData)
+const LeanChartEditorLite: React.FC<Props> = ({ initialLeanChart, onSave }) => {
+  const [form, setForm] = useState<LeanChart>(initialLeanChart)
+
+  useEffect(() => {
+    setForm(initialLeanChart)
+  }, [initialLeanChart])
 
   const handleChange = (field: keyof LeanChart, value: any) => {
+    console.log("Field changed:", field, value);
     setForm((prev) => ({ ...prev, [field]: value }))
+    console.log("Form changed:", form);
   }
 
-  const handleReset = () => setForm(initialData)
+  const handleReset = () => setForm(initialLeanChart)
 
   const handleSubmit = () => {
+    console.log("Form submitted:", form);
     onSave(form)
     toast.success("Le LeanChart a bien été mis à jour.")
   }
@@ -52,10 +59,6 @@ const LeanChartEditorLite: React.FC<Props> = ({ initialData, onSave }) => {
               <div>
                 <Label className="mb-1 block text-xs text-gray-500">Composant UX</Label>
                 <Input className={inputClass} value={form.UXComponent} onChange={(e) => handleChange("UXComponent", e.target.value)} />
-              </div>
-              <div>
-                <Label className="mb-1 block text-xs text-gray-500">Ordre d'affichage</Label>
-                <Input type="number" className={inputClass} value={form.displayOrder} onChange={(e) => handleChange("displayOrder", parseInt(e.target.value))} />
               </div>
             </div>
 

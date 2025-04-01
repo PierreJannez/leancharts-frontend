@@ -12,14 +12,15 @@ import { useAuth } from "./contexts/AuthContext";
 import AdminPage from "@/components/admin/AdminPage";
 
 const AppContent: React.FC = () => {
+  const { isAuthenticated, logout, user } = useAuth();
   const [selectedBundleId, setSelectedBundleId] = useState<number | null>(null);
   const [bundles, setBundles] = useState<Bundle[]>([]);
-  const { isAuthenticated, logout, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
       if (isAuthenticated && user && user.id) {
+        console.log("Fetching bundles for user:", user.id); 
         // 🔁 Appelle l’API avec un ID ou autre info stockée côté client si nécessaire
         const bundles = await fetchBundles(user?.id); // Remplacer 1 par un ID réel si besoin
         setBundles(bundles);
@@ -61,7 +62,7 @@ const AppContent: React.FC = () => {
                 path="/admin"
                 element={
                   <PrivateRoute>
-                    <AdminPage />
+                    <AdminPage initialBundles={bundles}/>
                   </PrivateRoute>
                 }
               />
