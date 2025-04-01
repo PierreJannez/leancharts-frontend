@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
+import IconSelect from "@/utils/IconSelect";
 
 interface BundleAdminPanelProps {
   bundle: Bundle | null;
@@ -37,8 +38,11 @@ const BundleAdminPanel: React.FC<BundleAdminPanelProps> = ({ bundle, onSave }) =
       <CardContent className="p-6 grid gap-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label className="text-xs text-muted-foreground">Icône</Label>
-            <Input value={form.icon} onChange={(e) => handleChange("icon", e.target.value)} />
+            <IconSelect
+                label="Icône"
+                value={form.icon}
+                onChange={(newIcon) => handleChange("icon", newIcon)}
+              />
           </div>
         </div>
         <div>

@@ -29,6 +29,11 @@ const AppContent: React.FC = () => {
     fetchData();
   }, [isAuthenticated, user]);
 
+  const handleUpdateBundle = (updated: Bundle) => {
+    setBundles(prev =>
+      prev.map(b => (b.id === updated.id ? updated : b))
+    );
+  };  
   const handleLogout = () => {
     logout();
     setBundles([]);
@@ -62,7 +67,7 @@ const AppContent: React.FC = () => {
                 path="/admin"
                 element={
                   <PrivateRoute>
-                    <AdminPage initialBundles={bundles}/>
+                    <AdminPage initialBundles={bundles} onBundleUpdate={handleUpdateBundle}/>
                   </PrivateRoute>
                 }
               />

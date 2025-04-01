@@ -10,9 +10,10 @@ import { updateBundle } from "@/services/bundleService"
 
 interface AdminPageProps {
   initialBundles: Bundle[];
+  onBundleUpdate: (bundle: Bundle) => void;
 }
 
-const AdminPage: React.FC<AdminPageProps> = ({ initialBundles }) => {
+const AdminPage: React.FC<AdminPageProps> = ({ initialBundles, onBundleUpdate }) => {
   const [bundles, setBundles] = useState<Bundle[]>(initialBundles);
   const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(initialBundles[0] || null);
   const [leanCharts, setLeanCharts] = useState<LeanChart[]>([]);
@@ -31,6 +32,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ initialBundles }) => {
         return [...prev, saved];
       });
       setSelectedBundle(saved);
+      onBundleUpdate(saved);
     } catch (error) {
       console.error("Erreur lors de la sauvegarde du bundle:", error);
     }
@@ -73,12 +75,11 @@ const AdminPage: React.FC<AdminPageProps> = ({ initialBundles }) => {
   }, [selectedBundle]);
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className="w-3/4 mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-6">Configuration</h1>
-
-      <div className="border rounded-md shadow-sm bg-white">
+      <div className="border rounded-md shadow-sm bg-red">
         <Tabs defaultValue="bundles" className="w-full">
-          <div className="border-b px-4 pt-4">
+          <div className="px-4 pt-4 mb-0">
             <TabsList>
               <TabsTrigger value="bundles">Bundles</TabsTrigger>
               <TabsTrigger value="leancharts">LeanCharts</TabsTrigger>
@@ -86,8 +87,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ initialBundles }) => {
           </div>
 
           <TabsContent value="bundles">
-            <div className="flex">
-              <div className="w-64 p-4 border-r bg-gray-50">
+            <div className="flex w-full">
+              <div className="w-1/6 p-4 border-r border-t bg-gray-50">
                 <ul className="space-y-2">
                   {bundles.map((bundle) => (
                     <li key={bundle.id}>
@@ -103,15 +104,15 @@ const AdminPage: React.FC<AdminPageProps> = ({ initialBundles }) => {
                   ))}
                 </ul>
               </div>
-              <div className="flex-1 p-6">
+              <div className="w-5/6 p-6 border-t">
                 <BundleAdminPanel bundle={selectedBundle} onSave={handleUpdateBundle} />
               </div>
             </div>
           </TabsContent>
 
           <TabsContent value="leancharts">
-            <div className="flex">
-              <div className="w-64 p-4 border-r bg-gray-50">
+            <div className="flex w-full">
+              <div className="w-64 p-4 border-r border-t bg-gray-50">
                 <div className="mb-4">
                   <Select
                     value={selectedBundle?.id.toString()}
@@ -144,7 +145,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ initialBundles }) => {
                   ))}
                 </ul>
               </div>
-              <div className="flex-1 p-6">
+              <div className="flex-1 p-6 border-t">
                 {selectedChart && (
                   <LeanChartAdminPanel
                     leanChart={selectedChart}
