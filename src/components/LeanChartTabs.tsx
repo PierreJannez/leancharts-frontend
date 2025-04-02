@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getIcon } from "../utils/icons";
 import { LeanChart, LeanChartData, ChartData } from '../types/LeanChart';
 import { fetchLeanChartData, updateShortTermChartValue, updateLongTermChartValue } from "../services/leanChartDataService";
+import { updateLeanChart } from "../services/leanChartService";
 import { StandardLeanChart } from "./leanchart/StandardLeanChart";
 import { CumulativeLeanChart } from "./leanchart/CumulativeLeanChart";
 import { Toaster } from "sonner";
@@ -13,18 +14,20 @@ interface TabsProps {
 }
 
 const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
-  const [activeTab, setActiveTab] = useState<number | null>(leanCharts.length > 0 ? leanCharts[0].id : null);
-  const [currentLeanChart, setCurrentLeanChart] = useState<LeanChart | undefined>(leanCharts.length > 0 ? leanCharts[0] : undefined);
+  const [charts, setCharts] = useState<LeanChart[]>([]);
+  const [activeTab, setActiveTab] = useState<number | null>(null);
+  const [currentLeanChart, setCurrentLeanChart] = useState<LeanChart | undefined>(undefined);
   const [monthOffset, setMonthOffset] = useState(0);
 
   const getCurrentMonthKey = () => {
     const targetDate = addMonths(new Date(), monthOffset);
-    return format(targetDate, "yyyy-MM"); // Ex: "2025-04"
+    return format(targetDate, "yyyy-MM");
   };
 
   const currentMonthKey = getCurrentMonthKey();
 
   useEffect(() => {
+    setCharts(leanCharts);
     if (leanCharts.length > 0) {
       setActiveTab(leanCharts[0].id);
     }
@@ -33,16 +36,16 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
   useEffect(() => {
     if (activeTab !== null) {
       const month = getCurrentMonthKey();
-
       fetchLeanChartData(activeTab, month)
         .then((data: LeanChartData) => {
-          const selectedChart = leanCharts.find(chart => chart.id === activeTab);
+          const selectedChart = charts.find(chart => chart.id === activeTab);
           if (selectedChart) {
-            setCurrentLeanChart({
+            const updatedChart = {
               ...selectedChart,
               longTermData: [...data.longTermValues],
               shortTermData: [...data.shortTermValues]
-            });
+            };
+            setCurrentLeanChart(updatedChart);
           }
         })
         .catch((error) => {
@@ -50,9 +53,9 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
           setCurrentLeanChart(undefined);
         });
     }
-  }, [activeTab, monthOffset, leanCharts]);
+  }, [activeTab, monthOffset, charts]);
 
-  if (leanCharts.length === 0) {
+  if (charts.length === 0) {
     return <p className="text-center text-gray-500">Aucun graphique disponible</p>;
   }
 
@@ -98,6 +101,23 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
     }
   };
 
+  const updateMainTarget = async (target: number) => {
+    if (!currentLeanChart) return;
+
+    const updatedChart = { ...currentLeanChart, shortTermMainTarget: target };
+    setCurrentLeanChart(updatedChart);
+
+    setCharts(prev =>
+      prev.map(chart => chart.id === updatedChart.id ? updatedChart : chart)
+    );
+
+    try {
+      await updateLeanChart(updatedChart);
+    } catch (error) {
+      console.error("Failed to update main target:", error);
+    }
+  };
+
   const renderChartComponent = () => {
     if (!currentLeanChart) return null;
 
@@ -106,6 +126,7 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
       currentMonth: currentMonthKey,
       onUpdateShortTerm: updateShortTermChartField,
       onUpdateLongTerm: updateLongTermChartField,
+      onUpdateMainTarget: updateMainTarget
     };
 
     switch (currentLeanChart.UXComponent) {
@@ -123,7 +144,7 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
       <Toaster position="top-right" richColors closeButton />
       <div className="flex items-center justify-between border-b-0">
         <div className="flex">
-          {leanCharts.map((leanChart) => {
+          {charts.map((leanChart) => {
             const IconComponent = getIcon(leanChart.icon);
             return (
               <button

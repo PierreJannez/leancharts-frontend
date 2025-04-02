@@ -11,9 +11,10 @@ interface Props {
   currentMonth: string; // format "YYYY-MM"
   onUpdateShortTerm: (chartData: ChartData, field: "value" | "target" | "comment", newValue: number | string) => void;
   onUpdateLongTerm: (chartData: ChartData, field: "value" | "target" | "comment", newValue: number | string) => void;
+  onUpdateMainTarget: (newTarget: number) => void; // 👈 nouvelle prop
 }
 
-export const StandardLeanChart: React.FC<Props> = ({ leanChart, currentMonth,  onUpdateShortTerm, onUpdateLongTerm }) => {
+export const StandardLeanChart: React.FC<Props> = ({ leanChart, currentMonth,  onUpdateShortTerm, onUpdateLongTerm, onUpdateMainTarget }) => {
   return (
     <div key={leanChart.id} className="text-center">
       <div className="flex justify-center gap-4">
@@ -39,6 +40,7 @@ export const StandardLeanChart: React.FC<Props> = ({ leanChart, currentMonth,  o
             onValueChange={(chartData, newValue) => onUpdateShortTerm(chartData, "value", newValue)}
             onTargetChange={(chartData, newTarget) => onUpdateShortTerm(chartData, "target", newTarget)}
             onCommentChange={(chartData, newComment) => onUpdateShortTerm(chartData, "comment", newComment)}
+            onMainTargetChange={(newTarget) => onUpdateMainTarget(newTarget)} // 👈 nouvelle prop{
           />
         </div>
       </div>
