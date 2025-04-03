@@ -4,24 +4,31 @@ import LeanChartAdminPanel from "@/components/admin/LeanChartAdminPanel"
 import BundleAdminPanel from "@/components/admin/BundleAdminPanel"
 import { Bundle } from "@/types/Bundle"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { fetchLeanCharts, updateLeanChart } from "@/services/leanChartService"
+import { fetchLeanCharts, updateLeanChart, createLeanChart } from "@/services/leanChartService"
 import { LeanChart } from "@/types/LeanChart"
-import { updateBundle } from "@/services/bundleService"
+import { updateBundle, createBundle } from "@/services/bundleService"
+import { FilePlus, Trash2 } from "lucide-react"
 
 interface AdminPageProps {
   initialBundles: Bundle[];
   onBundleUpdate: (bundle: Bundle) => void;
+  clientId: number;
 }
 
-const AdminPage: React.FC<AdminPageProps> = ({ initialBundles, onBundleUpdate }) => {
+const AdminPage: React.FC<AdminPageProps> = ({ initialBundles, onBundleUpdate, clientId }) => {
   const [bundles, setBundles] = useState<Bundle[]>(initialBundles);
   const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(initialBundles[0] || null);
   const [leanCharts, setLeanCharts] = useState<LeanChart[]>([]);
   const [selectedChart, setSelectedChart] = useState<LeanChart | null>(null);
 
-  const handleUpdateBundle = async (updated: Bundle) => {
+  const handleCreateOrUpdateBundle = async (bundle: Bundle) => {
     try {
-      const saved = await updateBundle(updated); // 🔄 Envoie au backend
+      let saved;
+      if (bundle.id) {
+        saved = await updateBundle(bundle);
+      } else {
+        saved = await createBundle({ ...bundle }, clientId);
+      }
       setBundles((prev) => {
         const index = prev.findIndex((b) => b.id === saved.id);
         if (index !== -1) {
@@ -49,19 +56,28 @@ const AdminPage: React.FC<AdminPageProps> = ({ initialBundles, onBundleUpdate })
     setSelectedChart(chart);
   };
 
-  const handleSaveChart = async (chart: LeanChart) => {
+  const handleCreateOrUpdateLeanChart = async (chart: LeanChart) => {
     try {
-      console.log("AdminPage.handleSaveChart->chart", chart);
-      const savedChart = await updateLeanChart(chart);
+      let savedChart: LeanChart;
+  
+      if (chart.id === -1) {
+        // Création d’un nouveau LeanChart
+        savedChart = await createLeanChart(chart, selectedBundle?.id ?? 0);
+      } else {
+        // Mise à jour d’un LeanChart existant
+        savedChart = await updateLeanChart(chart);
+      }
+  
       setLeanCharts((prev) => {
         const exists = prev.find((c) => c.id === savedChart.id);
         return exists
           ? prev.map((c) => (c.id === savedChart.id ? savedChart : c))
           : [...prev, savedChart];
       });
+  
       setSelectedChart(savedChart);
     } catch (error) {
-      console.error("Erreur lors de la sauvegarde du LeanChart:", error);
+      console.error("Erreur lors de la création/mise à jour du LeanChart:", error);
     }
   };
 
@@ -88,7 +104,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ initialBundles, onBundleUpdate })
 
           <TabsContent value="bundles">
             <div className="flex w-full">
-              <div className="w-1/6 p-4 border-r border-t bg-gray-50">
+              <div className="w-1/5 p-4 border-r border-t bg-gray-50 flex flex-col justify-between">
                 <ul className="space-y-2">
                   {bundles.map((bundle) => (
                     <li key={bundle.id}>
@@ -103,22 +119,33 @@ const AdminPage: React.FC<AdminPageProps> = ({ initialBundles, onBundleUpdate })
                     </li>
                   ))}
                 </ul>
+                <div className="flex justify-between gap-2 mt-6">
+                  <button
+                    className="p-2 rounded hover:bg-gray-100 transition-colors"
+                    onClick={() => setSelectedBundle({ id: 0, icon: "CirclePlus", shortName: "", longName: "", displayorder: 0 })}
+                  >
+                    <FilePlus className="w-6 h-6 text-gray-600" />
+                  </button>
+                  <button className="p-2 rounded hover:bg-gray-100 transition-colors">
+                    <Trash2 className="w-6 h-6 text-gray-600" />
+                  </button>
+                </div>
               </div>
-              <div className="w-5/6 p-6 border-t">
-                <BundleAdminPanel bundle={selectedBundle} onSave={handleUpdateBundle} />
+              <div className="w-4/5 p-6 border-t">
+                <BundleAdminPanel bundle={selectedBundle} onSave={handleCreateOrUpdateBundle} />
               </div>
             </div>
           </TabsContent>
 
           <TabsContent value="leancharts">
-            <div className="flex w-full">
-              <div className="w-64 p-4 border-r border-t bg-gray-50">
-                <div className="mb-4">
+          <div className="flex w-full">
+            <div className="w-1/5 p-4 border-r border-t bg-gray-50">                
+                <div className="mb-4 space-y-2">
                   <Select
                     value={selectedBundle?.id.toString()}
                     onValueChange={handleBundleChange}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Choisir un bundle" />
                     </SelectTrigger>
                     <SelectContent>
@@ -129,27 +156,68 @@ const AdminPage: React.FC<AdminPageProps> = ({ initialBundles, onBundleUpdate })
                       ))}
                     </SelectContent>
                   </Select>
+
+                  <ul className="space-y-2 w-full">
+                    {leanCharts.map((chart) => (
+                      <li key={chart.id}>
+                        <button
+                          onClick={() => handleSelectChart(chart)}
+                          className={`w-full text-left p-2 rounded ${
+                            selectedChart?.id === chart.id ? "bg-blue-100 font-semibold" : "hover:bg-gray-200"
+                          }`}
+                        >
+                          {chart.name}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+
                 </div>
-                <ul className="space-y-2">
-                  {leanCharts.map((chart) => (
-                    <li key={chart.id}>
-                      <button
-                        onClick={() => handleSelectChart(chart)}
-                        className={`w-full text-left p-2 rounded ${
-                          selectedChart?.id === chart.id ? "bg-blue-100 font-semibold" : "hover:bg-gray-200"
-                        }`}
-                      >
-                        {chart.name}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
+
+                {/* --- Bouton Ajouter LeanChart --- */}
+                <div className="flex justify-between gap-2 mt-6">
+                  <button
+                    className="p-2 rounded hover:bg-gray-100 transition-colors"
+                    title="Créer un nouveau LeanChart"
+                    onClick={() => setSelectedChart({
+                      id: -1,
+                      UXComponent: "StandardLeanChart", // ou "CumulativeLeanChart" selon le choix par défaut
+                      name: "New Chart",
+                      icon: "smile",
+                      isCumulative: false,
+                      isPositiveColorAboveTarget: true,
+                      negativeColor: "#ef4444",
+                      positiveColor: "#10b981",
+                      nbDecimal: 0,
+                      longTermTitle: "New",
+                      longTermxLabel: "",
+                      longTermyLabel: "",
+                      longTermMainTarget: 0,
+                      shortTermTitle: "New",
+                      shortTermxLabel: "",
+                      shortTermyLabel: "",
+                      shortTermMainTarget: 0,
+                      displayOrder: 0,
+                      longTermData: [],
+                      shortTermData: [],
+                      cumulLongTermData: [],
+                      cumulShortTermData: [],
+                      })
+                    }
+                  >
+                    <FilePlus className="w-6 h-6 text-gray-600" />
+                  </button>
+                  <button className="p-2 rounded hover:bg-gray-100 transition-colors">
+                    <Trash2 className="w-6 h-6 text-gray-600" />
+                  </button>
+                </div>             
               </div>
-              <div className="flex-1 p-6 border-t">
+              
+              <div className="w-4/5 p-6 border-t">
                 {selectedChart && (
                   <LeanChartAdminPanel
                     leanChart={selectedChart}
-                    onSave={handleSaveChart}
+                    onSave={handleCreateOrUpdateLeanChart}
                     bundleId={selectedBundle?.id.toString() || ""}
                   />
                 )}

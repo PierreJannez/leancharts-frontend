@@ -56,7 +56,7 @@ export const createLeanChart = async (chart: LeanChart, bundleId: number): Promi
   };
 
   try {
-    const response =await axios.put(`/api/create/`, payload);
+    const response =await axios.put(`/api/leancharts/create/`, payload);
     return response.data;
   } catch (error) {
     console.error("Erreur lors de l'enregistrement du LeanChart:", error);

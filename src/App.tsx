@@ -65,14 +65,20 @@ const AppContent: React.FC = () => {
                   </PrivateRoute>
                 }
               />
-              <Route
-                path="/admin"
-                element={
-                  <PrivateRoute>
-                    <AdminPage initialBundles={bundles} onBundleUpdate={handleUpdateBundle}/>
-                  </PrivateRoute>
-                }
-              />
+              {user && (
+                <Route
+                  path="/admin"
+                  element={
+                    <PrivateRoute>
+                      <AdminPage
+                        initialBundles={bundles}
+                        onBundleUpdate={handleUpdateBundle}
+                        clientId={user.id}
+                      />
+                    </PrivateRoute>
+                  }
+                />
+              )}
               <Route
                 path="/main"
                 element={

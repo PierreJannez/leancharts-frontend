@@ -5,44 +5,50 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
-import IconSelect from "@/utils/IconSelect";
+import IconSelect from "@/utils/IconSelect"
 
 interface BundleAdminPanelProps {
   bundle: Bundle | null;
   onSave: (bundle: Bundle) => void;
 }
 
+const emptyBundle: Bundle = {
+  id: -1, // ➕ -1 ou tout autre valeur par défaut pour indiquer une création
+  icon: "home",
+  shortName: "",
+  longName: "",
+  displayorder: 0,
+};
+
 const BundleAdminPanel: React.FC<BundleAdminPanelProps> = ({ bundle, onSave }) => {
-  const [form, setForm] = useState<Bundle | null>(bundle);
+  const [form, setForm] = useState<Bundle>(bundle ?? emptyBundle);
 
   useEffect(() => {
-    setForm(bundle);
+    setForm(bundle ?? emptyBundle);
   }, [bundle]);
 
-  if (!form) {
-    return <p className="text-muted-foreground">Veuillez sélectionner un bundle à éditer.</p>;
-  }
+  const isNew = form.id === -1;
 
   const handleChange = (field: keyof Bundle, value: string | number) => {
-    setForm((prev) => (prev ? { ...prev, [field]: value } : null));
+    setForm((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = () => {
-    if (!form) return;
-    onSave(form); // Délègue toute la logique à AdminPage
-    toast.success("Modifications envoyées !");
+    onSave(form);
+    toast.success(isNew ? "Bundle créé avec succès !" : "Modifications enregistrées !");
   };
 
   return (
     <Card>
       <CardContent className="p-6 grid gap-4">
+        <h2 className="text-lg font-semibold">{isNew ? "Créer un nouveau bundle" : "Modifier le bundle"}</h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <IconSelect
-                label="Icône"
-                value={form.icon}
-                onChange={(newIcon) => handleChange("icon", newIcon)}
-              />
+              label="Icône"
+              value={form.icon}
+              onChange={(newIcon) => handleChange("icon", newIcon)}
+            />
           </div>
         </div>
         <div>
@@ -54,7 +60,9 @@ const BundleAdminPanel: React.FC<BundleAdminPanelProps> = ({ bundle, onSave }) =
           <Input value={form.longName} onChange={(e) => handleChange("longName", e.target.value)} />
         </div>
         <div className="flex justify-end pt-4">
-          <Button onClick={handleSubmit}>Enregistrer</Button>
+          <Button onClick={handleSubmit}>
+            {isNew ? "Créer le bundle" : "Enregistrer"}
+          </Button>
         </div>
       </CardContent>
     </Card>

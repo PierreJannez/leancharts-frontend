@@ -33,15 +33,22 @@ export const updateBundle = async (bundle: Bundle): Promise<Bundle> => {
 
 /**
  * Create a new bundle.
- * @param bundle The bundle to create
+ * @param bundle The bundle to create (without id)
+ * @param clientId The ID of the client this bundle is associated with
  * @returns A promise resolving to the created bundle
  */
-export const createBundle = async (bundle: Omit<Bundle, "id">): Promise<Bundle> => {
+export const createBundle = async (
+    bundle: Omit<Bundle, "id">,
+    clientId: number
+  ): Promise<Bundle> => {
     try {
-        const response = await axios.post(`/api/bundles`, bundle);
-        return response.data.bundle;
+      const response = await axios.post(`/api/bundles/create`, {
+        ...bundle,
+        clientId,
+      });
+      return response.data.bundle;
     } catch (error) {
-        console.error("Erreur lors de la création du bundle:", error);
-        throw error;
+      console.error("Erreur lors de la création du bundle:", error);
+      throw error;
     }
-};
+  };
