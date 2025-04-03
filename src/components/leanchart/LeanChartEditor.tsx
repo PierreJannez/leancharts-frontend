@@ -5,7 +5,6 @@ import { Switch } from "../ui/switch"
 import { Button } from "../ui/button"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs"
 import { LeanChart } from "@/types/LeanChart"
-import { toast } from "sonner"
 import ColorPickerInput from "@/utils/ColorPickerInput";
 import IconSelect from "@/utils/IconSelect";
 
@@ -29,7 +28,6 @@ const LeanChartEditorLite: React.FC<Props> = ({ initialLeanChart, onSave }) => {
 
   const handleSubmit = () => {
     onSave(form)
-    toast.success("Le LeanChart a bien été mis à jour.")
   }
 
   const inputClass = "focus-visible:ring-0 focus:shadow-[0_0_0_2px_rgba(59,130,246,0.5)]"

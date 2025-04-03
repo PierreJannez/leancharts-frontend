@@ -42,11 +42,8 @@ const LeanChartAdminPanel: React.FC<LeanChartAdminPanelProps> = ({ leanChart, on
     setForm(leanChart ?? emptyChart);
   }, [leanChart]);
 
-  const isNew = form.id === -1;
-
   const handleSave = (updatedChart: LeanChart) => {
     onSave(updatedChart); // ← ce chart est bien celui modifié dans LeanChartEditor
-    toast.success(isNew ? "LeanChart créé avec succès !" : "Modifications enregistrées !");
   };
 
   return (

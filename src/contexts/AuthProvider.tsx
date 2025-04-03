@@ -7,8 +7,8 @@ import { User } from "@/types/User";
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true); // ⬅️ ici
 
-  // 🔁 Init au chargement : token + user
   useEffect(() => {
     const token = localStorage.getItem("token");
     const currentUser = getCurrentUser();
@@ -16,16 +16,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setIsAuthenticated(true);
       setUser(currentUser);
     }
+    setLoading(false); // ⬅️ important
   }, []);
 
-  // ✅ Login avec appel réel à l'API
   const login = async (email: string, password: string) => {
     const authResponse = await apiLogin({ email, password });
     setIsAuthenticated(true);
     setUser(authResponse.user);
   };
 
-  // ✅ Logout
   const logout = () => {
     apiLogout();
     setIsAuthenticated(false);
@@ -33,7 +32,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, user, setUser }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout, user, setUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

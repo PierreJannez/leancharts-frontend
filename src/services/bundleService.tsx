@@ -52,3 +52,18 @@ export const createBundle = async (
       throw error;
     }
   };
+
+/**
+ * Delete a bundle by its ID.
+ * The deletion will only succeed if the bundle has no associated LeanCharts.
+ * @param bundleId The ID of the bundle to delete
+ * @returns A promise resolving to a success message or throws on error
+ */
+export const deleteBundle = async (bundleId: number): Promise<void> => {
+  try {
+    await axios.delete(`/api/bundles/delete/${bundleId}`);
+  } catch (error) {
+    console.error(`Erreur lors de la suppression du bundle ${bundleId}:`, error);
+    throw error;
+  }
+};

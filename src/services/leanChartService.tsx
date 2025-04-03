@@ -63,3 +63,17 @@ export const createLeanChart = async (chart: LeanChart, bundleId: number): Promi
     throw error;
   }
 };
+
+/**
+ * Supprime un LeanChart.
+ * Cette opération supprime également ses données associées et le lien avec le bundle.
+ * @param leanChartId L’ID du LeanChart à supprimer
+ */
+export const deleteLeanChart = async (leanChartId: number): Promise<void> => {
+  try {
+    await axios.delete(`/api/leancharts/delete/${leanChartId}`);
+  } catch (error) {
+    console.error(`Erreur lors de la suppression du LeanChart ${leanChartId}:`, error);
+    throw error;
+  }
+};

@@ -11,6 +11,8 @@ import PrivateRoute from "./components/PrivateRoute";
 import Main from "./components/Main";
 import { useAuth } from "./contexts/AuthContext";
 import AdminPage from "@/components/admin/AdminPage";
+import { Toaster } from 'sonner'
+
 
 const AppContent: React.FC = () => {
   const { isAuthenticated, logout, user } = useAuth();
@@ -94,6 +96,7 @@ const AppContent: React.FC = () => {
           <Footer />
         </div>
       </div>
+      <Toaster richColors position="top-right" />
     </div>
   );
 };

@@ -4,10 +4,12 @@ import LeanChartAdminPanel from "@/components/admin/LeanChartAdminPanel"
 import BundleAdminPanel from "@/components/admin/BundleAdminPanel"
 import { Bundle } from "@/types/Bundle"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { fetchLeanCharts, updateLeanChart, createLeanChart } from "@/services/leanChartService"
+import { fetchLeanCharts, updateLeanChart, createLeanChart, deleteLeanChart } from "@/services/leanChartService"
 import { LeanChart } from "@/types/LeanChart"
-import { updateBundle, createBundle } from "@/services/bundleService"
+import { updateBundle, createBundle, deleteBundle } from "@/services/bundleService"
 import { FilePlus, Trash2 } from "lucide-react"
+import DeleteConfirmationDialog from "@/utils/DeleteConfirmationDialog"
+import { toastSuccess, toastError } from "@/utils/toastUtils";
 
 interface AdminPageProps {
   initialBundles: Bundle[];
@@ -20,6 +22,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ initialBundles, onBundleUpdate, c
   const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(initialBundles[0] || null);
   const [leanCharts, setLeanCharts] = useState<LeanChart[]>([]);
   const [selectedChart, setSelectedChart] = useState<LeanChart | null>(null);
+  const [showDeleteBundleDialog, setShowDeleteBundleDialog] = useState(false);
+  const [showDeleteChartDialog, setShowDeleteChartDialog] = useState(false);
 
   const handleCreateOrUpdateBundle = async (bundle: Bundle) => {
     try {
@@ -41,7 +45,30 @@ const AdminPage: React.FC<AdminPageProps> = ({ initialBundles, onBundleUpdate, c
       setSelectedBundle(saved);
       onBundleUpdate(saved);
     } catch (error) {
+      toastError("Erreur lors de la sauvegarde du bundle");
       console.error("Erreur lors de la sauvegarde du bundle:", error);
+    }
+  };
+
+  const handleDeleteSelectedBundle = async () => {
+    if (!selectedBundle) return;
+    
+    try {
+      await deleteBundle(selectedBundle.id);
+  
+      // Mise à jour de la liste des bundles après suppression
+      setBundles((prev) => prev.filter((b) => b.id !== selectedBundle.id));
+      setSelectedBundle(bundles[0] ?? null); // Réinitialiser la sélection
+
+      toastSuccess("Bundle supprimé avec succès.");
+      
+    } catch (error: any) {
+      if (error.response?.status === 409) {
+        toastError("Ce bundle ne peut pas être supprimé car il contient encore des LeanCharts.");
+      } else {
+        toastError("Une erreur est survenue lors de la suppression du bundle.");
+        console.error("Erreur lors de la suppression du bundle :", error);
+      }
     }
   };
 
@@ -76,8 +103,32 @@ const AdminPage: React.FC<AdminPageProps> = ({ initialBundles, onBundleUpdate, c
       });
   
       setSelectedChart(savedChart);
+
+      toastSuccess("LeanChart enregistré avec succès.");
+
     } catch (error) {
+      toastError("Erreur lors de la création/mise à jour du LeanChart");
       console.error("Erreur lors de la création/mise à jour du LeanChart:", error);
+    }
+  };
+
+  const handleDeleteSelectedLeanChart = async () => {
+    if (!selectedChart) return;
+  
+    try {
+      if (selectedChart.id !== -1) 
+      {
+        await deleteLeanChart(selectedChart.id);
+      }  
+  
+      setLeanCharts((prev) => prev.filter((chart) => chart.id !== selectedChart.id));
+      setSelectedChart(null);
+
+      toastSuccess("LeanChart supprimé avec succès.");
+
+    } catch (error) {
+      console.error("Erreur lors de la suppression du LeanChart :", error);
+      toastError("Erreur lors de la suppression du LeanChart");
     }
   };
 
@@ -126,10 +177,20 @@ const AdminPage: React.FC<AdminPageProps> = ({ initialBundles, onBundleUpdate, c
                   >
                     <FilePlus className="w-6 h-6 text-gray-600" />
                   </button>
-                  <button className="p-2 rounded hover:bg-gray-100 transition-colors">
+                  <button
+                    className="p-2 rounded hover:bg-gray-100 transition-colors"
+                    onClick={() => setShowDeleteBundleDialog(true)}
+                  >
                     <Trash2 className="w-6 h-6 text-gray-600" />
                   </button>
-                </div>
+
+                  <DeleteConfirmationDialog
+                    open={showDeleteBundleDialog}
+                    onOpenChange={setShowDeleteBundleDialog}
+                    title="Supprimer ce bundle ?"
+                    description={`ATTENTION : Vous allez supprimer le bundle "${selectedBundle?.shortName}" définitivement. Cette action est irréversible.`}
+                    onConfirm={handleDeleteSelectedBundle}
+                  />                </div>
               </div>
               <div className="w-4/5 p-6 border-t">
                 <BundleAdminPanel bundle={selectedBundle} onSave={handleCreateOrUpdateBundle} />
@@ -207,9 +268,21 @@ const AdminPage: React.FC<AdminPageProps> = ({ initialBundles, onBundleUpdate, c
                   >
                     <FilePlus className="w-6 h-6 text-gray-600" />
                   </button>
-                  <button className="p-2 rounded hover:bg-gray-100 transition-colors">
+                  <button
+                    className="p-2 rounded hover:bg-gray-100 transition-colors"
+                    title="Supprimer le LeanChart sélectionné"
+                    onClick={() => setShowDeleteChartDialog(true)}
+                  >
                     <Trash2 className="w-6 h-6 text-gray-600" />
                   </button>
+
+                  <DeleteConfirmationDialog
+                    open={showDeleteChartDialog}
+                    onOpenChange={setShowDeleteChartDialog}
+                    title="Supprimer ce LeanChart ?"
+                    description={`ATTENTION : Vous allez supprimer le LeanChart "${selectedChart?.name}" et toutes ses données associées. Cette action est définitive.`}
+                    onConfirm={handleDeleteSelectedLeanChart}
+                  />                
                 </div>             
               </div>
               

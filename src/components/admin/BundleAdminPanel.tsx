@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { toast } from "sonner"
 import IconSelect from "@/utils/IconSelect"
 
 interface BundleAdminPanelProps {
@@ -35,7 +34,6 @@ const BundleAdminPanel: React.FC<BundleAdminPanelProps> = ({ bundle, onSave }) =
 
   const handleSubmit = () => {
     onSave(form);
-    toast.success(isNew ? "Bundle créé avec succès !" : "Modifications enregistrées !");
   };
 
   return (
