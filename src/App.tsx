@@ -49,7 +49,6 @@ const AppContent: React.FC = () => {
         <div className="bg-white rounded-lg shadow-lg">
           {isAuthenticated && (
             <Header
-              menuItems={bundles}
               onSelectBundle={(id) => setSelectedBundleId(id)}
               onLogout={handleLogout}
             />

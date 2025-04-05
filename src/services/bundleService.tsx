@@ -17,6 +17,18 @@ export const fetchBundles = async (clientId: number): Promise<Bundle[]> => {
 };
 
 /**
+ * Fetch all bundles for a specific Team from the API.
+ * @param teamId The ID of the team
+ * @returns A promise resolving to an array of Bundles
+ */
+export const fetchBundlesByTeam = async (id_team: number): Promise<Bundle[]> => {
+  const res = await axios.get(`/api/bundles`, {
+    params: { id_team },
+  });
+  return res.data.bundles;
+};
+
+/**
  * Update a bundle.
  * @param bundle The bundle to update
  * @returns A promise resolving to the updated bundle

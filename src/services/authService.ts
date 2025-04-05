@@ -8,12 +8,7 @@
 
   export interface AuthResponse {
         token: string;
-        user: {
-            id: number;
-            id_enterprise: number;
-            name: string;
-            email: string;
-        };
+        user: User;
   }
   
   const API_URL = "/api"; // à adapter
@@ -34,7 +29,7 @@
     localStorage.setItem("token", data.token);
     localStorage.setItem("currentUser", JSON.stringify(data.user));
 
-    console.log("User data stored in localStorage:", data.user);
+    console.log("User data stored in localStorage:", localStorage.getItem("currentUser"));
     
     return data;
   }
