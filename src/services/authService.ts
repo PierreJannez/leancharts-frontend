@@ -10,6 +10,7 @@
         token: string;
         user: {
             id: number;
+            id_enterprise: number;
             name: string;
             email: string;
         };

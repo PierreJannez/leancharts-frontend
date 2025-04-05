@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react"
 import { LeanChart } from "@/types/LeanChart"
 import { Card, CardContent } from "@/components/ui/card"
 import LeanChartEditor from "@/components/leanchart/LeanChartEditor"
-import { toast } from "sonner"
 
 interface LeanChartAdminPanelProps {
   leanChart: LeanChart;

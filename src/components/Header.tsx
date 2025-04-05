@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, UserCircle, LogOut, Settings } from "lucide-react";
+import { Menu, UserCircle, LogOut, Settings, MessageSquarePlus} from "lucide-react";
 import { getIcon } from "../utils/icons";
 import {
   DropdownMenu,
@@ -36,6 +36,7 @@ const Header: React.FC<HeaderProps> = ({ menuItems, onSelectBundle, onLogout }) 
   return (
     <header className="relative bg-white text-black p-4 shadow-md">
       <div className="mx-auto flex justify-between items-center">
+
         {/* Left side: menu + logo */}
         <div className="flex items-center">
           <button
@@ -45,6 +46,18 @@ const Header: React.FC<HeaderProps> = ({ menuItems, onSelectBundle, onLogout }) 
             <Menu className="w-6 h-6 text-gray-600" />
           </button>
           <h1 className="px-2 font-bold">Lean Charts</h1>
+        </div>
+
+        <div className="flex items-center space-x-4">
+          <a
+            href="https://forms.gle/QuUwMgfCYeXDnGhP9"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <MessageSquarePlus className="w-4 h-4 mr-2" />
+            LeanCharts - Donnez votre avis
+          </a>
         </div>
 
         {/* Right side: user menu */}

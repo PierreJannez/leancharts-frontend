@@ -75,7 +75,7 @@ const AppContent: React.FC = () => {
                       <AdminPage
                         initialBundles={bundles}
                         onBundleUpdate={handleUpdateBundle}
-                        clientId={user.id}
+                        client={user}
                       />
                     </PrivateRoute>
                   }
