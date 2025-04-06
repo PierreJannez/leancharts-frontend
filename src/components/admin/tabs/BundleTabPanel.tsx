@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react"
+import { handleBackendError } from "@/utils/errorUtils"
 import { FilePlus, Trash2 } from "lucide-react"
 import { Bundle } from "@/types/Bundle"
 import { Team } from "@/types/Team"
@@ -51,7 +52,7 @@ const BundleTabPanel: React.FC<Props> = ({ enterpriseId }) => {
         setTeams(t)
         if (t.length > 0) setSelectedTeamId(t[0].id)
       })
-      .catch(() => toastError("Erreur lors du chargement des équipes."))
+      .catch((error) => handleBackendError(error))
   }, [selectedServiceId])
 
   // Load bundles when team changes
@@ -72,7 +73,7 @@ const BundleTabPanel: React.FC<Props> = ({ enterpriseId }) => {
           })
         }
       })
-      .catch(() => toastError("Erreur lors du chargement des bundles."))
+      .catch((error) => handleBackendError(error))
   }, [selectedTeamId])
 
   const handleSaveBundle = async (bundle: Bundle) => {
@@ -93,9 +94,8 @@ const BundleTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       setBundles(updatedList)
       setSelectedBundle(saved)
       toastSuccess("Bundle enregistré avec succès.")
-    } catch (err) {
-      toastError("Erreur lors de la sauvegarde du bundle.")
-      console.error(err)
+    } catch (error) {
+        handleBackendError(error)
     }
   }
 
@@ -109,9 +109,8 @@ const BundleTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       setSelectedBundle(newList[0] ?? null)
       setShowDeleteDialog(false)
       toastSuccess("Bundle supprimé avec succès.")
-    } catch (err) {
-      toastError("Erreur lors de la suppression du bundle.")
-      console.error(err)
+    } catch (error) {
+        handleBackendError(error)
     }
   }
 

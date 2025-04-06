@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react"
+import { handleBackendError } from "@/utils/errorUtils"
 import { Service } from "@/types/Service"
 import { FilePlus, Trash2 } from "lucide-react"
 import DeleteConfirmationDialog from "@/utils/DeleteConfirmationDialog"
@@ -8,7 +9,7 @@ import {
   updateService,
   deleteService,
 } from "@/services/serviceService"
-import { toastError, toastSuccess } from "@/utils/toastUtils"
+import { toastSuccess } from "@/utils/toastUtils"
 
 interface Props {
   enterpriseId: number
@@ -25,7 +26,7 @@ const ServiceTabPanel: React.FC<Props> = ({ enterpriseId }) => {
         setServices(s)
         if (s.length > 0) setSelectedService(s[0])
       })
-      .catch(() => toastError("Erreur lors du chargement des services."))
+      .catch((error) => handleBackendError(error))
   }, [enterpriseId])
 
   const handleSaveService = async (service: Service) => {
@@ -40,8 +41,7 @@ const ServiceTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       setSelectedService(saved)
       toastSuccess("Service enregistré avec succès.")
     } catch (error) {
-      toastError("Erreur lors de la sauvegarde du service.")
-      console.error("Erreur lors de la sauvegarde du service :", error)
+        handleBackendError(error)
     }
   }
 
@@ -53,8 +53,7 @@ const ServiceTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       setSelectedService(null)
       toastSuccess("Service supprimé avec succès.")
     } catch (error) {
-      toastError("Erreur lors de la suppression du service.")
-      console.error("Erreur lors de la suppression du service :", error)
+        handleBackendError(error)
     }
   }
 

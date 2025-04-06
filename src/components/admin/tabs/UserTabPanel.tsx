@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react"
+import { handleBackendError } from "@/utils/errorUtils"
 import { FilePlus, Trash2 } from "lucide-react"
 import { User } from "@/types/User"
 import { Service } from "@/types/Service"
 import DeleteConfirmationDialog from "@/utils/DeleteConfirmationDialog"
 import { fetchUsers, createUser, updateUser, deleteUser } from "@/services/userService"
 import { fetchServices } from "@/services/serviceService"
-import { toastError, toastSuccess } from "@/utils/toastUtils"
+import { toastSuccess } from "@/utils/toastUtils"
 
 interface Props {
   enterpriseId: number
@@ -23,11 +24,11 @@ const UserTabPanel: React.FC<Props> = ({ enterpriseId }) => {
         setUsers(u)
         setSelectedUser(u[0] ?? null)
       })
-      .catch(() => toastError("Erreur lors du chargement des utilisateurs."))
+      .catch((error) => handleBackendError(error))
 
     fetchServices(enterpriseId)
       .then(setServices)
-      .catch(() => toastError("Erreur lors du chargement des services."))
+      .catch((error) => handleBackendError(error))
   }, [enterpriseId])
 
   const handleSaveUser = async (user: User) => {
@@ -41,22 +42,21 @@ const UserTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       })
       setSelectedUser(saved)
       toastSuccess("Utilisateur enregistré avec succès.")
-    } catch (err) {
-      toastError("Erreur lors de la sauvegarde de l'utilisateur.")
-      console.error("Erreur utilisateur:", err)
+    } catch (error) {
+        handleBackendError(error)
     }
   }
 
   const handleDeleteUser = async () => {
     if (!selectedUser) return
+  
     try {
       await deleteUser(selectedUser.id)
       setUsers((prev) => prev.filter((u) => u.id !== selectedUser.id))
       setSelectedUser(null)
       toastSuccess("Utilisateur supprimé avec succès.")
-    } catch (err) {
-      toastError("Erreur lors de la suppression de l'utilisateur.")
-      console.error("Erreur suppression utilisateur:", err)
+    } catch (error) {
+        handleBackendError(error)  
     }
   }
 

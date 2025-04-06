@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react"
+import { handleBackendError } from "@/utils/errorUtils"
 import { FilePlus, Trash2 } from "lucide-react"
 import { Team } from "@/types/Team"
 import { Service } from "@/types/Service"
@@ -28,7 +29,7 @@ const TeamTabPanel: React.FC<Props> = ({ enterpriseId }) => {
   useEffect(() => {
     fetchServices(enterpriseId)
       .then(setServices)
-      .catch(() => toastError("Erreur lors du chargement des services."))
+      .catch((error) => handleBackendError(error))
   }, [enterpriseId])
 
   useEffect(() => {
@@ -38,7 +39,7 @@ const TeamTabPanel: React.FC<Props> = ({ enterpriseId }) => {
         setTeams(fetchedTeams)
         setSelectedTeam(fetchedTeams[0] ?? null)
       })
-      .catch(() => toastError("Erreur lors du chargement des équipes."))
+      .catch((error) => handleBackendError(error))
   }, [selectedServiceId])
 
   const handleSaveTeam = async () => {
@@ -55,9 +56,8 @@ const TeamTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       setTeams(updatedList)
       setSelectedTeam(saved)
       toastSuccess("Équipe enregistrée avec succès.")
-    } catch (err) {
-      toastError("Erreur lors de la sauvegarde de l’équipe.")
-      console.error(err)
+    } catch (error) {
+        handleBackendError(error)
     }
   }
 
@@ -69,9 +69,8 @@ const TeamTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       setTeams(remaining)
       setSelectedTeam(remaining[0] ?? null)
       toastSuccess("Équipe supprimée avec succès.")
-    } catch (err) {
-      toastError("Erreur lors de la suppression de l’équipe.")
-      console.error(err)
+    } catch (error) {
+        handleBackendError(error)
     }
   }
 

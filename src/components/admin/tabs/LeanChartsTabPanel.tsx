@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react"
+import { handleBackendError } from "@/utils/errorUtils"
 import { FilePlus, Trash2 } from "lucide-react"
 import { Bundle } from "@/types/Bundle"
 import { LeanChart } from "@/types/LeanChart"
@@ -44,7 +45,7 @@ const LeanChartsTabPanel: React.FC<Props> = ({ enterpriseId }) => {
   useEffect(() => {
     fetchServices(enterpriseId)
       .then((s) => setServices(s))
-      .catch(() => toastError("Erreur lors du chargement des services."))
+      .catch((error) => handleBackendError(error))
   }, [enterpriseId])
 
   useEffect(() => {
@@ -71,7 +72,7 @@ const LeanChartsTabPanel: React.FC<Props> = ({ enterpriseId }) => {
           setSelectedChart(null)
         }
       })
-      .catch(() => toastError("Erreur lors du chargement des équipes."))
+      .catch((error) => handleBackendError(error))
   }, [selectedServiceId])
 
   useEffect(() => {
@@ -94,7 +95,7 @@ const LeanChartsTabPanel: React.FC<Props> = ({ enterpriseId }) => {
           setSelectedChart(null)
         }
       })
-      .catch(() => toastError("Erreur lors du chargement des bundles."))
+      .catch((error) => handleBackendError(error))
   }, [selectedTeamId])
 
   useEffect(() => {
@@ -109,7 +110,7 @@ const LeanChartsTabPanel: React.FC<Props> = ({ enterpriseId }) => {
         setLeanCharts(charts)
         setSelectedChart(charts[0] || null)
       })
-      .catch(() => toastError("Erreur lors du chargement des LeanCharts."))
+      .catch((error) => handleBackendError(error))
   }, [selectedBundle])
 
   const handleSaveChart = async (chart: LeanChart) => {
@@ -129,9 +130,8 @@ const LeanChartsTabPanel: React.FC<Props> = ({ enterpriseId }) => {
 
       setSelectedChart(saved)
       toastSuccess("LeanChart enregistré avec succès.")
-    } catch (err) {
-      toastError("Erreur lors de la sauvegarde du LeanChart.")
-      console.error(err)
+    } catch (error) {
+        handleBackendError(error)
     }
   }
 
@@ -142,9 +142,8 @@ const LeanChartsTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       setLeanCharts((prev) => prev.filter((c) => c.id !== selectedChart.id))
       setSelectedChart(null)
       toastSuccess("LeanChart supprimé.")
-    } catch (err) {
-      toastError("Erreur lors de la suppression du LeanChart.")
-      console.error(err)
+    } catch (error) {
+        handleBackendError(error)
     }
   }
 
