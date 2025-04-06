@@ -1,0 +1,21 @@
+{
+  "name": "Easy Charts",
+  "short_name": "Easy Charts",
+  "lang": "fr",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/chart-column-increasing.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/chart-column-increasing.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

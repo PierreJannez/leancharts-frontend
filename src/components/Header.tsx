@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import {
-  Menu,
   UserCircle,
   LogOut,
   Settings,
@@ -30,7 +29,6 @@ const Header: React.FC<{
   const { isAuthenticated, logout, user } = useAuth()
   const navigate = useNavigate()
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [teams, setTeams] = useState<Team[]>([])
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null)
   const [bundles, setBundles] = useState<Bundle[]>([])
@@ -43,9 +41,10 @@ const Header: React.FC<{
         if (!selectedTeamId && t.length > 0) setSelectedTeamId(t[0].id)
       })
     }
-  }, [user])
+  }, [user, selectedTeamId])
 
   useEffect(() => {
+    console.log("Selected team ID:", selectedTeamId)
     if (selectedTeamId) {
       fetchBundlesByTeam(selectedTeamId).then((fetchedBundles) => {
         setBundles(fetchedBundles)
@@ -129,7 +128,6 @@ const Header: React.FC<{
                           setSelectedBundle(bundle)
                           onSelectBundle(bundle.id, bundle.shortName)
                           navigate(`/bundle/${bundle.shortName}`)
-                          setIsMenuOpen(false)
                         }}
                         className="flex items-center gap-2"
                       >

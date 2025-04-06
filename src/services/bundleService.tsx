@@ -51,12 +51,12 @@ export const updateBundle = async (bundle: Bundle): Promise<Bundle> => {
  */
 export const createBundle = async (
     bundle: Omit<Bundle, "id">,
-    clientId: number
+    teamId: number
   ): Promise<Bundle> => {
     try {
       const response = await axios.post(`/api/bundles/create`, {
         ...bundle,
-        clientId,
+        teamId,
       });
       return response.data.bundle;
     } catch (error) {

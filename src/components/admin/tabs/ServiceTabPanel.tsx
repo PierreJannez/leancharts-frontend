@@ -1,33 +1,63 @@
-// components/admin/tabs/ServiceTabPanel.tsx
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { Service } from "@/types/Service"
 import { FilePlus, Trash2 } from "lucide-react"
 import DeleteConfirmationDialog from "@/utils/DeleteConfirmationDialog"
+import {
+  fetchServices,
+  createService,
+  updateService,
+  deleteService,
+} from "@/services/serviceService"
+import { toastError, toastSuccess } from "@/utils/toastUtils"
 
 interface Props {
-  services: Service[]
-  selectedService: Service | null
-  onSelectService: (s: Service) => void
-  onSaveService: (s: Service) => void
-  onDeleteService: () => void
-  showDeleteDialog: boolean
-  setShowDeleteDialog: (v: boolean) => void
   enterpriseId: number
 }
 
-const ServiceTabPanel: React.FC<Props> = ({
-  services,
-  selectedService,
-  onSelectService,
-  onSaveService,
-  onDeleteService,
-  showDeleteDialog,
-  setShowDeleteDialog,
-  enterpriseId,
-}) => {
-  
-  console.log("🔍 props ServiceTabPanel", services, selectedService)
-  
+const ServiceTabPanel: React.FC<Props> = ({ enterpriseId }) => {
+  const [services, setServices] = useState<Service[]>([])
+  const [selectedService, setSelectedService] = useState<Service | null>(null)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+
+  useEffect(() => {
+    fetchServices(enterpriseId)
+      .then((s) => {
+        setServices(s)
+        if (s.length > 0) setSelectedService(s[0])
+      })
+      .catch(() => toastError("Erreur lors du chargement des services."))
+  }, [enterpriseId])
+
+  const handleSaveService = async (service: Service) => {
+    try {
+      const saved = service.id ? await updateService(service) : await createService(service)
+      setServices((prev) => {
+        const idx = prev.findIndex((s) => s.id === saved.id)
+        return idx >= 0
+          ? [...prev.slice(0, idx), saved, ...prev.slice(idx + 1)]
+          : [...prev, saved]
+      })
+      setSelectedService(saved)
+      toastSuccess("Service enregistré avec succès.")
+    } catch (error) {
+      toastError("Erreur lors de la sauvegarde du service.")
+      console.error("Erreur lors de la sauvegarde du service :", error)
+    }
+  }
+
+  const handleDeleteService = async () => {
+    if (!selectedService) return
+    try {
+      await deleteService(selectedService.id)
+      setServices((prev) => prev.filter((s) => s.id !== selectedService.id))
+      setSelectedService(null)
+      toastSuccess("Service supprimé avec succès.")
+    } catch (error) {
+      toastError("Erreur lors de la suppression du service.")
+      console.error("Erreur lors de la suppression du service :", error)
+    }
+  }
+
   return (
     <div className="flex w-full">
       <div className="w-1/5 p-4 border-r border-t bg-gray-50 flex flex-col justify-between">
@@ -35,7 +65,7 @@ const ServiceTabPanel: React.FC<Props> = ({
           {services.map((s) => (
             <li key={s.id}>
               <button
-                onClick={() => onSelectService(s)}
+                onClick={() => setSelectedService(s)}
                 className={`w-full text-left p-2 rounded ${
                   selectedService?.id === s.id ? "bg-blue-100 font-semibold" : "hover:bg-gray-200"
                 }`}
@@ -50,7 +80,7 @@ const ServiceTabPanel: React.FC<Props> = ({
           <button
             className="p-2 rounded hover:bg-gray-100 transition-colors"
             onClick={() =>
-              onSelectService({ id: 0, id_enterprise: enterpriseId, name: "" })
+              setSelectedService({ id: 0, id_enterprise: enterpriseId, name: "" })
             }
           >
             <FilePlus className="w-6 h-6 text-gray-600" />
@@ -67,7 +97,7 @@ const ServiceTabPanel: React.FC<Props> = ({
             onOpenChange={setShowDeleteDialog}
             title="Supprimer ce service ?"
             description={`ATTENTION : Vous allez supprimer le service "${selectedService?.name}" définitivement.`}
-            onConfirm={onDeleteService}
+            onConfirm={handleDeleteService}
           />
         </div>
       </div>
@@ -82,13 +112,13 @@ const ServiceTabPanel: React.FC<Props> = ({
                 className="w-full p-2 border rounded"
                 value={selectedService.name}
                 onChange={(e) =>
-                  onSelectService({ ...selectedService, name: e.target.value })
+                  setSelectedService({ ...selectedService, name: e.target.value })
                 }
               />
             </label>
             <button
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              onClick={() => onSaveService(selectedService)}
+              onClick={() => handleSaveService(selectedService)}
             >
               Enregistrer
             </button>

@@ -1,34 +1,65 @@
-import React from "react"
-import { User } from "@/types/User"
+import React, { useEffect, useState } from "react"
 import { FilePlus, Trash2 } from "lucide-react"
-import DeleteConfirmationDialog from "@/utils/DeleteConfirmationDialog"
+import { User } from "@/types/User"
 import { Service } from "@/types/Service"
+import DeleteConfirmationDialog from "@/utils/DeleteConfirmationDialog"
+import { fetchUsers, createUser, updateUser, deleteUser } from "@/services/userService"
+import { fetchServices } from "@/services/serviceService"
+import { toastError, toastSuccess } from "@/utils/toastUtils"
 
 interface Props {
-    users: User[]
-    selectedUser: User | null
-    onSelectUser: (user: User) => void
-    onSaveUser: (user: User) => void
-    onDeleteUser: () => void
-    showDeleteDialog: boolean
-    setShowDeleteDialog: (open: boolean) => void
-    enterpriseId: number
-    services: Service[] // ✅ nouveau
-    selectedService: Service | null // 👈 nouveau
+  enterpriseId: number
+}
+
+const UserTabPanel: React.FC<Props> = ({ enterpriseId }) => {
+  const [users, setUsers] = useState<User[]>([])
+  const [services, setServices] = useState<Service[]>([])
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+
+  useEffect(() => {
+    fetchUsers(enterpriseId)
+      .then((u) => {
+        setUsers(u)
+        setSelectedUser(u[0] ?? null)
+      })
+      .catch(() => toastError("Erreur lors du chargement des utilisateurs."))
+
+    fetchServices(enterpriseId)
+      .then(setServices)
+      .catch(() => toastError("Erreur lors du chargement des services."))
+  }, [enterpriseId])
+
+  const handleSaveUser = async (user: User) => {
+    try {
+      const saved = user.id ? await updateUser(user) : await createUser(user)
+      setUsers((prev) => {
+        const idx = prev.findIndex((u) => u.id === saved.id)
+        return idx >= 0
+          ? [...prev.slice(0, idx), saved, ...prev.slice(idx + 1)]
+          : [...prev, saved]
+      })
+      setSelectedUser(saved)
+      toastSuccess("Utilisateur enregistré avec succès.")
+    } catch (err) {
+      toastError("Erreur lors de la sauvegarde de l'utilisateur.")
+      console.error("Erreur utilisateur:", err)
+    }
   }
 
-const UserTabPanel: React.FC<Props> = ({
-  users,
-  selectedUser,
-  onSelectUser,
-  onSaveUser,
-  onDeleteUser,
-  showDeleteDialog,
-  setShowDeleteDialog,
-  enterpriseId,
-  services,
-  selectedService // ✅ nouveau
-}) => {
+  const handleDeleteUser = async () => {
+    if (!selectedUser) return
+    try {
+      await deleteUser(selectedUser.id)
+      setUsers((prev) => prev.filter((u) => u.id !== selectedUser.id))
+      setSelectedUser(null)
+      toastSuccess("Utilisateur supprimé avec succès.")
+    } catch (err) {
+      toastError("Erreur lors de la suppression de l'utilisateur.")
+      console.error("Erreur suppression utilisateur:", err)
+    }
+  }
+
   return (
     <div className="flex w-full">
       {/* Liste des utilisateurs */}
@@ -37,11 +68,9 @@ const UserTabPanel: React.FC<Props> = ({
           {users.map((user) => (
             <li key={user.id}>
               <button
-                onClick={() => onSelectUser(user)}
+                onClick={() => setSelectedUser(user)}
                 className={`w-full text-left p-2 rounded ${
-                  selectedUser?.id === user.id
-                    ? "bg-blue-100 font-semibold"
-                    : "hover:bg-gray-200"
+                  selectedUser?.id === user.id ? "bg-blue-100 font-semibold" : "hover:bg-gray-200"
                 }`}
               >
                 {user.firstName} {user.lastName}
@@ -55,18 +84,16 @@ const UserTabPanel: React.FC<Props> = ({
           <button
             className="p-2 rounded hover:bg-gray-100 transition-colors"
             onClick={() => {
-                const defaultServiceId =
-                  selectedService?.id ?? (services.length > 0 ? services[0].id : -1)
-              
-                onSelectUser({
-                  id: 0,
-                  id_enterprise: enterpriseId,
-                  id_service: defaultServiceId,
-                  firstName: "",
-                  lastName: "",
-                  email: "",
-                })
-              }}
+              const defaultServiceId = services[0]?.id ?? -1
+              setSelectedUser({
+                id: 0,
+                id_enterprise: enterpriseId,
+                id_service: defaultServiceId,
+                firstName: "",
+                lastName: "",
+                email: "",
+              })
+            }}
           >
             <FilePlus className="w-6 h-6 text-gray-600" />
           </button>
@@ -82,7 +109,7 @@ const UserTabPanel: React.FC<Props> = ({
             onOpenChange={setShowDeleteDialog}
             title="Supprimer cet utilisateur ?"
             description={`ATTENTION : Vous allez supprimer l'utilisateur "${selectedUser?.firstName} ${selectedUser?.lastName}".`}
-            onConfirm={onDeleteUser}
+            onConfirm={handleDeleteUser}
           />
         </div>
       </div>
@@ -91,25 +118,24 @@ const UserTabPanel: React.FC<Props> = ({
       <div className="w-4/5 p-6 border-t">
         {selectedUser && (
           <div className="space-y-4">
-
             {/* Champ Service */}
             <div className="flex items-center gap-4">
-            <label className="w-32 text-sm font-medium text-gray-700">Service</label>
-            <select
+              <label className="w-32 text-sm font-medium text-gray-700">Service</label>
+              <select
                 className="flex-1 p-2 border rounded"
                 value={selectedUser.id_service ?? -1}
                 onChange={(e) =>
-                onSelectUser({ ...selectedUser, id_service: parseInt(e.target.value) })
+                  setSelectedUser({ ...selectedUser, id_service: parseInt(e.target.value) })
                 }
-            >
+              >
                 <option value={-1}>Aucun</option>
                 {services.map((service) => (
-                <option key={service.id} value={service.id}>
+                  <option key={service.id} value={service.id}>
                     {service.name}
-                </option>
+                  </option>
                 ))}
-            </select>
-            </div>        
+              </select>
+            </div>
 
             {/* Champ Prénom */}
             <div className="flex items-center gap-4">
@@ -119,7 +145,7 @@ const UserTabPanel: React.FC<Props> = ({
                 className="flex-1 p-2 border rounded"
                 value={selectedUser.firstName}
                 onChange={(e) =>
-                  onSelectUser({ ...selectedUser, firstName: e.target.value })
+                  setSelectedUser({ ...selectedUser, firstName: e.target.value })
                 }
               />
             </div>
@@ -132,7 +158,7 @@ const UserTabPanel: React.FC<Props> = ({
                 className="flex-1 p-2 border rounded"
                 value={selectedUser.lastName}
                 onChange={(e) =>
-                  onSelectUser({ ...selectedUser, lastName: e.target.value })
+                  setSelectedUser({ ...selectedUser, lastName: e.target.value })
                 }
               />
             </div>
@@ -145,14 +171,14 @@ const UserTabPanel: React.FC<Props> = ({
                 className="flex-1 p-2 border rounded"
                 value={selectedUser.email}
                 onChange={(e) =>
-                  onSelectUser({ ...selectedUser, email: e.target.value })
+                  setSelectedUser({ ...selectedUser, email: e.target.value })
                 }
               />
             </div>
 
             <button
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              onClick={() => onSaveUser(selectedUser)}
+              onClick={() => handleSaveUser(selectedUser)}
             >
               Enregistrer
             </button>

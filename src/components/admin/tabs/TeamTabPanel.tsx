@@ -1,64 +1,110 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
+import { FilePlus, Trash2 } from "lucide-react"
 import { Team } from "@/types/Team"
 import { Service } from "@/types/Service"
-import { FilePlus, Trash2 } from "lucide-react"
 import DeleteConfirmationDialog from "@/utils/DeleteConfirmationDialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { fetchServices } from "@/services/serviceService"
+import { fetchTeams, createTeam, updateTeam, deleteTeam } from "@/services/teamService"
+import { toastError, toastSuccess } from "@/utils/toastUtils"
 
 interface Props {
-  services: Service[]
-  selectedServiceId: number | null
-  onServiceChange: (id: number) => void
-
-  teams: Team[]
-  selectedTeam: Team | null
-  onSelectTeam: (team: Team) => void
-  onSaveTeam: (team: Team) => void
-  onDeleteTeam: () => void
-  showDeleteDialog: boolean
-  setShowDeleteDialog: (open: boolean) => void
+  enterpriseId: number
 }
 
-const TeamTabPanel: React.FC<Props> = ({
-  services,
-  selectedServiceId,
-  onServiceChange,
-  teams,
-  selectedTeam,
-  onSelectTeam,
-  onSaveTeam,
-  onDeleteTeam,
-  showDeleteDialog,
-  setShowDeleteDialog,
-}) => {
+const TeamTabPanel: React.FC<Props> = ({ enterpriseId }) => {
+  const [services, setServices] = useState<Service[]>([])
+  const [teams, setTeams] = useState<Team[]>([])
+  const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null)
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+
+  useEffect(() => {
+    fetchServices(enterpriseId)
+      .then(setServices)
+      .catch(() => toastError("Erreur lors du chargement des services."))
+  }, [enterpriseId])
+
+  useEffect(() => {
+    if (!selectedServiceId) return
+    fetchTeams(selectedServiceId)
+      .then((fetchedTeams) => {
+        setTeams(fetchedTeams)
+        setSelectedTeam(fetchedTeams[0] ?? null)
+      })
+      .catch(() => toastError("Erreur lors du chargement des équipes."))
+  }, [selectedServiceId])
+
+  const handleSaveTeam = async () => {
+    if (!selectedTeam) return
+    try {
+      const saved = selectedTeam.id === 0
+        ? await createTeam(selectedTeam)
+        : await updateTeam(selectedTeam)
+
+      const updatedList = selectedTeam.id === 0
+        ? [...teams, saved]
+        : teams.map((t) => (t.id === saved.id ? saved : t))
+
+      setTeams(updatedList)
+      setSelectedTeam(saved)
+      toastSuccess("Équipe enregistrée avec succès.")
+    } catch (err) {
+      toastError("Erreur lors de la sauvegarde de l’équipe.")
+      console.error(err)
+    }
+  }
+
+  const handleDeleteTeam = async () => {
+    if (!selectedTeam || selectedTeam.id === 0) return
+    try {
+      await deleteTeam(selectedTeam.id)
+      const remaining = teams.filter((t) => t.id !== selectedTeam.id)
+      setTeams(remaining)
+      setSelectedTeam(remaining[0] ?? null)
+      toastSuccess("Équipe supprimée avec succès.")
+    } catch (err) {
+      toastError("Erreur lors de la suppression de l’équipe.")
+      console.error(err)
+    }
+  }
+
   return (
     <div className="flex w-full">
-      {/* Liste des équipes */}
       <div className="w-1/5 p-4 border-r border-t bg-gray-50 flex flex-col justify-between">
         <div className="space-y-4">
-          {/* Dropdown service */}
-          <Select
-            value={selectedServiceId?.toString() ?? ""}
-            onValueChange={(id) => onServiceChange(Number(id))}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Choisir un service" />
-            </SelectTrigger>
-            <SelectContent>
-              {services.map((service) => (
-                <SelectItem key={service.id} value={service.id.toString()}>
-                  {service.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div>
+            <label className="text-sm font-semibold text-gray-700 mb-1 block">
+              Service
+            </label>
+            <Select
+              value={selectedServiceId?.toString() ?? ""}
+              onValueChange={(id) => setSelectedServiceId(Number(id))}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Choisir un service" />
+              </SelectTrigger>
+              <SelectContent>
+                {services.map((service) => (
+                  <SelectItem key={service.id} value={service.id.toString()}>
+                    {service.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-          {/* Liste des teams */}
-          <ul className="space-y-2">
+          <ul className="space-y-2 mt-2">
             {teams.map((team) => (
               <li key={team.id}>
                 <button
-                  onClick={() => onSelectTeam(team)}
+                  onClick={() => setSelectedTeam(team)}
                   className={`w-full text-left p-2 rounded ${
                     selectedTeam?.id === team.id
                       ? "bg-blue-100 font-semibold"
@@ -72,21 +118,26 @@ const TeamTabPanel: React.FC<Props> = ({
           </ul>
         </div>
 
-        {/* Boutons ajouter/supprimer */}
         <div className="flex justify-between gap-2 mt-6">
           <button
             className="p-2 rounded hover:bg-gray-100 transition-colors"
             title="Créer une nouvelle équipe"
-            onClick={() =>
-              onSelectTeam({
+            disabled={!selectedServiceId}
+            onClick={() => {
+              if (!selectedServiceId) {
+                toastError("Veuillez d'abord sélectionner un service.")
+                return
+              }
+              setSelectedTeam({
                 id: 0,
-                id_service: selectedServiceId ?? 0,
+                id_service: selectedServiceId,
                 name: "",
               })
-            }
+            }}
           >
             <FilePlus className="w-6 h-6 text-gray-600" />
           </button>
+
           <button
             className="p-2 rounded hover:bg-gray-100 transition-colors"
             title="Supprimer l'équipe sélectionnée"
@@ -100,29 +151,28 @@ const TeamTabPanel: React.FC<Props> = ({
             onOpenChange={setShowDeleteDialog}
             title="Supprimer cette équipe ?"
             description={`ATTENTION : Vous allez supprimer l'équipe "${selectedTeam?.name}" définitivement.`}
-            onConfirm={onDeleteTeam}
+            onConfirm={handleDeleteTeam}
           />
         </div>
       </div>
 
-      {/* Formulaire de modification */}
       <div className="w-4/5 p-6 border-t">
         {selectedTeam && (
           <div className="space-y-4">
-            <label className="block">
-              <span className="text-sm font-medium text-gray-700">Nom de l'équipe</span>
-              <input
-                type="text"
-                className="w-full p-2 border rounded"
-                value={selectedTeam.name}
-                onChange={(e) =>
-                  onSelectTeam({ ...selectedTeam, name: e.target.value })
-                }
-              />
+            <label className="block text-sm font-semibold text-gray-700">
+              Nom de l'équipe
             </label>
+            <input
+              type="text"
+              className="w-full p-2 border rounded"
+              value={selectedTeam.name}
+              onChange={(e) =>
+                setSelectedTeam({ ...selectedTeam, name: e.target.value })
+              }
+            />
             <button
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              onClick={() => onSaveTeam(selectedTeam)}
+              onClick={handleSaveTeam}
             >
               Enregistrer
             </button>

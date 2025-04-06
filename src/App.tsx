@@ -33,10 +33,12 @@ const AppContent: React.FC = () => {
   }, [isAuthenticated, user]);
 
   const handleUpdateBundle = (updated: Bundle) => {
+    if (!updated) return;
     setBundles(prev =>
       prev.map(b => (b.id === updated.id ? updated : b))
     );
   };  
+
   const handleLogout = () => {
     logout();
     setBundles([]);
