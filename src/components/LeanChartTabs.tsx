@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { getIcon } from "../utils/icons";
-import { LeanChart, LeanChartData, ChartData } from '../types/LeanChart';
+import { LeanChart, ChartData } from '../types/LeanChart';
 import { fetchLeanChartData, updateShortTermChartValue, updateLongTermChartValue } from "../services/leanChartDataService";
 import { updateLeanChart } from "../services/leanChartService";
 import { StandardLeanChart } from "./leanchart/StandardLeanChart";
 import { CumulativeLeanChart } from "./leanchart/CumulativeLeanChart";
 import { Toaster } from "sonner";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, SquareActivity } from "lucide-react";
 import { addMonths, format } from "date-fns";
+import LeanChartGrid from "./leanchart/LeanChartGrid";
 
 interface TabsProps {
   leanCharts: LeanChart[];
@@ -15,7 +16,7 @@ interface TabsProps {
 
 const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
   const [charts, setCharts] = useState<LeanChart[]>([]);
-  const [activeTab, setActiveTab] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<number>(0); // ✅ Vue Grille par défaut
   const [currentLeanChart, setCurrentLeanChart] = useState<LeanChart | undefined>(undefined);
   const [monthOffset, setMonthOffset] = useState(0);
 
@@ -26,38 +27,53 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
 
   const currentMonthKey = getCurrentMonthKey();
 
-  useEffect(() => {
-    setCharts(leanCharts);
-    if (leanCharts.length > 0) {
-      setActiveTab(leanCharts[0].id);
-    }
-  }, [leanCharts]);
-
-  useEffect(() => {
-    if (activeTab !== null) {
-      const month = getCurrentMonthKey();
-      fetchLeanChartData(activeTab, month)
-        .then((data: LeanChartData) => {
-          const selectedChart = charts.find(chart => chart.id === activeTab);
-          if (selectedChart) {
-            const updatedChart = {
-              ...selectedChart,
-              longTermData: [...data.longTermValues],
-              shortTermData: [...data.shortTermValues]
-            };
-            setCurrentLeanChart(updatedChart);
-          }
+  const fetchAllCharts = async () => {
+    try {
+      const updated = await Promise.all(
+        leanCharts.map(async (chart) => {
+          const data = await fetchLeanChartData(chart.id, getCurrentMonthKey());
+          return {
+            ...chart,
+            longTermData: data.longTermValues,
+            shortTermData: data.shortTermValues,
+          };
         })
-        .catch((error) => {
-          console.error("Error fetching chart data:", error);
-          setCurrentLeanChart(undefined);
-        });
+      );
+      setCharts(updated);
+    } catch (err) {
+      console.error("Erreur chargement des charts :", err);
     }
-  }, [activeTab, monthOffset, charts]);
+  };
 
-  if (charts.length === 0) {
-    return <p className="text-center text-gray-500">Aucun graphique disponible</p>;
-  }
+  const fetchSingleChart = async (chartId: number) => {
+    try {
+      const data = await fetchLeanChartData(chartId, getCurrentMonthKey());
+      const selectedChart = leanCharts.find((chart) => chart.id === chartId);
+      if (selectedChart) {
+        const updatedChart = {
+          ...selectedChart,
+          longTermData: [...data.longTermValues],
+          shortTermData: [...data.shortTermValues],
+        };
+        setCurrentLeanChart(updatedChart);
+      }
+    } catch (error) {
+      console.error("Erreur chargement graphique :", error);
+      setCurrentLeanChart(undefined);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllCharts();
+  }, [leanCharts, monthOffset]);
+
+  useEffect(() => {
+    if (activeTab === 0) {
+      fetchAllCharts();
+    } else {
+      fetchSingleChart(activeTab);
+    }
+  }, [activeTab]);
 
   const updateShortTermChartField = async (chartData: ChartData, field: "value" | "target" | "comment", newValue: number | string) => {
     if (currentLeanChart && currentLeanChart.shortTermData) {
@@ -119,6 +135,10 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
   };
 
   const renderChartComponent = () => {
+    if (activeTab === 0) {
+      return <LeanChartGrid leanCharts={charts} currentMonth={currentMonthKey} />;
+    }
+
     if (!currentLeanChart) return null;
 
     const props = {
@@ -126,7 +146,7 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
       currentMonth: currentMonthKey,
       onUpdateShortTerm: updateShortTermChartField,
       onUpdateLongTerm: updateLongTermChartField,
-      onUpdateMainTarget: updateMainTarget
+      onUpdateMainTarget: updateMainTarget,
     };
 
     switch (currentLeanChart.UXComponent) {
@@ -139,18 +159,32 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
     }
   };
 
+  const handleMonthChange = (direction: number) => {
+    setMonthOffset((prev) => prev + direction);
+  };
+
   return (
     <div className="w-full p-4">
       <Toaster position="top-right" richColors closeButton />
       <div className="flex items-center justify-between border-b-0">
         <div className="flex">
+          <button
+            key={0}
+            className={`flex items-center gap-2 px-6 py-2 text-sm font-medium transition-all rounded-t-lg border 
+              ${activeTab === 0 ? "border-gray-400 text-blue-600 font-bold bg-gray-100" : "text-gray-700 border-gray-400 bg-white hover:bg-gray-100"}`}
+            onClick={() => setActiveTab(0)}
+          >
+            <SquareActivity size={16} className={activeTab === 0 ? "text-blue-600" : "text-gray-600"} />
+            Synthèse
+          </button>
+
           {charts.map((leanChart) => {
             const IconComponent = getIcon(leanChart.icon);
             return (
               <button
                 key={leanChart.id}
-                className={`flex items-center gap-2 px-6 py-2 text-sm font-medium transition-all rounded-t-lg border bg-white 
-                  ${activeTab === leanChart.id ? "border-gray-400 text-blue-600 font-bold" : "text-gray-700 border-gray-400 hover:bg-gray-100"}`}
+                className={`flex items-center gap-2 px-6 py-2 text-sm font-medium transition-all rounded-t-lg border 
+                  ${activeTab === leanChart.id ? "border-gray-400 text-blue-600 font-bold bg-gray-100" : "text-gray-700 border-gray-400 bg-white hover:bg-gray-100"}`}
                 onClick={() => setActiveTab(leanChart.id)}
               >
                 <IconComponent size={16} className={activeTab === leanChart.id ? "text-blue-600" : "text-gray-600"} />
@@ -162,13 +196,13 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
 
         <div className="flex gap-2 ml-auto">
           <button
-            onClick={() => setMonthOffset((prev) => prev - 1)}
+            onClick={() => handleMonthChange(-1)}
             className="bg-white border border-gray-300 rounded-full p-1 shadow hover:bg-gray-100"
           >
             <ChevronLeft className="w-5 h-5 text-gray-700" />
           </button>
           <button
-            onClick={() => setMonthOffset((prev) => prev + 1)}
+            onClick={() => handleMonthChange(1)}
             className="bg-white border border-gray-300 rounded-full p-1 shadow hover:bg-gray-100"
           >
             <ChevronRight className="w-5 h-5 text-gray-700" />

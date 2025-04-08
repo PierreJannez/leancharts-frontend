@@ -1,6 +1,10 @@
 import React, { useState, useMemo } from "react";
 import { LeanChart, ChartData } from "../../types/LeanChart"; // Assurez-vous que ce type est correctement défini
 import { MessageSquare } from "lucide-react"; // Importer l'icône de commentaire depuis Lucide
+import { getMonthYear } from "../../utils/DateUtils";
+import TooltipPortal from "./TooltipPortal";
+import CommentModal from "./CommentModal";
+
 
 interface StandardLongTermeInputTableProps {
   leanChart: LeanChart | undefined; // Le graphique long terme
@@ -12,8 +16,9 @@ interface StandardLongTermeInputTableProps {
 const StandardLongTermInputTable: React.FC<StandardLongTermeInputTableProps> = ({ leanChart, onValueChange, onTargetChange, onCommentChange }) => {
   const [isModalOpen, setIsModalOpen] = useState(false); // État pour gérer l'ouverture de la modale
   const [currentComment, setCurrentComment] = useState(""); // État pour stocker le commentaire en cours d'édition
-  const [currentEntry1, setCurrentEntry1] = useState<ChartData | null>(null); // État pour stocker l'entrée en cours d'édition
-  const [hoveredEntry1, setHoveredEntry1] = useState<ChartData | null>(null); // État pour gérer l'entrée survolée
+  const [hoveredEntry1, setHoveredEntry1] = useState<ChartData | null>(null)
+  const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number } | null>(null)
+  const [currentEntry1, setCurrentEntry1] = useState<ChartData | null>(null);
 
   const values = useMemo(() => {
     if (!leanChart) return [];
@@ -30,21 +35,6 @@ const StandardLongTermInputTable: React.FC<StandardLongTermeInputTableProps> = (
   }
 
   console.log("StandardLongTermeInputTableProps->leanchart.nbDecimal", leanChart.nbDecimal);
-
-  // Fonction pour normaliser la date (dd-mm-yyyy -> yyyy-mm-dd)
-  const getMonthYear = (dateString: string) => {
-    const [, month, year] = dateString.split("-");
-    const date = new Date(`${year}-${month}-01`);
-    
-    // Récupérer le nom du mois avec la première lettre en majuscule
-    const monthName = date.toLocaleString("fr-FR", { month: "long" });
-    const capitalizedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1);
-  
-    // Extraire les deux derniers chiffres de l'année
-    const shortYear = year.slice(-2);
-  
-    return `${capitalizedMonth} ${shortYear}`;
-  };
 
   // Fonction pour ouvrir la modale
   const openModal = (entry: ChartData) => {
@@ -65,7 +55,7 @@ const StandardLongTermInputTable: React.FC<StandardLongTermeInputTableProps> = (
     <>
       {/* Titre et trait horizontal */}
       <div className="w-full mb-4">
-        <h2 className="text-left text-md font-medium text-gray-700">Saisie des données à long terme</h2>
+        <h2 className="text-left text-md font-medium text-gray-700">Long terme</h2>
         <hr className="mt-2 border-gray-300" />
       </div>
 
@@ -83,7 +73,14 @@ const StandardLongTermInputTable: React.FC<StandardLongTermeInputTableProps> = (
             >
               <div></div> {/* Colonne vide pour aligner avec les titres */}
               {values.map((entry) => (
-                <div key={entry.date}>{getMonthYear(entry.date)}</div>
+                <div key={entry.date}>
+                  {getMonthYear(entry.date).split("\n").map((line, i) => (
+                    <React.Fragment key={i}>
+                      {line}
+                      <br />
+                    </React.Fragment>
+                  ))}
+                </div>
               ))}
             </div>
 
@@ -155,19 +152,31 @@ const StandardLongTermInputTable: React.FC<StandardLongTermeInputTableProps> = (
                 <div
                   key={entry.date}
                   className="relative flex justify-center items-center"
-                  onMouseEnter={() => setHoveredEntry1(entry)}
-                  onMouseLeave={() => setHoveredEntry1(null)}
+                  onMouseEnter={(e) => {
+                    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+                    setHoveredEntry1(entry);
+                    setTooltipPosition({
+                      top: rect.top,
+                      left: rect.left + rect.width / 2,
+                    });
+                  }}
+                  onMouseLeave={() => {
+                    setHoveredEntry1(null);
+                    setTooltipPosition(null);
+                  }}
                 >
                   <MessageSquare
-                    className={`w-5 h-5 cursor-pointer rounded-full p-1 ${
+                    className={`w-8 h-8 cursor-pointer rounded-full p-1 ${
                       entry.comment ? "text-blue-500 bg-blue-100" : "text-gray-300"
                     }`}
                     onClick={() => openModal(entry)}
                   />
-                  {hoveredEntry1 === entry && entry.comment && (
-                    <div className="absolute bottom-full mb-2 px-2 py-1 text-xs text-white bg-gray-700 rounded shadow-lg">
-                      {entry.comment}
-                    </div>
+                  {hoveredEntry1 && tooltipPosition && hoveredEntry1.comment && (
+                    <TooltipPortal position={tooltipPosition}>
+                      <div className="bg-gray-700 text-white text-xs rounded px-2 py-1 shadow-lg max-w-xs whitespace-pre-wrap">
+                        {hoveredEntry1.comment}
+                      </div>
+                    </TooltipPortal>
                   )}
                 </div>
               ))}
@@ -175,27 +184,14 @@ const StandardLongTermInputTable: React.FC<StandardLongTermeInputTableProps> = (
           </div>
         </div>
 
-        {/* Modale pour éditer le commentaire */}
-        {isModalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-transparent z-50">
-          <div className="bg-white p-6 rounded shadow-lg w-96">
-            <h2 className="text-lg font-medium mb-4">Modifier le commentaire</h2>
-            <textarea
-              className="w-full h-32 p-2 border border-gray-300 rounded"
-              value={currentComment}
-              onChange={(e) => setCurrentComment(e.target.value)}
-            />
-            <div className="flex justify-end mt-4">
-              <button className="px-4 py-2 bg-gray-300 rounded mr-2" onClick={() => setIsModalOpen(false)}>
-                Annuler
-              </button>
-              <button className="px-4 py-2 bg-blue-500 text-white rounded" onClick={saveComment}>
-                Enregistrer
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        <CommentModal
+        open={isModalOpen}
+        comment={currentComment}
+        onChange={setCurrentComment}
+        onCancel={() => setIsModalOpen(false)}
+        onSave={saveComment}
+        
+      />
       </div>
     </>
   );
