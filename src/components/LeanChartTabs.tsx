@@ -75,6 +75,10 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
     }
   }, [activeTab]);
 
+  useEffect(() => {
+    setActiveTab(0); // ✅ Réinitialisation à Synthèse quand les charts changent (bundle changé)
+  }, [charts]);
+
   const updateShortTermChartField = async (chartData: ChartData, field: "value" | "target" | "comment", newValue: number | string) => {
     if (currentLeanChart && currentLeanChart.shortTermData) {
       const updatedValues = currentLeanChart.shortTermData.map((entry) =>
@@ -170,8 +174,8 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
         <div className="flex">
           <button
             key={0}
-            className={`flex items-center gap-2 px-6 py-2 text-sm font-medium transition-all rounded-t-lg border 
-              ${activeTab === 0 ? "border-gray-400 text-blue-600 font-bold bg-gray-100" : "text-gray-700 border-gray-400 bg-white hover:bg-gray-100"}`}
+            className={`flex items-center gap-2 px-6 py-2 text-sm font-medium transition-all rounded-t-lg border bg-white 
+              ${activeTab === 0 ? "border-gray-400 text-blue-600 font-bold" : "text-gray-700 border-gray-400 hover:bg-gray-100"}`}
             onClick={() => setActiveTab(0)}
           >
             <SquareActivity size={16} className={activeTab === 0 ? "text-blue-600" : "text-gray-600"} />
@@ -183,8 +187,8 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
             return (
               <button
                 key={leanChart.id}
-                className={`flex items-center gap-2 px-6 py-2 text-sm font-medium transition-all rounded-t-lg border 
-                  ${activeTab === leanChart.id ? "border-gray-400 text-blue-600 font-bold bg-gray-100" : "text-gray-700 border-gray-400 bg-white hover:bg-gray-100"}`}
+                className={`flex items-center gap-2 px-6 py-2 text-sm font-medium transition-all rounded-t-lg border bg-white 
+                  ${activeTab === leanChart.id ? "border-gray-400 text-blue-600 font-bold" : "text-gray-700 border-gray-400 hover:bg-gray-100"}`}
                 onClick={() => setActiveTab(leanChart.id)}
               >
                 <IconComponent size={16} className={activeTab === leanChart.id ? "text-blue-600" : "text-gray-600"} />
