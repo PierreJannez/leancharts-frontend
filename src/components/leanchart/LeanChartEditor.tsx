@@ -7,6 +7,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs"
 import { LeanChart } from "@/types/LeanChart"
 import ColorPickerInput from "@/utils/ColorPickerInput";
 import IconSelect from "@/utils/IconSelect";
+import NumericInputWithNegativeSupport from "@/utils/NumericInputWithNegativeSupport";
 
 interface Props {
   initialLeanChart: LeanChart
@@ -76,7 +77,6 @@ const LeanChartEditorLite: React.FC<Props> = ({ initialLeanChart, onSave }) => {
 
           <div className="grid grid-cols-2 gap-6 mt-4">
             <div>
-              <Label className="mb-1 block text-xs text-gray-500">Couleur positive</Label>
               <ColorPickerInput
                 label="Couleur positive"
                 value={form.positiveColor}
@@ -84,7 +84,6 @@ const LeanChartEditorLite: React.FC<Props> = ({ initialLeanChart, onSave }) => {
               />
             </div>
             <div>
-              <Label className="mb-1 block text-xs text-gray-500">Couleur négative</Label>
               <ColorPickerInput
                 label="Couleur négative"
                 value={form.negativeColor}
@@ -93,10 +92,33 @@ const LeanChartEditorLite: React.FC<Props> = ({ initialLeanChart, onSave }) => {
             </div>
           </div>
 
-          <div className="mt-4">
-            <Label className="mb-1 block text-xs text-gray-500">Nombre de décimales</Label>
-            <Input type="number" className={inputClass} value={form.nbDecimal} onChange={(e) => handleChange("nbDecimal", parseInt(e.target.value))} />
+          <div className="grid grid-cols-3 gap-6 mt-4">
+            <div>
+              <Label className="mb-1 block text-xs text-gray-500">Nombre de décimales</Label>
+              <Input type="number" className={inputClass} value={form.nbDecimal} onChange={(e) => handleChange("nbDecimal", parseInt(e.target.value))} />
+            </div>
+            <div>
+              <Label className="mb-1 block text-xs text-gray-500">Minimum</Label>
+              <NumericInputWithNegativeSupport
+                value={typeof form.min === "number" ? form.min : form.min || ""}
+                onChange={(val) => handleChange("min", val)}
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <Label className="mb-1 block text-xs text-gray-500">Maximum</Label>
+              <NumericInputWithNegativeSupport
+                value={typeof form.max === "number" ? form.max : form.max || ""}
+                onChange={(val) => handleChange("max", val)}
+                className={inputClass}
+              />
+            </div>
           </div>
+          {form.min > form.max && (
+            <p className="text-red-500 text-xs mt-2">
+              Le minimum doit être inférieur ou égal au maximum.
+            </p>
+          )}
         </TabsContent>
 
         <TabsContent value="long">

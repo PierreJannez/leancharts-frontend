@@ -9,6 +9,7 @@ import { Toaster } from "sonner";
 import { ChevronLeft, ChevronRight, SquareActivity } from "lucide-react";
 import { addMonths, format } from "date-fns";
 import LeanChartGrid from "./leanchart/LeanChartGrid";
+import { handleBackendError } from "@/utils/errorUtils";
 
 interface TabsProps {
   leanCharts: LeanChart[];
@@ -73,35 +74,59 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
     } else {
       fetchSingleChart(activeTab);
     }
-  }, [activeTab]);
+  }, [activeTab, monthOffset]);
 
   useEffect(() => {
     setActiveTab(0); // ✅ Réinitialisation à Synthèse quand les charts changent (bundle changé)
-  }, [charts]);
+  }, [leanCharts]);
 
-  const updateShortTermChartField = async (chartData: ChartData, field: "value" | "target" | "comment", newValue: number | string) => {
-    if (currentLeanChart && currentLeanChart.shortTermData) {
-      const updatedValues = currentLeanChart.shortTermData.map((entry) =>
-        entry.date === chartData.date ? { ...entry, [field]: newValue } : entry
+  const updateShortTermChartField = async (
+    chartData: ChartData,
+    field: "value" | "target" | "comment",
+    newValue: number | string
+  ) => {
+    if (!currentLeanChart || !currentLeanChart.shortTermData) return;
+  
+    const prevValue = chartData[field];
+  
+    // Optimistic update
+    const updatedValues = currentLeanChart.shortTermData.map((entry) =>
+      entry.date === chartData.date ? { ...entry, [field]: newValue } : entry
+    );
+    setCurrentLeanChart({ ...currentLeanChart, shortTermData: updatedValues });
+  
+    try {
+      await updateShortTermChartValue(
+        currentLeanChart.id,
+        chartData.date,
+        field === "target" ? newValue as number : chartData.target,
+        field === "value" ? newValue as number : chartData.value,
+        field === "comment" ? newValue as string : chartData.comment
       );
-      setCurrentLeanChart({ ...currentLeanChart, shortTermData: updatedValues });
-
-      try {
-        await updateShortTermChartValue(
-          activeTab!,
-          chartData.date,
-          field === "target" ? newValue as number : chartData.target,
-          field === "value" ? newValue as number : chartData.value,
-          field === "comment" ? newValue as string : chartData.comment
-        );
-      } catch (error) {
-        console.error(`Failed to update ${field} for ${chartData.date}:`, error);
-      }
+    } catch (error) {
+      console.error(`Erreur update ${field} pour ${chartData.date}:`, error);
+  
+      // 🔁 Rollback en cas d’échec
+      const rolledBackValues = currentLeanChart.shortTermData.map((entry) =>
+        entry.date === chartData.date ? { ...entry, [field]: prevValue } : entry
+      );
+      setCurrentLeanChart({ ...currentLeanChart, shortTermData: rolledBackValues });
+  
+      // Affiche un message à l’utilisateur
+      handleBackendError(error); // ou toast.error(…)
     }
   };
 
-  const updateLongTermChartField = async (chartData: ChartData, field: "value" | "target" | "comment", newValue: number | string) => {
-    if (currentLeanChart && currentLeanChart.longTermData) {
+  const updateLongTermChartField = async (
+    chartData: ChartData,
+    field: "value" | "target" | "comment",
+    newValue: number | string
+    ) => {
+      if (!currentLeanChart || !currentLeanChart.longTermData) return;
+
+      const prevValue = chartData[field]; // 💾 Sauvegarde de la valeur précédente
+
+      // 🔄 Mise à jour optimiste
       const updatedValues = currentLeanChart.longTermData.map((entry) =>
         entry.date === chartData.date ? { ...entry, [field]: newValue } : entry
       );
@@ -109,32 +134,53 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
 
       try {
         await updateLongTermChartValue(
-          activeTab!,
+          currentLeanChart.id,
           chartData.date,
           field === "target" ? newValue as number : chartData.target,
           field === "value" ? newValue as number : chartData.value,
           field === "comment" ? newValue as string : chartData.comment
         );
       } catch (error) {
-        console.error(`Failed to update ${field} for ${chartData.date}:`, error);
+        console.error(`❌ Échec update ${field} pour ${chartData.date}:`, error);
+
+        // 🔁 Rollback en cas d’erreur
+        const rolledBackValues = currentLeanChart.longTermData.map((entry) =>
+          entry.date === chartData.date ? { ...entry, [field]: prevValue } : entry
+        );
+        setCurrentLeanChart({ ...currentLeanChart, longTermData: rolledBackValues });
+
+        // 🔔 Affiche une erreur utilisateur
+        handleBackendError(error); // ou toast.error(...)
       }
-    }
   };
 
   const updateMainTarget = async (target: number) => {
     if (!currentLeanChart) return;
-
+  
+    const prevValue = currentLeanChart.shortTermMainTarget; // 💾 Sauvegarde de la valeur précédente
     const updatedChart = { ...currentLeanChart, shortTermMainTarget: target };
     setCurrentLeanChart(updatedChart);
-
+  
+    // Met à jour la liste des charts en local (optimisme UI)
     setCharts(prev =>
       prev.map(chart => chart.id === updatedChart.id ? updatedChart : chart)
     );
-
+  
     try {
       await updateLeanChart(updatedChart);
     } catch (error) {
       console.error("Failed to update main target:", error);
+  
+      // 🔄 Restaure la valeur précédente en cas d’échec
+      const revertedChart = { ...updatedChart, shortTermMainTarget: prevValue };
+      setCurrentLeanChart(revertedChart);
+      setCharts(prev =>
+        prev.map(chart => chart.id === revertedChart.id ? revertedChart : chart)
+      );
+
+      // 🔔 Affiche une erreur utilisateur
+      handleBackendError(error); // ou toast.error(...)
+      throw error; // Propage l’erreur pour que le composant parent puisse gérer l’erreur
     }
   };
 

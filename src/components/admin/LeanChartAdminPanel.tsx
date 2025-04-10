@@ -27,6 +27,8 @@ const emptyChart: LeanChart = {
   shortTermMainTarget: 0,
   longTermMainTarget: 0,
   isCumulative: false,
+  min: -1,
+  max: -1,
   cumulLongTermData: [],
   cumulShortTermData: [],
   shortTermData: [],

@@ -24,7 +24,9 @@ export interface LeanChart {
   shortTermxLabel:string;
   shortTermyLabel:string;
   shortTermMainTarget:number;
-  displayOrder:number; 
+  displayOrder:number;
+  min:number;
+  max:number; 
   longTermData: ChartData[];
   shortTermData: ChartData[];
   cumulLongTermData: number[];

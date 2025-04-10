@@ -6,7 +6,6 @@ export const formatFrShortDateLabel = (dateStr: string): string => {
     const weekday = date.toLocaleDateString("fr-FR", { weekday: "short" });
     const dayOfMonth = date.toLocaleDateString("fr-FR", { day: "2-digit" });
     const displayDate = `${weekday.charAt(0).toUpperCase() + weekday.slice(1)}\n${dayOfMonth}`
-    console.log("Formatted date:", displayDate);
     return displayDate;
   };
 

@@ -76,18 +76,28 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
           <h2 className="text-left text-md font-medium text-gray-700">Court Terme</h2>
 
           <div className="flex items-center gap-2">
+            
             <input
               type="number"
               value={bulkTarget}
-              onChange={(e) => {
-                const newTarget = Number(e.target.value)
-                leanChart.shortTermMainTarget = newTarget
-                setBulkTarget(newTarget)
-                onMainTargetChange(newTarget)
+              onChange={async (e) => {
+                const newTarget = Number(e.target.value);
+                const prevTarget = bulkTarget;
+
+                setBulkTarget(newTarget);
+                leanChart.shortTermMainTarget = newTarget;
+
+                try {
+                  await onMainTargetChange(newTarget); // ⚠️ doit être async
+                } catch (error) {
+                  console.error("Erreur lors de la mise à jour de la cible principale :", error);
+                  setBulkTarget(prevTarget); // rollback
+                  leanChart.shortTermMainTarget = prevTarget;
+                }
               }}
               className="border border-gray-300 rounded p-1 text-sm w-14 text-center bg-white"
             />
-            <button
+              <button
               onClick={applyBulkTarget}
               className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
             >
@@ -158,7 +168,6 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
                 </div>
               ))}
             </div>
-
             <div
               className="grid gap-[3px] w-full items-center text-xs text-gray-700"
               style={{ gridTemplateColumns: `1fr repeat(${values.length}, 1fr)` }}

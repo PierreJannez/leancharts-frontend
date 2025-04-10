@@ -260,6 +260,8 @@ const LeanChartsTabPanel: React.FC<Props> = ({ enterpriseId }) => {
                 shortTermyLabel: "",
                 shortTermMainTarget: 0,
                 displayOrder: 0,
+                min: -1,
+                max: -1,
                 longTermData: [],
                 shortTermData: [],
                 cumulLongTermData: [],
