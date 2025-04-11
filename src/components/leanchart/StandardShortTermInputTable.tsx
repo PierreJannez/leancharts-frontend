@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { ChartData, LeanChart } from "../../types/LeanChart";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, UploadCloud } from "lucide-react";
 import { formatFrShortDateLabel } from "../../utils/DateUtils";
 import TooltipPortal from "./TooltipPortal";
 import CommentModal from "./CommentModal";
+import ImportCSVModal from "../importation/ImportCSVModal";
+import { Button } from "@/components/ui/button"
 
 interface StandardShortTermInputTableProps {
   leanChart: LeanChart | undefined;
@@ -11,6 +13,7 @@ interface StandardShortTermInputTableProps {
   onTargetChange: (entry: ChartData, newTarget: number) => void;
   onCommentChange: (entry: ChartData, newComment: string) => void;
   onMainTargetChange: (newTarget: number) => void; // 👈 nouvelle prop
+  onRefreshRequested?: () => void; // 👈 nouvelle prop facultative
 }
 
 const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = ({
@@ -18,7 +21,8 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
   onValueChange,
   onTargetChange,
   onCommentChange,
-  onMainTargetChange
+  onMainTargetChange,
+  onRefreshRequested
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentComment, setCurrentComment] = useState("");
@@ -26,7 +30,8 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
   const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number } | null>(null)
   const [currentEntry, setCurrentEntry] = useState<ChartData | null>(null);
   const [bulkTarget, setBulkTarget] = useState<number>(leanChart?.shortTermMainTarget || 0);
-
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  
   const values = leanChart?.shortTermData || [];
 
   if (!leanChart) {
@@ -72,39 +77,52 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
   return (
     <>
       <div className="w-full mb-4">
-        <div className="flex justify-between items-center">
+      <div className="grid grid-cols-3 items-center">
+        {/* Colonne 1 : Titre "Court Terme" */}
+        <div className="flex items-center gap-2">
           <h2 className="text-left text-md font-medium text-gray-700">Court Terme</h2>
-
-          <div className="flex items-center gap-2">
-            
-            <input
-              type="number"
-              value={bulkTarget}
-              onChange={async (e) => {
-                const newTarget = Number(e.target.value);
-                const prevTarget = bulkTarget;
-
-                setBulkTarget(newTarget);
-                leanChart.shortTermMainTarget = newTarget;
-
-                try {
-                  await onMainTargetChange(newTarget); // ⚠️ doit être async
-                } catch (error) {
-                  console.error("Erreur lors de la mise à jour de la cible principale :", error);
-                  setBulkTarget(prevTarget); // rollback
-                  leanChart.shortTermMainTarget = prevTarget;
-                }
-              }}
-              className="border border-gray-300 rounded p-1 text-sm w-14 text-center bg-white"
-            />
-              <button
-              onClick={applyBulkTarget}
-              className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
-            >
-              Répartir la cible
-            </button>
-          </div>
         </div>
+
+        {/* Colonne 2 : Bouton Import centré */}
+        <div className="flex justify-center">
+          <button
+            onClick={() => setIsImportModalOpen(true)}
+            className="flex items-center gap-1 text-sm text-gray-600 hover:text-blue-600 transition-colors"
+            title="Importer un fichier CSV"
+          >
+            <UploadCloud size={24} />
+            <span className="text-lg font-medium text-gray-700">Importer</span>
+          </button>
+        </div>
+
+        {/* Colonne 3 : Champ + bouton de répartition */}
+        <div className="flex justify-end items-center gap-2">
+          <input
+            type="number"
+            value={bulkTarget}
+            onChange={async (e) => {
+              const newTarget = Number(e.target.value);
+              const prevTarget = bulkTarget;
+              setBulkTarget(newTarget);
+              leanChart.shortTermMainTarget = newTarget;
+              try {
+                await onMainTargetChange(newTarget);
+              } catch (error) {
+                console.error("Erreur lors de la mise à jour de la cible principale :", error);
+                setBulkTarget(prevTarget);
+                leanChart.shortTermMainTarget = prevTarget;
+              }
+            }}
+            className="border border-gray-300 rounded p-1 text-sm w-14 text-center bg-white"
+          />
+          <button
+            onClick={applyBulkTarget}
+            className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+          >
+            Répartir la cible
+          </button>
+        </div>
+      </div>
         <hr className="mt-2 border-gray-300" />
       </div>
       <div className="flex flex-col items-center mt-4 w-full">
@@ -216,9 +234,26 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
         onChange={setCurrentComment}
         onCancel={() => setIsModalOpen(false)}
         onSave={saveComment}
-        
       />
+
+      {isImportModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded shadow-lg max-w-lg w-full border border-gray-400">
+            <ImportCSVModal
+              chartId={leanChart.id}
+              onImportFinished={() => {
+                setIsImportModalOpen(false);
+                onRefreshRequested?.(); // 👈 appelle le parent pour recharger
+              }}
+            />
+          <div className="mt-4 text-right">
+              <Button variant="secondary" onClick={() => setIsImportModalOpen(false)}>Fermer</Button>
+            </div>
+          </div>
+        </div>
+      )}  
     </>
+    
   );
 };
 

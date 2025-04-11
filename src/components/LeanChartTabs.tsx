@@ -201,9 +201,12 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
 
     switch (currentLeanChart.UXComponent) {
       case "StandardLeanChart":
-        return <StandardLeanChart {...props} />;
+        return <StandardLeanChart {...props} 
+        onRefreshRequested={() => fetchSingleChart(currentLeanChart.id)} // 👈 recharge depuis le backend
+        />;
       case "CumulativeLeanChart":
-        return <CumulativeLeanChart {...props} />;
+        return <CumulativeLeanChart {...props} 
+        />;
       default:
         return null;
     }

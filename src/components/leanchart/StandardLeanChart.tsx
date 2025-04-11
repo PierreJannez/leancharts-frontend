@@ -12,9 +12,10 @@ interface Props {
   onUpdateShortTerm: (chartData: ChartData, field: "value" | "target" | "comment", newValue: number | string) => void;
   onUpdateLongTerm: (chartData: ChartData, field: "value" | "target" | "comment", newValue: number | string) => void;
   onUpdateMainTarget: (newTarget: number) => void; // 👈 nouvelle prop
+  onRefreshRequested?: () => void; // 👈 nouvelle prop facultative
 }
 
-export const StandardLeanChart: React.FC<Props> = ({ leanChart, currentMonth,  onUpdateShortTerm, onUpdateLongTerm, onUpdateMainTarget }) => {
+export const StandardLeanChart: React.FC<Props> = ({ leanChart, currentMonth,  onUpdateShortTerm, onUpdateLongTerm, onUpdateMainTarget, onRefreshRequested }) => {
   return (
     <div key={leanChart.id} className="text-center">
       <div className="flex justify-center gap-4">
@@ -41,7 +42,8 @@ export const StandardLeanChart: React.FC<Props> = ({ leanChart, currentMonth,  o
             onTargetChange={(chartData, newTarget) => onUpdateShortTerm(chartData, "target", newTarget)}
             onCommentChange={(chartData, newComment) => onUpdateShortTerm(chartData, "comment", newComment)}
             onMainTargetChange={(newTarget) => onUpdateMainTarget(newTarget)} // 👈 nouvelle prop{
-          />
+            onRefreshRequested={onRefreshRequested}
+              />
         </div>
       </div>
     </div>
