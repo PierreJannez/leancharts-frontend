@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+// ✅ Version modale export PDF avec fond blanc, bord gris foncé, titre et bouton de sauvegarde
+
+import React, { useState, useEffect, useRef } from "react";
 import { getIcon } from "../utils/icons";
 import { LeanChart, ChartData } from '../types/LeanChart';
 import { fetchLeanChartData, updateShortTermChartValue, updateLongTermChartValue } from "../services/leanChartDataService";
@@ -10,22 +12,24 @@ import { ChevronLeft, ChevronRight, SquareActivity } from "lucide-react";
 import { addMonths, format } from "date-fns";
 import LeanChartGrid from "./leanchart/LeanChartGrid";
 import { handleBackendError } from "@/utils/errorUtils";
+import { generateChartImages } from "../utils/generateChartImages";
+import ExportPDFModal from "./leanchart/ExportPDFModal";
 
 interface TabsProps {
   leanCharts: LeanChart[];
+  bundleTitle: string;
 }
 
-const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
+const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts, bundleTitle }) => {
   const [charts, setCharts] = useState<LeanChart[]>([]);
-  const [activeTab, setActiveTab] = useState<number>(0); // ✅ Vue Grille par défaut
+  const [activeTab, setActiveTab] = useState<number>(0);
   const [currentLeanChart, setCurrentLeanChart] = useState<LeanChart | undefined>(undefined);
   const [monthOffset, setMonthOffset] = useState(0);
+  const [pdfImages, setPdfImages] = useState<string[] | null>(null);
+  const [showPdf, setShowPdf] = useState(false);
+  const chartGridRef = useRef<HTMLDivElement>(null);
 
-  const getCurrentMonthKey = () => {
-    const targetDate = addMonths(new Date(), monthOffset);
-    return format(targetDate, "yyyy-MM");
-  };
-
+  const getCurrentMonthKey = () => format(addMonths(new Date(), monthOffset), "yyyy-MM");
   const currentMonthKey = getCurrentMonthKey();
 
   const fetchAllCharts = async () => {
@@ -69,32 +73,22 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
   }, [leanCharts, monthOffset]);
 
   useEffect(() => {
-    if (activeTab === 0) {
-      fetchAllCharts();
-    } else {
-      fetchSingleChart(activeTab);
-    }
+    if (activeTab === 0) fetchAllCharts();
+    else fetchSingleChart(activeTab);
   }, [activeTab, monthOffset]);
 
   useEffect(() => {
-    setActiveTab(0); // ✅ Réinitialisation à Synthèse quand les charts changent (bundle changé)
+    setActiveTab(0);
   }, [leanCharts]);
 
-  const updateShortTermChartField = async (
-    chartData: ChartData,
-    field: "value" | "target" | "comment",
-    newValue: number | string
-  ) => {
+  const updateShortTermChartField = async (chartData: ChartData, field: "value" | "target" | "comment", newValue: number | string) => {
     if (!currentLeanChart || !currentLeanChart.shortTermData) return;
-  
     const prevValue = chartData[field];
-  
-    // Optimistic update
     const updatedValues = currentLeanChart.shortTermData.map((entry) =>
       entry.date === chartData.date ? { ...entry, [field]: newValue } : entry
     );
     setCurrentLeanChart({ ...currentLeanChart, shortTermData: updatedValues });
-  
+
     try {
       await updateShortTermChartValue(
         currentLeanChart.id,
@@ -105,88 +99,69 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
       );
     } catch (error) {
       console.error(`Erreur update ${field} pour ${chartData.date}:`, error);
-  
-      // 🔁 Rollback en cas d’échec
       const rolledBackValues = currentLeanChart.shortTermData.map((entry) =>
         entry.date === chartData.date ? { ...entry, [field]: prevValue } : entry
       );
       setCurrentLeanChart({ ...currentLeanChart, shortTermData: rolledBackValues });
-  
-      // Affiche un message à l’utilisateur
-      handleBackendError(error); // ou toast.error(…)
+      handleBackendError(error);
     }
   };
 
-  const updateLongTermChartField = async (
-    chartData: ChartData,
-    field: "value" | "target" | "comment",
-    newValue: number | string
-    ) => {
-      if (!currentLeanChart || !currentLeanChart.longTermData) return;
+  const updateLongTermChartField = async (chartData: ChartData, field: "value" | "target" | "comment", newValue: number | string) => {
+    if (!currentLeanChart || !currentLeanChart.longTermData) return;
+    const prevValue = chartData[field];
+    const updatedValues = currentLeanChart.longTermData.map((entry) =>
+      entry.date === chartData.date ? { ...entry, [field]: newValue } : entry
+    );
+    setCurrentLeanChart({ ...currentLeanChart, longTermData: updatedValues });
 
-      const prevValue = chartData[field]; // 💾 Sauvegarde de la valeur précédente
-
-      // 🔄 Mise à jour optimiste
-      const updatedValues = currentLeanChart.longTermData.map((entry) =>
-        entry.date === chartData.date ? { ...entry, [field]: newValue } : entry
+    try {
+      await updateLongTermChartValue(
+        currentLeanChart.id,
+        chartData.date,
+        field === "target" ? newValue as number : chartData.target,
+        field === "value" ? newValue as number : chartData.value,
+        field === "comment" ? newValue as string : chartData.comment
       );
-      setCurrentLeanChart({ ...currentLeanChart, longTermData: updatedValues });
-
-      try {
-        await updateLongTermChartValue(
-          currentLeanChart.id,
-          chartData.date,
-          field === "target" ? newValue as number : chartData.target,
-          field === "value" ? newValue as number : chartData.value,
-          field === "comment" ? newValue as string : chartData.comment
-        );
-      } catch (error) {
-        console.error(`❌ Échec update ${field} pour ${chartData.date}:`, error);
-
-        // 🔁 Rollback en cas d’erreur
-        const rolledBackValues = currentLeanChart.longTermData.map((entry) =>
-          entry.date === chartData.date ? { ...entry, [field]: prevValue } : entry
-        );
-        setCurrentLeanChart({ ...currentLeanChart, longTermData: rolledBackValues });
-
-        // 🔔 Affiche une erreur utilisateur
-        handleBackendError(error); // ou toast.error(...)
-      }
+    } catch (error) {
+      console.error(`Erreur update ${field} pour ${chartData.date}:`, error);
+      const rolledBackValues = currentLeanChart.longTermData.map((entry) =>
+        entry.date === chartData.date ? { ...entry, [field]: prevValue } : entry
+      );
+      setCurrentLeanChart({ ...currentLeanChart, longTermData: rolledBackValues });
+      handleBackendError(error);
+    }
   };
 
   const updateMainTarget = async (target: number) => {
     if (!currentLeanChart) return;
-  
-    const prevValue = currentLeanChart.shortTermMainTarget; // 💾 Sauvegarde de la valeur précédente
+    const prevValue = currentLeanChart.shortTermMainTarget;
     const updatedChart = { ...currentLeanChart, shortTermMainTarget: target };
     setCurrentLeanChart(updatedChart);
-  
-    // Met à jour la liste des charts en local (optimisme UI)
-    setCharts(prev =>
-      prev.map(chart => chart.id === updatedChart.id ? updatedChart : chart)
-    );
-  
+    setCharts(prev => prev.map(chart => chart.id === updatedChart.id ? updatedChart : chart));
+
     try {
       await updateLeanChart(updatedChart);
     } catch (error) {
       console.error("Failed to update main target:", error);
-  
-      // 🔄 Restaure la valeur précédente en cas d’échec
       const revertedChart = { ...updatedChart, shortTermMainTarget: prevValue };
       setCurrentLeanChart(revertedChart);
-      setCharts(prev =>
-        prev.map(chart => chart.id === revertedChart.id ? revertedChart : chart)
-      );
-
-      // 🔔 Affiche une erreur utilisateur
-      handleBackendError(error); // ou toast.error(...)
-      throw error; // Propage l’erreur pour que le composant parent puisse gérer l’erreur
+      setCharts(prev => prev.map(chart => chart.id === revertedChart.id ? revertedChart : chart));
+      handleBackendError(error);
     }
+  };
+
+  const handleExportPDF = async () => {
+    if (!chartGridRef.current) return;
+    const children = Array.from(chartGridRef.current.querySelectorAll(".chart-box")) as HTMLDivElement[];
+    const images = await generateChartImages(children);
+    setPdfImages(images);
+    setShowPdf(true);
   };
 
   const renderChartComponent = () => {
     if (activeTab === 0) {
-      return <LeanChartGrid leanCharts={charts} currentMonth={currentMonthKey} />;
+      return <div ref={chartGridRef}><LeanChartGrid leanCharts={charts} currentMonth={currentMonthKey} /></div>;
     }
 
     if (!currentLeanChart) return null;
@@ -201,24 +176,18 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
 
     switch (currentLeanChart.UXComponent) {
       case "StandardLeanChart":
-        return <StandardLeanChart {...props} 
-        onRefreshRequested={() => fetchSingleChart(currentLeanChart.id)} // 👈 recharge depuis le backend
-        />;
+        return <StandardLeanChart {...props} onRefreshRequested={() => fetchSingleChart(currentLeanChart.id)} />;
       case "CumulativeLeanChart":
-        return <CumulativeLeanChart {...props} 
-        />;
+        return <CumulativeLeanChart {...props} />;
       default:
         return null;
     }
   };
 
-  const handleMonthChange = (direction: number) => {
-    setMonthOffset((prev) => prev + direction);
-  };
-
   return (
     <div className="w-full p-4">
       <Toaster position="top-right" richColors closeButton />
+
       <div className="flex items-center justify-between border-b-0">
         <div className="flex">
           <button
@@ -248,16 +217,20 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts }) => {
         </div>
 
         <div className="flex gap-2 ml-auto">
-          <button
-            onClick={() => handleMonthChange(-1)}
-            className="bg-white border border-gray-300 rounded-full p-1 shadow hover:bg-gray-100"
-          >
+          {activeTab === 0 && (
+            <ExportPDFModal
+              open={showPdf}
+              setOpen={setShowPdf}
+              images={pdfImages}
+              onTriggerClick={handleExportPDF}
+              bundleTitle={bundleTitle}
+            />         
+          )}
+
+          <button onClick={() => setMonthOffset((prev) => prev - 1)} className="bg-white border border-gray-300 rounded-full p-1 shadow hover:bg-gray-100">
             <ChevronLeft className="w-5 h-5 text-gray-700" />
           </button>
-          <button
-            onClick={() => handleMonthChange(1)}
-            className="bg-white border border-gray-300 rounded-full p-1 shadow hover:bg-gray-100"
-          >
+          <button onClick={() => setMonthOffset((prev) => prev + 1)} className="bg-white border border-gray-300 rounded-full p-1 shadow hover:bg-gray-100">
             <ChevronRight className="w-5 h-5 text-gray-700" />
           </button>
         </div>

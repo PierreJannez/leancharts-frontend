@@ -18,7 +18,7 @@ const LeanChartGrid: React.FC<LeanChartGridProps> = ({ leanCharts, currentMonth 
           : ShortTermChartComponent;
 
         return (
-          <div key={key} className="border border-gray-400 rounded-lg p-4 bg-white">
+          <div key={key} className="chart-box border border-gray-400 rounded-lg p-4 bg-white">
             <ChartComponent
               leanChart={chart}
               currentMonth={currentMonth}
