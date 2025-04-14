@@ -37,20 +37,20 @@ const LeanChartEditorLite: React.FC<Props> = ({ initialLeanChart, onSave }) => {
     <div className="grid gap-6 text-sm text-gray-800">
       <Tabs defaultValue="general" className="w-full">
         <TabsList className="mb-4">
-          <TabsTrigger value="general">Général</TabsTrigger>
-          <TabsTrigger value="long">Long Terme</TabsTrigger>
-          <TabsTrigger value="short">Court Terme</TabsTrigger>
+          <TabsTrigger value="general">General</TabsTrigger>
+          <TabsTrigger value="long">Long term</TabsTrigger>
+          <TabsTrigger value="short">Short term</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general">
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <Label className="mb-1 block text-xs text-gray-500">Nom</Label>
+              <Label className="mb-1 block text-xs text-gray-500">Name</Label>
               <Input className={inputClass} value={form.name} onChange={(e) => handleChange("name", e.target.value)} />
             </div>
             <div>
               <IconSelect
-                label="Icône"
+                label="Icon"
                 value={form.icon}
                 onChange={(newIcon) => handleChange("icon", newIcon)}
               />
@@ -59,18 +59,18 @@ const LeanChartEditorLite: React.FC<Props> = ({ initialLeanChart, onSave }) => {
 
           <div className="grid grid-cols-2 gap-6 mt-4">
             <div>
-              <Label className="mb-1 block text-xs text-gray-500">Composant UX</Label>
+              <Label className="mb-1 block text-xs text-gray-500">UX component</Label>
               <Input className={inputClass} value={form.UXComponent} onChange={(e) => handleChange("UXComponent", e.target.value)} />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-6 mt-4">
             <div className="flex items-center gap-4">
-              <Label className="text-xs text-gray-500">Cumulé ?</Label>
+              <Label className="text-xs text-gray-500">Cumulated?</Label>
               <Switch checked={form.isCumulative} onCheckedChange={(v) => handleChange("isCumulative", v)} />
             </div>
             <div className="flex items-center gap-4">
-              <Label className="text-xs text-gray-500">Vert si au-dessus de la cible ?</Label>
+              <Label className="text-xs text-gray-500">Green if above the target ?</Label>
               <Switch checked={form.isPositiveColorAboveTarget} onCheckedChange={(v) => handleChange("isPositiveColorAboveTarget", v)} />
             </div>
           </div>
@@ -78,14 +78,14 @@ const LeanChartEditorLite: React.FC<Props> = ({ initialLeanChart, onSave }) => {
           <div className="grid grid-cols-2 gap-6 mt-4">
             <div>
               <ColorPickerInput
-                label="Couleur positive"
+                label="Positive color"
                 value={form.positiveColor}
                 onChange={(newColor) => handleChange("positiveColor", newColor)}
               />
             </div>
             <div>
               <ColorPickerInput
-                label="Couleur négative"
+                label="Negative color"
                 value={form.negativeColor}
                 onChange={(newColor) => handleChange("negativeColor", newColor)}
               />
@@ -94,7 +94,7 @@ const LeanChartEditorLite: React.FC<Props> = ({ initialLeanChart, onSave }) => {
 
           <div className="grid grid-cols-3 gap-6 mt-4">
             <div>
-              <Label className="mb-1 block text-xs text-gray-500">Nombre de décimales</Label>
+              <Label className="mb-1 block text-xs text-gray-500">Number of decimal places</Label>
               <Input type="number" className={inputClass} value={form.nbDecimal} onChange={(e) => handleChange("nbDecimal", parseInt(e.target.value))} />
             </div>
             <div>
@@ -116,7 +116,7 @@ const LeanChartEditorLite: React.FC<Props> = ({ initialLeanChart, onSave }) => {
           </div>
           {form.min > form.max && (
             <p className="text-red-500 text-xs mt-2">
-              Le minimum doit être inférieur ou égal au maximum.
+              The minimum must be less than or equal to the maximum.
             </p>
           )}
         </TabsContent>
@@ -124,20 +124,20 @@ const LeanChartEditorLite: React.FC<Props> = ({ initialLeanChart, onSave }) => {
         <TabsContent value="long">
           <div className="grid grid-cols-3 gap-6">
             <div>
-              <Label className="mb-1 block text-xs text-gray-500">Titre</Label>
+              <Label className="mb-1 block text-xs text-gray-500">Title</Label>
               <Input className={inputClass} value={form.longTermTitle} onChange={(e) => handleChange("longTermTitle", e.target.value)} />
             </div>
             <div>
-              <Label className="mb-1 block text-xs text-gray-500">Axe X</Label>
+              <Label className="mb-1 block text-xs text-gray-500">Axis X</Label>
               <Input className={inputClass} value={form.longTermxLabel} onChange={(e) => handleChange("longTermxLabel", e.target.value)} />
             </div>
             <div>
-              <Label className="mb-1 block text-xs text-gray-500">Axe Y</Label>
+              <Label className="mb-1 block text-xs text-gray-500">Axis Y</Label>
               <Input className={inputClass} value={form.longTermyLabel} onChange={(e) => handleChange("longTermyLabel", e.target.value)} />
             </div>
           </div>
           <div className="mt-4">
-            <Label className="mb-1 block text-xs text-gray-500">Cible principale</Label>
+            <Label className="mb-1 block text-xs text-gray-500">Main target</Label>
             <Input type="number" className={inputClass} value={form.longTermMainTarget} onChange={(e) => handleChange("longTermMainTarget", parseFloat(e.target.value))} />
           </div>
         </TabsContent>
@@ -145,28 +145,28 @@ const LeanChartEditorLite: React.FC<Props> = ({ initialLeanChart, onSave }) => {
         <TabsContent value="short">
           <div className="grid grid-cols-3 gap-6">
             <div>
-              <Label className="mb-1 block text-xs text-gray-500">Titre</Label>
+              <Label className="mb-1 block text-xs text-gray-500">Title</Label>
               <Input className={inputClass} value={form.shortTermTitle} onChange={(e) => handleChange("shortTermTitle", e.target.value)} />
             </div>
             <div>
-              <Label className="mb-1 block text-xs text-gray-500">Axe X</Label>
+              <Label className="mb-1 block text-xs text-gray-500">Axis X</Label>
               <Input className={inputClass} value={form.shortTermxLabel} onChange={(e) => handleChange("shortTermxLabel", e.target.value)} />
             </div>
             <div>
-              <Label className="mb-1 block text-xs text-gray-500">Axe Y</Label>
+              <Label className="mb-1 block text-xs text-gray-500">Y axis</Label>
               <Input className={inputClass} value={form.shortTermyLabel} onChange={(e) => handleChange("shortTermyLabel", e.target.value)} />
             </div>
           </div>
           <div className="mt-4">
-            <Label className="mb-1 block text-xs text-gray-500">Cible principale</Label>
+            <Label className="mb-1 block text-xs text-gray-500">Main target</Label>
             <Input type="number" className={inputClass} value={form.shortTermMainTarget} onChange={(e) => handleChange("shortTermMainTarget", parseFloat(e.target.value))} />
           </div>
         </TabsContent>
       </Tabs>
 
       <div className="flex justify-end gap-4 pt-6">
-        <Button variant="secondary" onClick={handleReset}>Réinitialiser</Button>
-        <Button onClick={handleSubmit}>Enregistrer
+        <Button variant="secondary" onClick={handleReset}>Reset</Button>
+        <Button onClick={handleSubmit}>Save
 
         </Button>
       </div>

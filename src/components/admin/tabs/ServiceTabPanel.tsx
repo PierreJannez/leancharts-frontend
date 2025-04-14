@@ -39,7 +39,7 @@ const ServiceTabPanel: React.FC<Props> = ({ enterpriseId }) => {
           : [...prev, saved]
       })
       setSelectedService(saved)
-      toastSuccess("Service enregistré avec succès.")
+      toastSuccess("Service successfully registered.")
     } catch (error) {
         handleBackendError(error)
     }
@@ -51,7 +51,7 @@ const ServiceTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       await deleteService(selectedService.id)
       setServices((prev) => prev.filter((s) => s.id !== selectedService.id))
       setSelectedService(null)
-      toastSuccess("Service supprimé avec succès.")
+      toastSuccess("Service successfully removed.")
     } catch (error) {
         handleBackendError(error)
     }
@@ -94,8 +94,8 @@ const ServiceTabPanel: React.FC<Props> = ({ enterpriseId }) => {
           <DeleteConfirmationDialog
             open={showDeleteDialog}
             onOpenChange={setShowDeleteDialog}
-            title="Supprimer ce service ?"
-            description={`ATTENTION : Vous allez supprimer le service "${selectedService?.name}" définitivement.`}
+            title="Cancel this service?"
+            description={`WARNING: You are about to cancel the service "${selectedService?.name}" permanently.`}
             onConfirm={handleDeleteService}
           />
         </div>
@@ -105,7 +105,7 @@ const ServiceTabPanel: React.FC<Props> = ({ enterpriseId }) => {
         {selectedService && (
           <div className="space-y-4">
             <label className="block">
-              <span className="text-sm font-medium text-gray-700">Nom du service</span>
+              <span className="text-sm font-medium text-gray-700">Name of the service</span>
               <input
                 type="text"
                 className="w-full p-2 border rounded"
@@ -119,7 +119,7 @@ const ServiceTabPanel: React.FC<Props> = ({ enterpriseId }) => {
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
               onClick={() => handleSaveService(selectedService)}
             >
-              Enregistrer
+              Save
             </button>
           </div>
         )}

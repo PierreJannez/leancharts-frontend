@@ -50,7 +50,7 @@ const LeanChartAdminPanel: React.FC<LeanChartAdminPanelProps> = ({ leanChart, on
   return (
     <div className="grid gap-6">
       {!form ? (
-        <div className="text-muted-foreground">Aucun LeanChart sélectionné.</div>
+        <div className="text-muted-foreground">No LeanChart selected.</div>
       ) : (
         <Card>
           <CardContent className="p-6">

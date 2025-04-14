@@ -55,7 +55,7 @@ const StandardLongTermInputTable: React.FC<StandardLongTermeInputTableProps> = (
     <>
       {/* Titre et trait horizontal */}
       <div className="w-full mb-4">
-        <h2 className="text-left text-md font-medium text-gray-700">Long terme</h2>
+        <h2 className="text-left text-md font-medium text-gray-700">Long term</h2>
         <hr className="mt-2 border-gray-300" />
       </div>
 

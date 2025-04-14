@@ -115,7 +115,7 @@ const LeanChartsTabPanel: React.FC<Props> = ({ enterpriseId }) => {
 
   const handleSaveChart = async (chart: LeanChart) => {
     try {
-      if (!selectedBundle) return toastError("Aucun bundle sélectionné.")
+      if (!selectedBundle) return toastError("No bundle selected.")
 
       const saved = chart.id === -1
         ? await createLeanChart(chart, selectedBundle.id)
@@ -129,7 +129,7 @@ const LeanChartsTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       })
 
       setSelectedChart(saved)
-      toastSuccess("LeanChart enregistré avec succès.")
+      toastSuccess("LeanChart successfully registered.")
     } catch (error) {
         handleBackendError(error)
     }
@@ -141,7 +141,7 @@ const LeanChartsTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       await deleteLeanChart(selectedChart.id)
       setLeanCharts((prev) => prev.filter((c) => c.id !== selectedChart.id))
       setSelectedChart(null)
-      toastSuccess("LeanChart supprimé.")
+      toastSuccess("LeanChart deleted.")
     } catch (error) {
         handleBackendError(error)
     }
@@ -160,7 +160,7 @@ const LeanChartsTabPanel: React.FC<Props> = ({ enterpriseId }) => {
               onValueChange={(v) => setSelectedServiceId(Number(v))}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Choisir un service" />
+                <SelectValue placeholder="Choose a service" />
               </SelectTrigger>
               <SelectContent>
                 {services.map((s) => (
@@ -174,13 +174,13 @@ const LeanChartsTabPanel: React.FC<Props> = ({ enterpriseId }) => {
 
           {/* Équipe */}
           <div>
-            <label className="text-sm font-semibold text-gray-700">Équipe</label>
+            <label className="text-sm font-semibold text-gray-700">Team</label>
             <Select
               value={selectedTeamId?.toString() || ""}
               onValueChange={(v) => setSelectedTeamId(Number(v))}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Choisir une équipe" />
+                <SelectValue placeholder="Choose a team" />
               </SelectTrigger>
               <SelectContent>
                 {teams.map((t) => (
@@ -203,7 +203,7 @@ const LeanChartsTabPanel: React.FC<Props> = ({ enterpriseId }) => {
               }
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Choisir un bundle" />
+                <SelectValue placeholder="Choose a bundle" />
               </SelectTrigger>
               <SelectContent>
                 {bundles.map((b) => (
@@ -214,7 +214,7 @@ const LeanChartsTabPanel: React.FC<Props> = ({ enterpriseId }) => {
               </SelectContent>
             </Select>
             {bundles.length === 0 && (
-              <p className="text-xs text-muted-foreground italic mt-1">Aucun bundle pour cette équipe.</p>
+              <p className="text-xs text-muted-foreground italic mt-1">No bundle for this team.</p>
             )}
           </div>
         </div>
@@ -239,7 +239,7 @@ const LeanChartsTabPanel: React.FC<Props> = ({ enterpriseId }) => {
         <div className="flex justify-between gap-2 mt-6">
           <button
             className="p-2 rounded hover:bg-gray-100 transition-colors"
-            title="Créer un nouveau LeanChart"
+            title="Create a new LeanChart"
             onClick={() =>
               setSelectedChart({
                 id: -1,
@@ -273,7 +273,7 @@ const LeanChartsTabPanel: React.FC<Props> = ({ enterpriseId }) => {
           </button>
           <button
             className="p-2 rounded hover:bg-gray-100 transition-colors"
-            title="Supprimer le LeanChart sélectionné"
+            title="Delete the selected LeanChart"
             onClick={() => setShowDeleteDialog(true)}
             disabled={!selectedChart}
           >
@@ -284,8 +284,8 @@ const LeanChartsTabPanel: React.FC<Props> = ({ enterpriseId }) => {
         <DeleteConfirmationDialog
           open={showDeleteDialog}
           onOpenChange={setShowDeleteDialog}
-          title="Supprimer ce LeanChart ?"
-          description={`ATTENTION : Vous allez supprimer le LeanChart "${selectedChart?.name}" définitivement.`}
+          title="Delete this LeanChart?"
+          description={`WARNING: You are going to delete the LeanChart "${selectedChart?.name}" permanently.`}
           onConfirm={handleDeleteChart}
         />
       </div>

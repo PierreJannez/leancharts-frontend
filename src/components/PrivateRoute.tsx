@@ -6,7 +6,7 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return <div className="text-center py-10">Chargement...</div>;
+    return <div className="text-center py-10">Loading...</div>;
   }
 
   return isAuthenticated ? children : <Navigate to="/login" replace />;

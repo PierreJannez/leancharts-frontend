@@ -68,7 +68,7 @@ const Header: React.FC<{
         {/* Left side */}
         <div className="flex flex-col items-start gap-1">
           <div className="flex items-center gap-4">
-            <h1 className="text-xl font-semibold">Lean Charts</h1>
+            <h1 className="text-xl font-semibold">Easy Charts</h1>
           </div>
           {user && (
             <div className="text-sm text-gray-600 font-medium mt-1">
@@ -79,15 +79,15 @@ const Header: React.FC<{
 
         {/* Team + Bundle selections side by side */}
         <div className="flex items-end gap-6 ml-4">
-          {/* Équipe */}
+          {/* Team */}
           <div className="flex flex-col gap-1">
-            <span className="text-sm font-bold text-gray-700">Équipe</span>
+            <span className="text-sm font-bold text-gray-700">Team</span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 border px-3 py-1.5 rounded text-sm bg-white hover:bg-gray-50">
                   {selectedTeamId
                     ? teams.find((t) => t.id === selectedTeamId)?.name
-                    : "Choisir une équipe"}
+                    : "Select a team"}
                   <ChevronDown className="w-4 h-4 text-muted-foreground" />
                 </button>
               </DropdownMenuTrigger>
@@ -114,7 +114,7 @@ const Header: React.FC<{
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-2 border px-3 py-1.5 rounded text-sm bg-white hover:bg-gray-50">
-                    {selectedBundle ? selectedBundle.shortName : "Sélectionner un bundle"}
+                    {selectedBundle ? selectedBundle.shortName : "Select a bundle"}
                     <ChevronDown className="w-4 h-4 text-muted-foreground" />
                   </button>
                 </DropdownMenuTrigger>
@@ -151,7 +151,7 @@ const Header: React.FC<{
             className="px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700"
           >
             <MessageSquarePlus className="w-4 h-4 mr-2 inline-block" />
-            Donnez votre avis
+            Give your opinion
           </a>
 
           {isAuthenticated && (
@@ -164,11 +164,11 @@ const Header: React.FC<{
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => navigate("/admin")}> 
                   <Settings className="w-4 h-4 mr-2 text-muted-foreground" />
-                  Configuration
+                  Setup
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="w-4 h-4 mr-2 text-muted-foreground" />
-                  Déconnexion
+                  Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

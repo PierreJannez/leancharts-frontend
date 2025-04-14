@@ -85,7 +85,7 @@ const ImportCSVModal: React.FC<ImportCSVModalProps> = ({ chartId, onImportFinish
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <Button onClick={handleImport} disabled={!file}>
-        Importer les données {selectedType === "shortTerm" ? "court terme" : "long terme"}
+        Importer les données {selectedType === "shortTerm" ? "Short term" : "Long term"}
       </Button>
     </div>
   );

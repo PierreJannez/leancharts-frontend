@@ -78,20 +78,19 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
     <>
       <div className="w-full mb-4">
       <div className="grid grid-cols-3 items-center">
-        {/* Colonne 1 : Titre "Court Terme" */}
+        {/* Colonne 1 : Titre "Short term" */}
         <div className="flex items-center gap-2">
-          <h2 className="text-left text-md font-medium text-gray-700">Court Terme</h2>
+          <h2 className="text-left text-md font-medium text-gray-700">Short term</h2>
         </div>
 
         {/* Colonne 2 : Bouton Import centré */}
         <div className="flex justify-center">
           <button
-            onClick={() => setIsImportModalOpen(true)}
-            className="flex items-center gap-1 text-sm text-gray-600 hover:text-blue-600 transition-colors"
-            title="Importer un fichier CSV"
+            onClick={() => setIsImportModalOpen(true)} 
+            className="flex items-center gap-1 text-sm bg-white border border-gray-300 rounded-full p-1 shadow hover:bg-gray-100 transition-colors"
+            title="Upload a CSV file"
           >
             <UploadCloud size={24} />
-            <span className="text-lg font-medium text-gray-700">Importer</span>
           </button>
         </div>
 
@@ -119,7 +118,7 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
             onClick={applyBulkTarget}
             className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
           >
-            Répartir la cible
+            Distribute the target
           </button>
         </div>
       </div>

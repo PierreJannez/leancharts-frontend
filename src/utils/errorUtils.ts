@@ -16,12 +16,12 @@ export const handleBackendError = (err: unknown) => {
 
     // 2. Sinon, afficher un message réseau ou HTTP si disponible
     if (axiosErr.message) {
-      toastError(`Erreur serveur : ${axiosErr.message}`)
+      toastError(`Server error : ${axiosErr.message}`)
       return
     }
   }
 
   // 3. Autres erreurs génériques (non Axios)
-  console.error("Erreur inconnue :", err)
-  toastError("Une erreur inconnue est survenue.")
+  console.error("Unknown error :", err)
+  toastError("An unknown error has occurred.")
 }

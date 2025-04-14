@@ -17,14 +17,14 @@ const LoginPage: React.FC = () => {
       await login(email, password); // 👈 appel réel à l'authentification
       navigate("/main");           // ✅ redirection après connexion
     } catch (err) {
-      setError("Email ou mot de passe incorrect. " + err);
+      setError("Incorrect email or password. " + err);
     }
   };
 
   return (
     <div className="flex justify-center items-center">
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-80">
-        <h2 className="text-2xl font-bold mb-4">Connexion</h2>
+        <h2 className="text-2xl font-bold mb-4">Connection</h2>
         <div className="mb-4">
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
             Email
@@ -40,7 +40,7 @@ const LoginPage: React.FC = () => {
         </div>
         <div className="mb-4">
           <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-            Mot de passe
+          Password
           </label>
           <input
             id="password"
@@ -56,7 +56,7 @@ const LoginPage: React.FC = () => {
           type="submit"
           className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
         >
-          Se connecter
+          Log in
         </button>
       </form>
     </div>

@@ -38,7 +38,7 @@ export const updateBundle = async (bundle: Bundle): Promise<Bundle> => {
         const response = await axios.put(`/api/bundles/update/${bundle.id}`, bundle);
         return response.data.bundle;
     } catch (error) {
-        console.error(`Erreur lors de la mise à jour du bundle ${bundle.id}:`, error);
+        console.error(`Error updating bundle ${bundle.id}:`, error);
         throw error;
     }
 };
@@ -60,7 +60,7 @@ export const createBundle = async (
       });
       return response.data.bundle;
     } catch (error) {
-      console.error("Erreur lors de la création du bundle:", error);
+      console.error("Error creating bundle:", error);
       throw error;
     }
   };
@@ -75,7 +75,7 @@ export const deleteBundle = async (bundleId: number): Promise<void> => {
   try {
     await axios.delete(`/api/bundles/delete/${bundleId}`);
   } catch (error) {
-    console.error(`Erreur lors de la suppression du bundle ${bundleId}:`, error);
+    console.error(`Error deleting bundle ${bundleId}:`, error);
     throw error;
   }
 };

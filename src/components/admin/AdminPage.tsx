@@ -27,7 +27,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ client }) => {
           <Tabs defaultValue="users" value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="px-4 pt-4 mb-0">
             <TabsList>
-              <TabsTrigger value="users">Utilisateurs</TabsTrigger>
+              <TabsTrigger value="users">Users</TabsTrigger>
               <TabsTrigger value="services">Services</TabsTrigger>
               <TabsTrigger value="teams">Teams</TabsTrigger>
               <TabsTrigger value="bundles">Bundles</TabsTrigger>

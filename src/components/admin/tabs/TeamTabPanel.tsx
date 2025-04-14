@@ -55,7 +55,7 @@ const TeamTabPanel: React.FC<Props> = ({ enterpriseId }) => {
 
       setTeams(updatedList)
       setSelectedTeam(saved)
-      toastSuccess("Équipe enregistrée avec succès.")
+      toastSuccess("Team successfully registered.")
     } catch (error) {
         handleBackendError(error)
     }
@@ -68,7 +68,7 @@ const TeamTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       const remaining = teams.filter((t) => t.id !== selectedTeam.id)
       setTeams(remaining)
       setSelectedTeam(remaining[0] ?? null)
-      toastSuccess("Équipe supprimée avec succès.")
+      toastSuccess("Team successfully deleted.")
     } catch (error) {
         handleBackendError(error)
     }
@@ -87,7 +87,7 @@ const TeamTabPanel: React.FC<Props> = ({ enterpriseId }) => {
               onValueChange={(id) => setSelectedServiceId(Number(id))}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Choisir un service" />
+                <SelectValue placeholder="Choose a service" />
               </SelectTrigger>
               <SelectContent>
                 {services.map((service) => (
@@ -120,11 +120,11 @@ const TeamTabPanel: React.FC<Props> = ({ enterpriseId }) => {
         <div className="flex justify-between gap-2 mt-6">
           <button
             className="p-2 rounded hover:bg-gray-100 transition-colors"
-            title="Créer une nouvelle équipe"
+            title="Create a new team"
             disabled={!selectedServiceId}
             onClick={() => {
               if (!selectedServiceId) {
-                toastError("Veuillez d'abord sélectionner un service.")
+                toastError("Please select a service first.")
                 return
               }
               setSelectedTeam({
@@ -139,7 +139,7 @@ const TeamTabPanel: React.FC<Props> = ({ enterpriseId }) => {
 
           <button
             className="p-2 rounded hover:bg-gray-100 transition-colors"
-            title="Supprimer l'équipe sélectionnée"
+            title="Delete selected team"
             onClick={() => setShowDeleteDialog(true)}
           >
             <Trash2 className="w-6 h-6 text-gray-600" />
@@ -148,8 +148,8 @@ const TeamTabPanel: React.FC<Props> = ({ enterpriseId }) => {
           <DeleteConfirmationDialog
             open={showDeleteDialog}
             onOpenChange={setShowDeleteDialog}
-            title="Supprimer cette équipe ?"
-            description={`ATTENTION : Vous allez supprimer l'équipe "${selectedTeam?.name}" définitivement.`}
+            title="Delete this team?"
+            description={`WARNING: You are about to delete the team "${selectedTeam?.name}" permanently.`}
             onConfirm={handleDeleteTeam}
           />
         </div>
@@ -159,7 +159,7 @@ const TeamTabPanel: React.FC<Props> = ({ enterpriseId }) => {
         {selectedTeam && (
           <div className="space-y-4">
             <label className="block text-sm font-semibold text-gray-700">
-              Nom de l'équipe
+            Team name
             </label>
             <input
               type="text"
@@ -173,7 +173,7 @@ const TeamTabPanel: React.FC<Props> = ({ enterpriseId }) => {
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
               onClick={handleSaveTeam}
             >
-              Enregistrer
+              Save
             </button>
           </div>
         )}

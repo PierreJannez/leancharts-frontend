@@ -26,14 +26,14 @@ const ExportPDFModal: React.FC<ExportPDFModalProps> = ({ open, setOpen, images, 
 
       <DialogContent className="max-w-[95vw] h-[92vh] p-4 bg-white border border-gray-600">
         <div className="flex items-center justify-between mt-4 mb-4">
-          <h2 className="text-xl font-semibold">Aperçu PDF des graphes</h2>
+          <h2 className="text-xl font-semibold">PDF preview of graphs</h2>
           {images && (
             <PDFDownloadLink
               document={<ExportPDF images={images} bundleTitle={bundleTitle}/>}
               fileName="leancharts.pdf"
               className="text-sm px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
-              Télécharger le PDF
+              Download PDF
             </PDFDownloadLink >
           )}
         </div>

@@ -34,14 +34,14 @@ const CreateUserPage: React.FC = () => {
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 border rounded bg-white shadow">
-      <h1 className="text-xl font-semibold mb-4">Créer un utilisateur</h1>
+      <h1 className="text-xl font-semibold mb-4">Create a user</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <Label htmlFor="firstName">Prénom</Label>
+          <Label htmlFor="firstName">First name</Label>
           <Input name="firstName" value={form.firstName} onChange={handleChange} />
         </div>
         <div>
-          <Label htmlFor="lastName">Nom</Label>
+          <Label htmlFor="lastName">Last name</Label>
           <Input name="lastName" value={form.lastName} onChange={handleChange} />
         </div>
         <div>
@@ -49,11 +49,11 @@ const CreateUserPage: React.FC = () => {
           <Input type="email" name="email" value={form.email} onChange={handleChange} />
         </div>
         <div>
-          <Label htmlFor="password">Mot de passe</Label>
+          <Label htmlFor="password">Password</Label>
           <Input type="password" name="password" value={form.password} onChange={handleChange} />
         </div>
         <Button type="submit" className="w-full">
-          Enregistrer
+        Save
         </Button>
       </form>
     </div>

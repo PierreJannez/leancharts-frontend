@@ -39,22 +39,22 @@ const BundleAdminPanel: React.FC<BundleAdminPanelProps> = ({ bundle, onSave }) =
   return (
     <Card>
       <CardContent className="p-6 grid gap-4">
-        <h2 className="text-lg font-semibold">{isNew ? "Créer un nouveau bundle" : "Modifier le bundle"}</h2>
+        <h2 className="text-lg font-semibold">{isNew ? "Create a new bundle" : "Modify the bundle"}</h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <IconSelect
-              label="Icône"
+              label="Icon"
               value={form.icon}
               onChange={(newIcon) => handleChange("icon", newIcon)}
             />
           </div>
         </div>
         <div>
-          <Label className="text-xs text-muted-foreground">Nom court</Label>
+          <Label className="text-xs text-muted-foreground">Short name</Label>
           <Input value={form.shortName} onChange={(e) => handleChange("shortName", e.target.value)} />
         </div>
         <div>
-          <Label className="text-xs text-muted-foreground">Nom long</Label>
+          <Label className="text-xs text-muted-foreground">Full name</Label>
           <Input value={form.longName} onChange={(e) => handleChange("longName", e.target.value)} />
         </div>
         <div className="flex justify-end pt-4">

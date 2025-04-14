@@ -4,7 +4,7 @@ import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, CartesianGrid, Respons
 import { GenericChartInfo } from './GenericChartInfo';
 import { colord } from "colord";
 import { parse, format } from "date-fns";
-import { fr } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 
 interface CumulativeShortTermChartProps {
   leanChart: LeanChart;
@@ -31,7 +31,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 
 const formatMonthKeyToLabel = (monthKey: string): string => {
   const date = parse(monthKey, "yyyy-MM", new Date());
-  return format(date, "MMMM yyyy", { locale: fr });
+  return format(date, "MMMM yyyy", { locale: enUS });
 };
 
 

@@ -10,7 +10,7 @@ export async function generateChartImages(chartRefs: (HTMLDivElement | null)[]):
       const dataUrl = await toPng(ref, { cacheBust: true, backgroundColor: 'white' });
       images.push(dataUrl);
     } catch (err) {
-      console.error('Erreur capture graphique :', err);
+      console.error('Error capturing graphic :', err);
     }
   }
 

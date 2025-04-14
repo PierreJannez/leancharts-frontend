@@ -37,7 +37,7 @@ const CustomTooltip = ({ active, payload, nbDecimal }: any) => {
 
 const GenericChartComponent: React.FC<GenericChartComponentProps> = ({ genericChartInfo, tickFormatter }) => {
   if (!genericChartInfo) {
-    return <p className="text-center text-gray-500">Aucun graphique disponible</p>;
+    return <p className="text-center text-gray-500">No graph available</p>;
   }
 
 console.log("genericChartInfo.nbDecimal=", genericChartInfo.nbDecimal);

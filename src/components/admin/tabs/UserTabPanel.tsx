@@ -41,7 +41,7 @@ const UserTabPanel: React.FC<Props> = ({ enterpriseId }) => {
           : [...prev, saved]
       })
       setSelectedUser(saved)
-      toastSuccess("Utilisateur enregistré avec succès.")
+      toastSuccess("User successfully registered.")
     } catch (error) {
         handleBackendError(error)
     }
@@ -54,7 +54,7 @@ const UserTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       await deleteUser(selectedUser.id)
       setUsers((prev) => prev.filter((u) => u.id !== selectedUser.id))
       setSelectedUser(null)
-      toastSuccess("Utilisateur supprimé avec succès.")
+      toastSuccess("User successfully deleted.")
     } catch (error) {
         handleBackendError(error)  
     }
@@ -107,8 +107,8 @@ const UserTabPanel: React.FC<Props> = ({ enterpriseId }) => {
           <DeleteConfirmationDialog
             open={showDeleteDialog}
             onOpenChange={setShowDeleteDialog}
-            title="Supprimer cet utilisateur ?"
-            description={`ATTENTION : Vous allez supprimer l'utilisateur "${selectedUser?.firstName} ${selectedUser?.lastName}".`}
+            title="Delete this user?"
+            description={`WARNING: You are about to delete the user "${selectedUser?.firstName} ${selectedUser?.lastName}".`}
             onConfirm={handleDeleteUser}
           />
         </div>
@@ -128,7 +128,7 @@ const UserTabPanel: React.FC<Props> = ({ enterpriseId }) => {
                   setSelectedUser({ ...selectedUser, id_service: parseInt(e.target.value) })
                 }
               >
-                <option value={-1}>Aucun</option>
+                <option value={-1}>None</option>
                 {services.map((service) => (
                   <option key={service.id} value={service.id}>
                     {service.name}
@@ -139,7 +139,7 @@ const UserTabPanel: React.FC<Props> = ({ enterpriseId }) => {
 
             {/* Champ Prénom */}
             <div className="flex items-center gap-4">
-              <label className="w-32 text-sm font-medium text-gray-700">Prénom</label>
+              <label className="w-32 text-sm font-medium text-gray-700">First name</label>
               <input
                 type="text"
                 className="flex-1 p-2 border rounded"
@@ -152,7 +152,7 @@ const UserTabPanel: React.FC<Props> = ({ enterpriseId }) => {
 
             {/* Champ Nom */}
             <div className="flex items-center gap-4">
-              <label className="w-32 text-sm font-medium text-gray-700">Nom</label>
+              <label className="w-32 text-sm font-medium text-gray-700">Last name</label>
               <input
                 type="text"
                 className="flex-1 p-2 border rounded"
@@ -180,7 +180,7 @@ const UserTabPanel: React.FC<Props> = ({ enterpriseId }) => {
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
               onClick={() => handleSaveUser(selectedUser)}
             >
-              Enregistrer
+              Save
             </button>
           </div>
         )}

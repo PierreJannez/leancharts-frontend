@@ -41,7 +41,7 @@ const BundleTabPanel: React.FC<Props> = ({ enterpriseId }) => {
   useEffect(() => {
     fetchServices(enterpriseId)
       .then(setServices)
-      .catch(() => toastError("Erreur lors du chargement des services."))
+      .catch(() => toastError("Error loading services."))
   }, [enterpriseId])
 
   // Load teams when service changes
@@ -78,7 +78,7 @@ const BundleTabPanel: React.FC<Props> = ({ enterpriseId }) => {
 
   const handleSaveBundle = async (bundle: Bundle) => {
     if (!selectedTeamId) {
-      toastError("Veuillez d'abord sélectionner une équipe.")
+      toastError("Please select a team first.")
       return
     }
 
@@ -93,7 +93,7 @@ const BundleTabPanel: React.FC<Props> = ({ enterpriseId }) => {
 
       setBundles(updatedList)
       setSelectedBundle(saved)
-      toastSuccess("Bundle enregistré avec succès.")
+      toastSuccess("Bundle successfully registered.")
     } catch (error) {
         handleBackendError(error)
     }
@@ -108,7 +108,7 @@ const BundleTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       setBundles(newList)
       setSelectedBundle(newList[0] ?? null)
       setShowDeleteDialog(false)
-      toastSuccess("Bundle supprimé avec succès.")
+      toastSuccess("Bundle successfully deleted.")
     } catch (error) {
         handleBackendError(error)
     }
@@ -124,7 +124,7 @@ const BundleTabPanel: React.FC<Props> = ({ enterpriseId }) => {
             onValueChange={(value) => setSelectedServiceId(Number(value))}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Choisir un service" />
+              <SelectValue placeholder="Choose a service" />
             </SelectTrigger>
             <SelectContent>
               {services.map((service) => (
@@ -135,13 +135,13 @@ const BundleTabPanel: React.FC<Props> = ({ enterpriseId }) => {
             </SelectContent>
           </Select>
 
-          <label className="text-sm font-semibold text-gray-700">Équipe</label>
+          <label className="text-sm font-semibold text-gray-700">Team</label>
           <Select
             value={selectedTeamId?.toString() ?? ""}
             onValueChange={(value) => setSelectedTeamId(Number(value))}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Choisir une équipe" />
+              <SelectValue placeholder="Choose a team" />
             </SelectTrigger>
             <SelectContent>
               {teams.map((team) => (
@@ -173,7 +173,7 @@ const BundleTabPanel: React.FC<Props> = ({ enterpriseId }) => {
         <div className="flex justify-between gap-2 mt-6">
           <button
             className="p-2 rounded hover:bg-gray-100 transition-colors"
-            title="Créer un nouveau bundle"
+            title="Create a new bundle"
             onClick={() =>
               setSelectedBundle({
                 id: 0,
@@ -188,7 +188,7 @@ const BundleTabPanel: React.FC<Props> = ({ enterpriseId }) => {
           </button>
           <button
             className="p-2 rounded hover:bg-gray-100 transition-colors"
-            title="Supprimer le bundle"
+            title="Delete this bundle"
             onClick={() => setShowDeleteDialog(true)}
           >
             <Trash2 className="w-6 h-6 text-gray-600" />
@@ -198,8 +198,8 @@ const BundleTabPanel: React.FC<Props> = ({ enterpriseId }) => {
         <DeleteConfirmationDialog
           open={showDeleteDialog}
           onOpenChange={setShowDeleteDialog}
-          title="Supprimer ce bundle ?"
-          description={`ATTENTION : Vous allez supprimer le bundle "${selectedBundle?.shortName}" définitivement.`}
+          title="Delete this bundle ?"
+          description={`WARNING: You are going to delete the bundle "${selectedBundle?.shortName}" permanently.`}
           onConfirm={handleDeleteBundle}
         />
       </div>

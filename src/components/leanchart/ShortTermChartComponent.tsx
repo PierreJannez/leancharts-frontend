@@ -3,7 +3,7 @@ import GenericChartComponent from "./GenericChartComponent";
 import { LeanChart } from "../../types/LeanChart";
 import { GenericChartInfo } from "./GenericChartInfo";
 import { parse, format } from "date-fns";
-import { fr } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 
 interface ShortTermChartComponentProps {
   leanChart: LeanChart;
@@ -12,7 +12,7 @@ interface ShortTermChartComponentProps {
 
 const formatMonthKeyToLabel = (monthKey: string): string => {
   const date = parse(monthKey, "yyyy-MM", new Date());
-  return format(date, "MMMM yyyy", { locale: fr });
+  return format(date, "MMMM yyyy", { locale: enUS });
 };
 
 const ShortTermChartComponent: React.FC<ShortTermChartComponentProps> = ({ leanChart, currentMonth }) => {

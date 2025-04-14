@@ -20,7 +20,7 @@ const CommentModal: React.FC<CommentModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-auto">
       <div className="bg-white p-6 rounded shadow-xl w-96 border border-gray-400 max-w-full">
-        <h2 className="text-lg font-medium mb-4">Modifier le commentaire</h2>
+        <h2 className="text-lg font-medium mb-4">Edit comment</h2>
         <textarea
           className="w-full h-32 p-2 border border-gray-300 rounded"
           value={comment}
@@ -31,13 +31,13 @@ const CommentModal: React.FC<CommentModalProps> = ({
             className="px-4 py-2 bg-gray-300 rounded mr-2"
             onClick={onCancel}
           >
-            Annuler
+            Cancel
           </button>
           <button
             className="px-4 py-2 bg-blue-500 text-white rounded"
             onClick={onSave}
           >
-            Enregistrer
+            Save
           </button>
         </div>
       </div>

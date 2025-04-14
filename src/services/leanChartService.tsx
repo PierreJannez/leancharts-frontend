@@ -18,7 +18,7 @@ export const fetchLeanCharts = async (bundleId: number): Promise<LeanChart[]> =>
       longTermData: chart.longTermData || []
     }));
   } catch (error) {
-    console.error(`Erreur lors de la récupération des LeanCharts pour le bundle ${bundleId}:`, error);
+    console.error(`Error retrieving LeanCharts for the bundle ${bundleId}:`, error);
     return [];
   }
 };
@@ -38,7 +38,7 @@ export const updateLeanChart = async (chart: LeanChart): Promise<LeanChart> => {
     const response =await axios.put(`/api/leancharts/update/${chart.id}`, payload);
     return response.data;
   } catch (error) {
-    console.error("Erreur lors de la mise à jour du LeanChart:", error);
+    console.error("Error updating LeanChart:", error);
     throw error;
   }
 };
@@ -59,7 +59,7 @@ export const createLeanChart = async (chart: LeanChart, bundleId: number): Promi
     const response =await axios.put(`/api/leancharts/create/`, payload);
     return response.data;
   } catch (error) {
-    console.error("Erreur lors de l'enregistrement du LeanChart:", error);
+    console.error("Error when saving the LeanChart:", error);
     throw error;
   }
 };
@@ -73,7 +73,7 @@ export const deleteLeanChart = async (leanChartId: number): Promise<void> => {
   try {
     await axios.delete(`/api/leancharts/delete/${leanChartId}`);
   } catch (error) {
-    console.error(`Erreur lors de la suppression du LeanChart ${leanChartId}:`, error);
+    console.error(`Error deleting LeanChart ${leanChartId}:`, error);
     throw error;
   }
 };
