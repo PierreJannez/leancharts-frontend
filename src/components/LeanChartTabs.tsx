@@ -197,7 +197,7 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts, bundleTitle }) => {
             onClick={() => setActiveTab(0)}
           >
             <SquareActivity size={16} className={activeTab === 0 ? "text-blue-600" : "text-gray-600"} />
-            Synthèse
+            Summary
           </button>
 
           {charts.map((leanChart) => {

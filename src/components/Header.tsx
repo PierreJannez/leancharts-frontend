@@ -24,8 +24,7 @@ import {
 
 const Header: React.FC<{
   onSelectBundle: (bundleId: number, bundleName: string) => void
-  onLogout: () => void
-}> = ({ onSelectBundle, onLogout }) => {
+  onLogout: () => void }> = ({ onSelectBundle, onLogout }) => {
   const { isAuthenticated, logout, user } = useAuth()
   const navigate = useNavigate()
 
@@ -72,7 +71,7 @@ const Header: React.FC<{
           </div>
           {user && (
             <div className="text-sm text-gray-600 font-medium mt-1">
-              {user.firstName} {user.lastName}
+              {user.enterprise} - {user.firstName} {user.lastName} 
             </div>
           )}
         </div>
