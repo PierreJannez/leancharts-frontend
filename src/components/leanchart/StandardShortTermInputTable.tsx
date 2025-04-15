@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { ChartData, LeanChart } from "../../types/LeanChart";
-import { MessageSquare, UploadCloud } from "lucide-react";
+import { MessageCircleWarning, UploadCloud } from "lucide-react";
 import { formatFrShortDateLabel } from "../../utils/DateUtils";
 import TooltipPortal from "./TooltipPortal";
 import CommentModal from "./CommentModal";
 import ImportCSVModal from "../importation/ImportCSVModal";
 import { Button } from "@/components/ui/button"
+import SmartNumberInput from "@/utils/SmartNumberInput";
 
 interface StandardShortTermInputTableProps {
   leanChart: LeanChart | undefined;
@@ -151,14 +152,10 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
               <div className="text-left">Target</div>
               {values.map((entry) => (
                 <div key={entry.date} className="text-center">
-                  <input
-                    type="number"
-                    value={
-                      Number(leanChart.nbDecimal) === 0
-                        ? Number(entry.target).toFixed(leanChart.nbDecimal)
-                        : entry.target
-                    }
-                    onChange={(e) => onTargetChange(entry, Number(e.target.value))}
+                  <SmartNumberInput
+                    value={Number(entry.target)}
+                    onChange={(val) => handleValueChange(entry, val)}
+                    nbDecimal={leanChart.nbDecimal}
                     className="w-full text-xs text-center border border-gray-300 rounded bg-white"
                   />
                 </div>
@@ -170,19 +167,15 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
               style={{ gridTemplateColumns: `1fr repeat(${values.length}, 1fr)` }}
             >
               <div className="text-left">Valeur</div>
-              {values.map((entry) => (
+              {values.map((entry) => (              
                 <div key={entry.date} className="text-center">
-                  <input
-                    type="number"
-                    value={
-                      Number(leanChart.nbDecimal) === 0
-                        ? Number(entry.value).toFixed(leanChart.nbDecimal)
-                        : entry.value
-                    }
-                    onChange={(e) => handleValueChange(entry, Number(e.target.value))}
+                  <SmartNumberInput
+                    value={Number(entry.value)}
+                    onChange={(val) => handleValueChange(entry, val)}
+                    nbDecimal={leanChart.nbDecimal}
                     className="w-full text-xs text-center border border-gray-300 rounded bg-white"
                   />
-                </div>
+                </div>               
               ))}
             </div>
             <div
@@ -207,8 +200,8 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
                     setTooltipPosition(null);
                   }}
                 >
-                  <MessageSquare
-                    className={`w-8 h-8 cursor-pointer rounded-full p-1 ${
+                  <MessageCircleWarning
+                    className={`w-7 h-7 cursor-pointer rounded-full p-1 ${
                       entry.comment ? "text-blue-500 bg-blue-100" : "text-gray-300"
                     }`}
                     onClick={() => openModal(entry)}
