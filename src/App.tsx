@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -13,7 +13,6 @@ import { useAuth } from "./contexts/AuthContext";
 import AdminPage from "@/components/admin/AdminPage";
 import { Toaster } from 'sonner'
 
-
 const AppContent: React.FC = () => {
   const { isAuthenticated, logout, user } = useAuth();
   const [selectedBundleId, setSelectedBundleId] = useState<number | null>(null);
@@ -22,22 +21,24 @@ const AppContent: React.FC = () => {
 
   useEffect(() => {
     async function fetchData() {
-      if (isAuthenticated && user && user.id) {
-        console.log("Fetching bundles for user:", user.id); 
-        // 🔁 Appelle l’API avec un ID ou autre info stockée côté client si nécessaire
-        const bundles = await fetchBundles(user?.id); // Remplacer 1 par un ID réel si besoin
+      if (isAuthenticated && user?.id) {
+        const bundles = await fetchBundles(user.id);
         setBundles(bundles);
       }
     }
     fetchData();
   }, [isAuthenticated, user]);
 
+  const handleSelectBundle = useCallback((id: number) => {
+    setSelectedBundleId(id);
+  }, []); // ✅ stable, évite de recréer une fonction à chaque render
+
   const handleUpdateBundle = (updated: Bundle) => {
     if (!updated) return;
     setBundles(prev =>
       prev.map(b => (b.id === updated.id ? updated : b))
     );
-  };  
+  };
 
   const handleLogout = () => {
     logout();
@@ -51,7 +52,7 @@ const AppContent: React.FC = () => {
         <div className="bg-white rounded-lg shadow-lg">
           {isAuthenticated && (
             <Header
-              onSelectBundle={(id) => setSelectedBundleId(id)}
+              onSelectBundle={handleSelectBundle}
               onLogout={handleLogout}
             />
           )}

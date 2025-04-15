@@ -24,7 +24,8 @@ import {
 
 const Header: React.FC<{
   onSelectBundle: (bundleId: number, bundleName: string) => void
-  onLogout: () => void }> = ({ onSelectBundle, onLogout }) => {
+  onLogout: () => void
+}> = ({ onSelectBundle, onLogout }) => {
   const { isAuthenticated, logout, user } = useAuth()
   const navigate = useNavigate()
 
@@ -37,20 +38,23 @@ const Header: React.FC<{
     if (user?.id_service) {
       fetchTeams(user.id_service).then((t) => {
         setTeams(t)
-        if (!selectedTeamId && t.length > 0) setSelectedTeamId(t[0].id)
+        if (t.length > 0) {
+          const firstTeam = t[0]
+          setSelectedTeamId(firstTeam.id)
+        }
       })
     }
-  }, [user, selectedTeamId])
+  }, [user])
 
   useEffect(() => {
-    console.log("Selected team ID:", selectedTeamId)
     if (selectedTeamId) {
       fetchBundlesByTeam(selectedTeamId).then((fetchedBundles) => {
         setBundles(fetchedBundles)
         if (fetchedBundles.length > 0) {
-          setSelectedBundle(fetchedBundles[0])
-          onSelectBundle(fetchedBundles[0].id, fetchedBundles[0].shortName)
-          navigate(`/bundle/${fetchedBundles[0].shortName}`)
+          const firstBundle = fetchedBundles[0]
+          setSelectedBundle(firstBundle)
+          onSelectBundle(firstBundle.id, firstBundle.shortName)
+          navigate(`/bundle/${firstBundle.shortName}`)
         }
       })
     }
@@ -64,21 +68,18 @@ const Header: React.FC<{
   return (
     <header className="relative bg-white border-b p-4 shadow-sm">
       <div className="mx-auto flex justify-between items-start">
-        {/* Left side */}
         <div className="flex flex-col items-start gap-1">
           <div className="flex items-center gap-4">
             <h1 className="text-xl font-semibold">Easy Charts</h1>
           </div>
           {user && (
             <div className="text-sm text-gray-600 font-medium mt-1">
-              {user.enterprise} - {user.firstName} {user.lastName} 
+              {user.enterprise} - {user.firstName} {user.lastName}
             </div>
           )}
         </div>
 
-        {/* Team + Bundle selections side by side */}
         <div className="flex items-end gap-6 ml-4">
-          {/* Team */}
           <div className="flex flex-col gap-1">
             <span className="text-sm font-bold text-gray-700">Team</span>
             <DropdownMenu>
@@ -106,7 +107,6 @@ const Header: React.FC<{
             </DropdownMenu>
           </div>
 
-          {/* Bundles */}
           {selectedTeamId && bundles.length > 0 && (
             <div className="flex flex-col gap-1">
               <span className="text-sm font-bold text-gray-700">Bundle</span>
@@ -141,7 +141,6 @@ const Header: React.FC<{
           )}
         </div>
 
-        {/* Feedback + user menu */}
         <div className="flex items-center gap-4">
           <a
             href="https://forms.gle/QuUwMgfCYeXDnGhP9"
