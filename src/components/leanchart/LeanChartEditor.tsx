@@ -58,13 +58,6 @@ const LeanChartEditorLite: React.FC<Props> = ({ initialLeanChart, onSave }) => {
           </div>
 
           <div className="grid grid-cols-2 gap-6 mt-4">
-            <div>
-              <Label className="mb-1 block text-xs text-gray-500">UX component</Label>
-              <Input className={inputClass} value={form.UXComponent} onChange={(e) => handleChange("UXComponent", e.target.value)} />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-6 mt-4">
             <div className="flex items-center gap-4">
               <Label className="text-xs text-gray-500">Cumulated?</Label>
               <Switch checked={form.isCumulative} onCheckedChange={(v) => handleChange("isCumulative", v)} />

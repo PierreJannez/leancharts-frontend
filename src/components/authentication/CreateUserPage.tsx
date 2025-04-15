@@ -8,6 +8,7 @@ import { toast } from "sonner"
 const CreateUserPage: React.FC = () => {
   const [form, setForm] = useState({
     id_enterprise: -1,
+    enterprise: "",
     id_service: -1,
     firstName: "",
     lastName: "",
@@ -25,7 +26,7 @@ const CreateUserPage: React.FC = () => {
       console.log("Form data:", form);
       await registerUser(form);
       toast.success("Utilisateur créé avec succès !");
-      setForm({ id_enterprise: -1, id_service: -1, firstName: "", lastName: "", email: "", password: "" });
+      setForm({ id_enterprise: -1, enterprise: "", id_service: -1, firstName: "", lastName: "", email: "", password: "" });
     } catch (err) {
       toast.error("Erreur lors de la création de l'utilisateur.");
       console.error(err);

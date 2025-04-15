@@ -3,6 +3,7 @@ import { User } from "@/types/User"
 
 export interface RegisterPayload {
   id_enterprise: number
+  enterprise: string
   id_service: number
   firstName: string
   lastName: string
@@ -13,6 +14,7 @@ export interface RegisterPayload {
 // 🔁 Conversion RegisterPayload → User-like
 export const toUser = (payload: RegisterPayload): Omit<User, "id"> => ({
   id_enterprise: payload.id_enterprise,
+  enterprise: "",
   id_service: payload.id_service,
   firstName: payload.firstName,
   lastName: payload.lastName,

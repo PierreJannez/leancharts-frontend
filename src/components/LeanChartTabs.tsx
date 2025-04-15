@@ -174,13 +174,10 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts, bundleTitle }) => {
       onUpdateMainTarget: updateMainTarget,
     };
 
-    switch (currentLeanChart.UXComponent) {
-      case "StandardLeanChart":
-        return <StandardLeanChart {...props} onRefreshRequested={() => fetchSingleChart(currentLeanChart.id)} />;
-      case "CumulativeLeanChart":
-        return <CumulativeLeanChart {...props} />;
-      default:
-        return null;
+    if (currentLeanChart.isCumulative) {
+      return <CumulativeLeanChart {...props} />;
+    } else {
+      return <StandardLeanChart {...props} onRefreshRequested={() => fetchSingleChart(currentLeanChart.id)} />;
     }
   };
 

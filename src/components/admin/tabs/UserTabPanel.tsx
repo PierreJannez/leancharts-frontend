@@ -88,6 +88,7 @@ const UserTabPanel: React.FC<Props> = ({ enterpriseId }) => {
               setSelectedUser({
                 id: 0,
                 id_enterprise: enterpriseId,
+                enterprise: "",
                 id_service: defaultServiceId,
                 firstName: "",
                 lastName: "",
