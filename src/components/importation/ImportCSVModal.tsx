@@ -51,7 +51,7 @@ const ImportCSVModal: React.FC<ImportCSVModalProps> = ({ chartId, onImportFinish
           onImportFinished?.();
         } catch (error) {
           console.error("Erreur pendant l'import CSV:", error);
-          setError("Erreur lors de l'import des données.");
+          setError("Error importing data.");
           handleBackendError(error);
         }
       },
@@ -60,19 +60,19 @@ const ImportCSVModal: React.FC<ImportCSVModalProps> = ({ chartId, onImportFinish
 
   return (
     <div className="space-y-4 bg-white/90 backdrop-blur-sm p-4 rounded shadow ">
-      <h2 className="text-md font-semibold text-gray-800 mb-2">Importer des données CSV</h2>
+      <h2 className="text-md font-semibold text-gray-800 mb-2">Import CSV data</h2>
       <div className="flex justify-between items-center gap-2 ">
         <Button
           variant={selectedType === "shortTerm" ? "default" : "outline"}
           onClick={() => setSelectedType("shortTerm")}
         >
-          Court Terme
+          Short Term
         </Button>
         <Button
           variant={selectedType === "longTerm" ? "default" : "outline"}
           onClick={() => setSelectedType("longTerm")}
         >
-          Long Terme
+          Long Term
         </Button>
       </div>
 
@@ -85,7 +85,7 @@ const ImportCSVModal: React.FC<ImportCSVModalProps> = ({ chartId, onImportFinish
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <Button onClick={handleImport} disabled={!file}>
-        Importer les données {selectedType === "shortTerm" ? "Short term" : "Long term"}
+      Import the data {selectedType === "shortTerm" ? "Short term" : "Long term"}
       </Button>
     </div>
   );

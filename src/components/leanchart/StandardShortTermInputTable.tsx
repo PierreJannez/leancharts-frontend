@@ -239,7 +239,7 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
               }}
             />
           <div className="mt-4 text-right">
-              <Button variant="secondary" onClick={() => setIsImportModalOpen(false)}>Fermer</Button>
+              <Button variant="secondary" onClick={() => setIsImportModalOpen(false)}>Close</Button>
             </div>
           </div>
         </div>
