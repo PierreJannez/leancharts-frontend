@@ -23,10 +23,17 @@ const CreateUserPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      console.log("Form data:", form);
       await registerUser(form);
       toast.success("Utilisateur créé avec succès !");
-      setForm({ id_enterprise: -1, enterprise: "", id_service: -1, firstName: "", lastName: "", email: "", password: "" });
+      setForm({
+        id_enterprise: -1,
+        enterprise: "",
+        id_service: -1,
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+      });
     } catch (err) {
       toast.error("Erreur lors de la création de l'utilisateur.");
       console.error(err);
@@ -34,27 +41,31 @@ const CreateUserPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 border rounded bg-white shadow">
-      <h1 className="text-xl font-semibold mb-4">Create a user</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="max-w-md mx-auto mt-12 p-8 border rounded bg-white shadow">
+      <h1 className="text-2xl font-bold mb-6 text-gray-800">Create a user</h1>
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <Label htmlFor="firstName">First name</Label>
-          <Input name="firstName" value={form.firstName} onChange={handleChange} />
+          <Label htmlFor="firstName" className="text-base font-medium text-gray-700">First name</Label>
+          <Input name="firstName" value={form.firstName} onChange={handleChange} className="mt-1" />
         </div>
         <div>
-          <Label htmlFor="lastName">Last name</Label>
-          <Input name="lastName" value={form.lastName} onChange={handleChange} />
+          <Label htmlFor="lastName" className="text-base font-medium text-gray-700">Last name</Label>
+          <Input name="lastName" value={form.lastName} onChange={handleChange} className="mt-1" />
         </div>
         <div>
-          <Label htmlFor="email">Email</Label>
-          <Input type="email" name="email" value={form.email} onChange={handleChange} />
+          <Label htmlFor="enterprise" className="text-base font-medium text-gray-700">Enterprise</Label>
+          <Input name="enterprise" value={form.enterprise} onChange={handleChange} className="mt-1" />
         </div>
         <div>
-          <Label htmlFor="password">Password</Label>
-          <Input type="password" name="password" value={form.password} onChange={handleChange} />
+          <Label htmlFor="email" className="text-base font-medium text-gray-700">Email</Label>
+          <Input type="email" name="email" value={form.email} onChange={handleChange} className="mt-1" />
         </div>
-        <Button type="submit" className="w-full">
-        Save
+        <div>
+          <Label htmlFor="password" className="text-base font-medium text-gray-700">Password</Label>
+          <Input type="password" name="password" value={form.password} onChange={handleChange} className="mt-1" />
+        </div>
+        <Button type="submit" className="w-full mt-4">
+          Save
         </Button>
       </form>
     </div>

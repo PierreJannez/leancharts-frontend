@@ -14,7 +14,7 @@ export interface RegisterPayload {
 // 🔁 Conversion RegisterPayload → User-like
 export const toUser = (payload: RegisterPayload): Omit<User, "id"> => ({
   id_enterprise: payload.id_enterprise,
-  enterprise: "",
+  enterprise: payload.enterprise,
   id_service: payload.id_service,
   firstName: payload.firstName,
   lastName: payload.lastName,
