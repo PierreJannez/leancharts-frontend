@@ -154,7 +154,7 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
                 <div key={entry.date} className="text-center">
                   <SmartNumberInput
                     value={Number(entry.target)}
-                    onChange={(val) => handleValueChange(entry, val)}
+                    onChange={(val) => onTargetChange(entry, val)}
                     nbDecimal={leanChart.nbDecimal}
                     className="w-full text-xs text-center border border-gray-300 rounded bg-white"
                   />
