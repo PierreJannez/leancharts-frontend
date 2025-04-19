@@ -246,6 +246,7 @@ const LeanChartsTabPanel: React.FC<Props> = ({ enterpriseId }) => {
                 UXComponent: "StandardLeanChart",
                 name: "New Chart",
                 icon: "smile",
+                periodicity:"Daily",
                 isCumulative: false,
                 isPositiveColorAboveTarget: true,
                 negativeColor: "#ef4444",

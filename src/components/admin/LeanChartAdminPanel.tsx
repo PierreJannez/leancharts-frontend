@@ -13,6 +13,7 @@ const emptyChart: LeanChart = {
   id: 0,
   name: "",
   icon: "CirclePlus",
+  periodicity: "Daily",
   UXComponent: "StandardLeanChart",
   shortTermTitle: "",
   shortTermxLabel: "",

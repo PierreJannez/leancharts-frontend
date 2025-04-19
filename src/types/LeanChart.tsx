@@ -11,6 +11,7 @@ export interface LeanChart {
   UXComponent: string;
   name: string; 
   icon:string;
+  periodicity:string;
   isCumulative:boolean;
   isPositiveColorAboveTarget:boolean;
   negativeColor:string;

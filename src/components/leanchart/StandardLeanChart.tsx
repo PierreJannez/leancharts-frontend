@@ -1,10 +1,11 @@
-// StandardLeanChart.tsx
 import React from "react";
 import { LeanChart, ChartData } from "../../types/LeanChart";
 import LongTermChartComponent from "./LongTermChartComponent";
 import ShortTermChartComponent from "./ShortTermChartComponent";
+import WeeklyShortTermChartComponent from "./WeeklyShortTermChart";
 import StandardLongTermInputTable from "./StandardLongTermInputTable";
 import StandardShortTermInputTable from "./StandardShortTermInputTable";
+import WeeklyShortTermInputTable from "./WeeklyShortTermInputTable";
 
 interface Props {
   leanChart: LeanChart;
@@ -23,7 +24,11 @@ export const StandardLeanChart: React.FC<Props> = ({ leanChart, currentMonth,  o
           <LongTermChartComponent leanChart={leanChart} title="Last three months" />
         </div>
         <div className="w-3/4 bg-gray-100 rounded-md shadow p-4 border-1 border-gray-300">
-          <ShortTermChartComponent leanChart={leanChart } currentMonth={currentMonth} />
+          {leanChart.periodicity === "weekly" ? (
+            <WeeklyShortTermChartComponent leanChart={leanChart} currentMonth={currentMonth} />
+          ) : (
+            <ShortTermChartComponent leanChart={leanChart} currentMonth={currentMonth} />
+          )}
         </div>
       </div>
       <div className="flex justify-center mt-2 gap-4 ">
@@ -36,14 +41,25 @@ export const StandardLeanChart: React.FC<Props> = ({ leanChart, currentMonth,  o
           />
         </div>
         <div className="w-3/4 bg-gray-100 rounded-md shadow p-4 border-1 border-gray-300">
-          <StandardShortTermInputTable
-            leanChart={leanChart}
-            onValueChange={(chartData, newValue) => onUpdateShortTerm(chartData, "value", newValue)}
-            onTargetChange={(chartData, newTarget) => onUpdateShortTerm(chartData, "target", newTarget)}
-            onCommentChange={(chartData, newComment) => onUpdateShortTerm(chartData, "comment", newComment)}
-            onMainTargetChange={(newTarget) => onUpdateMainTarget(newTarget)} // 👈 nouvelle prop{
-            onRefreshRequested={onRefreshRequested}
-              />
+          {leanChart.periodicity === "weekly" ? (
+            <WeeklyShortTermInputTable
+              leanChart={leanChart}
+              onValueChange={(chartData, newValue) => onUpdateShortTerm(chartData, "value", newValue)}
+              onTargetChange={(chartData, newTarget) => onUpdateShortTerm(chartData, "target", newTarget)}
+              onCommentChange={(chartData, newComment) => onUpdateShortTerm(chartData, "comment", newComment)}
+              onMainTargetChange={(newTarget) => onUpdateMainTarget(newTarget)}
+              onRefreshRequested={onRefreshRequested}
+            />
+          ) : (
+            <StandardShortTermInputTable
+              leanChart={leanChart}
+              onValueChange={(chartData, newValue) => onUpdateShortTerm(chartData, "value", newValue)}
+              onTargetChange={(chartData, newTarget) => onUpdateShortTerm(chartData, "target", newTarget)}
+              onCommentChange={(chartData, newComment) => onUpdateShortTerm(chartData, "comment", newComment)}
+              onMainTargetChange={(newTarget) => onUpdateMainTarget(newTarget)}
+              onRefreshRequested={onRefreshRequested}
+            />
+          )}
         </div>
       </div>
     </div>

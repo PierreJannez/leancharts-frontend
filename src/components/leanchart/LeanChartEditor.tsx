@@ -8,6 +8,7 @@ import { LeanChart } from "@/types/LeanChart"
 import ColorPickerInput from "@/utils/ColorPickerInput";
 import IconSelect from "@/utils/IconSelect";
 import NumericInputWithNegativeSupport from "@/utils/NumericInputWithNegativeSupport";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 interface Props {
   initialLeanChart: LeanChart
@@ -48,12 +49,26 @@ const LeanChartEditorLite: React.FC<Props> = ({ initialLeanChart, onSave }) => {
               <Label className="mb-1 block text-xs text-gray-500">Name</Label>
               <Input className={inputClass} value={form.name} onChange={(e) => handleChange("name", e.target.value)} />
             </div>
-            <div>
-              <IconSelect
-                label="Icon"
-                value={form.icon}
-                onChange={(newIcon) => handleChange("icon", newIcon)}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <IconSelect
+                  label="Icon"
+                  value={form.icon}
+                  onChange={(newIcon) => handleChange("icon", newIcon)}
+                />
+              </div>
+              <div>
+                <Label className="mb-1 block text-xs text-gray-500">Periodicity</Label>
+                <Select value={form.periodicity || 'daily'} onValueChange={(value) => handleChange('periodicity', value)}>
+                  <SelectTrigger className={inputClass}>
+                    <SelectValue placeholder="Select periodicity" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="daily">Daily</SelectItem>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 
@@ -107,6 +122,7 @@ const LeanChartEditorLite: React.FC<Props> = ({ initialLeanChart, onSave }) => {
               />
             </div>
           </div>
+
           {form.min > form.max && (
             <p className="text-red-500 text-xs mt-2">
               The minimum must be less than or equal to the maximum.
@@ -159,12 +175,10 @@ const LeanChartEditorLite: React.FC<Props> = ({ initialLeanChart, onSave }) => {
 
       <div className="flex justify-end gap-4 pt-6">
         <Button variant="secondary" onClick={handleReset}>Reset</Button>
-        <Button onClick={handleSubmit}>Save
-
-        </Button>
+        <Button onClick={handleSubmit}>Save</Button>
       </div>
     </div>
   )
 }
 
-export default LeanChartEditorLite
+export default LeanChartEditorLite;

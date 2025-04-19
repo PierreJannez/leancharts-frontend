@@ -10,8 +10,8 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   image: {
-    width: '100%',
-    height: '100%',
+    width: '75%',
+    height: '75%',
   },
   titlePage: {
     justifyContent: 'center',

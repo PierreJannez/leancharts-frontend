@@ -1,6 +1,6 @@
 import React from "react";
 import { FileText } from "lucide-react";
-import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogTrigger, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { ExportPDF, ExportPDFViewer } from "@/utils/ExportPDF";
 
@@ -17,16 +17,16 @@ const ExportPDFModal: React.FC<ExportPDFModalProps> = ({ open, setOpen, images, 
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button
-  onClick={onTriggerClick}
-  className="bg-white border border-gray-300 rounded-full p-1 shadow hover:bg-gray-100"
->
-  <FileText className="w-5 h-5 text-gray-700" />
-</button>
+          onClick={onTriggerClick}
+          className="bg-white border border-gray-300 rounded-full p-1 shadow hover:bg-gray-100"
+        >
+          <FileText className="w-5 h-5 text-gray-700" />
+        </button>
       </DialogTrigger>
 
       <DialogContent className="max-w-[95vw] h-[92vh] p-4 bg-white border border-gray-600">
+        <DialogTitle>PDF preview of graphs</DialogTitle>
         <div className="flex items-center justify-between mt-4 mb-4">
-          <h2 className="text-xl font-semibold">PDF preview of graphs</h2>
           {images && (
             <PDFDownloadLink
               document={<ExportPDF images={images} bundleTitle={bundleTitle}/>}

@@ -1,7 +1,8 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
-import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+import tailwindcss from '@tailwindcss/vite';
+import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -13,20 +14,27 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
-    port: 5173, // Port dev par défaut (utile mais optionnel)
+    port: 5173,
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src')
-    }
+      '@': path.resolve(__dirname, 'src'),
+      buffer: 'buffer', // 👈 Ajout alias Buffer
+    },
   },
-/*  preview: {
-    port: parseInt(process.env.PORT || '8080'), // Pour Render (prod)
-    host: '0.0.0.0', // 🔥 Indispensable pour Render
-    allowedHosts: ['leancharts-frontend.onrender.com']
+  optimizeDeps: {
+    esbuildOptions: {
+      define: {
+        global: 'globalThis', // 👈 Shim global
+      },
+      plugins: [
+        NodeGlobalsPolyfillPlugin({
+          buffer: true, // 👈 Ajout Buffer
+        }),
+      ],
+    },
   },
-*/
   build: {
-    chunkSizeWarningLimit: 1000 // Optionnel : supprime warning de taille
-  }
-})
+    chunkSizeWarningLimit: 1000,
+  },
+});

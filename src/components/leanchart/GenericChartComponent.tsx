@@ -13,10 +13,12 @@ import {
 } from "recharts";
 import { GenericChartInfo } from "./GenericChartInfo";
 import { colord } from "colord";
+import { TooltipProps } from 'recharts'; // 👈 à ajouter en haut
 
 interface GenericChartComponentProps {
   genericChartInfo: GenericChartInfo;
   tickFormatter: (value: string) => string;
+  customTooltip?: (props: TooltipProps<number, string>) => React.ReactNode;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -35,10 +37,12 @@ const CustomTooltip = ({ active, payload, nbDecimal }: any) => {
   return null;
 };
 
-const GenericChartComponent: React.FC<GenericChartComponentProps> = ({ genericChartInfo, tickFormatter }) => {
+const GenericChartComponent: React.FC<GenericChartComponentProps> = ({ genericChartInfo, tickFormatter, customTooltip }) => {
   if (!genericChartInfo) {
     return <p className="text-center text-gray-500">No graph available</p>;
   }
+
+  console.log(genericChartInfo);
 
   const axisTickStyle = {
     fontSize: 12,
@@ -92,7 +96,11 @@ const GenericChartComponent: React.FC<GenericChartComponentProps> = ({ genericCh
               style: axisLabelStyle,
             }}
           />
-          <Tooltip content={(props) => <CustomTooltip {...props} nbDecimal={nbDecimal} />} />
+          <Tooltip
+            content={(props) =>
+              customTooltip ? CustomTooltip(props) : <CustomTooltip {...props} nbDecimal={nbDecimal} />
+            }
+          />
           <Line type="monotone" dataKey="target" stroke="red" strokeWidth={2} />
           <Bar dataKey="value" barSize={30}>
             <LabelList

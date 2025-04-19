@@ -174,6 +174,8 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts, bundleTitle }) => {
       onUpdateMainTarget: updateMainTarget,
     };
 
+console.log("LeanChartTabs: Rendering Current Lean Chart:", currentLeanChart);
+
     if (currentLeanChart.isCumulative) {
       return <CumulativeLeanChart {...props} />;
     } else {
