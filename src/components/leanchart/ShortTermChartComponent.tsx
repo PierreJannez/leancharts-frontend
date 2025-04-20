@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import GenericChartComponent from "./GenericChartComponent";
 import { LeanChart } from "../../types/LeanChart";
 import { GenericChartInfo } from "./GenericChartInfo";
@@ -26,10 +26,13 @@ const ShortTermChartComponent: React.FC<ShortTermChartComponentProps> = ({ leanC
   };
 
   return (
-    <GenericChartComponent
-      genericChartInfo={genericChartInfo}
-      tickFormatter={(date) => date.split('-')[0]} // Affiche uniquement le jour
-    />
+    <Suspense fallback={<div className="text-center">Loading chart...</div>}>
+
+      <GenericChartComponent
+        genericChartInfo={genericChartInfo}
+        tickFormatter={(date) => date.split('-')[0]} // Affiche uniquement le jour
+      />
+      </Suspense>
   );
 };
 
