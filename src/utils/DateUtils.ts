@@ -1,3 +1,6 @@
+import { parse, format } from "date-fns";
+import { enUS } from "date-fns/locale";
+
 export const formatFrShortDateLabel = (dateStr: string): string => {
     // Ex: input "04-03-2024" → convert to "2024-03-04"
     const [day, month, year] = dateStr.split("-");
@@ -24,3 +27,9 @@ export const formatFrShortDateLabel = (dateStr: string): string => {
   
     return `${formattedMonth}\n${shortYear}`;
   };
+
+  export const formatMonthKeyToLabel = (monthKey: string): string => {
+    const date = parse(monthKey, "yyyy-MM", new Date());
+    return format(date, "MMMM yyyy", { locale: enUS });
+  };
+  

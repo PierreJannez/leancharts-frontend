@@ -2,8 +2,12 @@
 import { parse, startOfWeek, format } from "date-fns";
 import { ChartData } from "../types/LeanChart";
 
-export function groupByWeek(data: ChartData[]): ChartData[] {
-  const weekMap = new Map<string, ChartData & { originalDate: string }>();
+export interface ChartDataWithOriginal extends ChartData {
+  originalDate: string;
+}
+
+export function groupByWeek(data: ChartData[]): ChartDataWithOriginal[] {
+  const weekMap = new Map<string, ChartDataWithOriginal>();
 
   data.forEach(({ date, value, target, comment }) => {
     const parsedDate = parse(date, "dd-MM-yyyy", new Date());
@@ -17,12 +21,11 @@ export function groupByWeek(data: ChartData[]): ChartData[] {
     const existing = weekMap.get(weekStart);
     if (existing) {
       existing.value += numericValue;
-      existing.target += numericTarget;
       existing.comment += comment ? `\n${comment}` : '';
     } else {
       weekMap.set(weekStart, {
-        date: weekStart,              // pour affichage
-        originalDate: date,           // 👈 pour sauvegarde
+        date: weekStart,
+        originalDate: date,
         value: numericValue,
         target: numericTarget,
         comment: comment || "",
