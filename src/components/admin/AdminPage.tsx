@@ -19,13 +19,12 @@ interface AdminPageProps {
 const AdminPage: React.FC<AdminPageProps> = ({ client }) => {
   const [activeTab, setActiveTab] = useState("users")
 
-  
   return (
-      <div className="w-3/4 mx-auto p-6">
-        <h1 className="text-2xl font-semibold mb-2">Configuration</h1>
-        <div className="border rounded-md shadow-sm">
-          <Tabs defaultValue="users" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="px-4 pt-4 mb-0">
+    <div className="w-3/4 mx-auto p-6">
+      <h1 className="text-2xl font-semibold mb-2">Configuration</h1>
+      <div className="border rounded-md shadow-sm">
+        <Tabs defaultValue="users" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <div className="flex justify-between items-center px-4 pt-4 mb-0">
             <TabsList>
               <TabsTrigger value="users">Users</TabsTrigger>
               <TabsTrigger value="services">Services</TabsTrigger>
@@ -33,36 +32,32 @@ const AdminPage: React.FC<AdminPageProps> = ({ client }) => {
               <TabsTrigger value="bundles">Bundles</TabsTrigger>
               <TabsTrigger value="leancharts">LeanCharts</TabsTrigger>
             </TabsList>
+            <button
+              className="text-sm text-blue-600 hover:underline"
+              onClick={() => window.history.back()}
+            >
+              Back
+            </button>
           </div>
 
           <TabsContent value="users">
-            <UserTabPanel
-              enterpriseId={client.id_enterprise}
-              />
+            <UserTabPanel enterpriseId={client.id_enterprise} />
           </TabsContent>
 
           <TabsContent value="services">
-            <ServiceTabPanel
-              enterpriseId={client.id_enterprise}
-            />
+            <ServiceTabPanel enterpriseId={client.id_enterprise} />
           </TabsContent>
 
           <TabsContent value="teams">
-            <TeamTabPanel
-              enterpriseId={client.id_enterprise}
-              />
+            <TeamTabPanel enterpriseId={client.id_enterprise} />
           </TabsContent>
 
           <TabsContent value="bundles">
-            <BundleTabPanel 
-              enterpriseId={client.id_enterprise}
-            />
+            <BundleTabPanel enterpriseId={client.id_enterprise} />
           </TabsContent>
 
           <TabsContent value="leancharts">
-            <LeanChartTabPanel
-              enterpriseId={client.id_enterprise}
-            />
+            <LeanChartTabPanel enterpriseId={client.id_enterprise} />
           </TabsContent>
         </Tabs>
       </div>

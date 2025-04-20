@@ -61,6 +61,8 @@ const GenericChartComponent: React.FC<GenericChartComponentProps> = ({ genericCh
   const COLOR_FILL_POSITIVE_TARGET = colord(genericChartInfo.positiveColor).alpha(0.5).toRgbString();
   const COLOR_TEXT_NEGATIVE_TARGET = colord(genericChartInfo.negativeColor).alpha(1).toRgbString();
   const COLOR_TEXT_POSITIVE_TARGET = colord(genericChartInfo.positiveColor).alpha(1).toRgbString();
+  const COLOR_STROKE_NEGATIVE_TARGET = colord(genericChartInfo.negativeColor).darken(0.2).toRgbString();
+  const COLOR_STROKE_POSITIVE_TARGET = colord(genericChartInfo.positiveColor).darken(0.2).toRgbString();
 
   const maxTarget = Math.max(...genericChartInfo.values.map((entry) => entry.target));
   const yAxisMax = Math.ceil(maxTarget * 1.1);
@@ -134,23 +136,23 @@ const GenericChartComponent: React.FC<GenericChartComponentProps> = ({ genericCh
             {genericChartInfo.values.map((_entry, index) => {
               const isAboveTarget = index !== undefined && Number(genericChartInfo.values[index]?.value || 0) >= Number(genericChartInfo.values[index]?.target || 0);
               let fillColor = COLOR_FILL_POSITIVE_TARGET;
-              let strokeColor = "green";
+              let strokeColor = COLOR_STROKE_POSITIVE_TARGET;
 
               if (genericChartInfo.isPositiveColorAboveTarget) {
                 if (isAboveTarget) {
                   fillColor = COLOR_FILL_POSITIVE_TARGET;
-                  strokeColor = "green";
+                  strokeColor = COLOR_STROKE_POSITIVE_TARGET;
                 } else {
                   fillColor = COLOR_FILL_NEGATIVE_TARGET;
-                  strokeColor = "red";
+                  strokeColor = COLOR_STROKE_NEGATIVE_TARGET;
                 }
               } else {
                 if (isAboveTarget) {
                   fillColor = COLOR_FILL_NEGATIVE_TARGET;
-                  strokeColor = "red";
+                  strokeColor = COLOR_STROKE_NEGATIVE_TARGET;
                 } else {
                   fillColor = COLOR_FILL_POSITIVE_TARGET;
-                  strokeColor = "green";
+                  strokeColor = COLOR_STROKE_POSITIVE_TARGET;
                 }
               }
               return (
