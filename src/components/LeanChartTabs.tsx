@@ -1,6 +1,6 @@
 // ✅ Version modale export PDF avec fond blanc, bord gris foncé, titre et bouton de sauvegarde
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import { getIcon } from "../utils/icons";
 import { LeanChart, ChartData } from '../types/LeanChart';
 import { fetchLeanChartData, updateShortTermChartValue, updateLongTermChartValue } from "../services/leanChartDataService";
@@ -161,7 +161,11 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts, bundleTitle }) => {
 
   const renderChartComponent = () => {
     if (activeTab === 0) {
-      return <div ref={chartGridRef}><LeanChartGrid leanCharts={charts} currentMonth={currentMonthKey} /></div>;
+      return <div ref={chartGridRef} key={currentMonthKey}>
+              <Suspense fallback={<div className="text-center">Loading chart...</div>}>
+                <LeanChartGrid leanCharts={charts} currentMonth={currentMonthKey} />
+              </Suspense>
+             </div>;
     }
 
     if (!currentLeanChart) return null;
@@ -174,13 +178,22 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts, bundleTitle }) => {
       onUpdateMainTarget: updateMainTarget,
     };
 
-console.log("LeanChartTabs: Rendering Current Lean Chart:", currentLeanChart);
-
-    if (currentLeanChart.isCumulative) {
-      return <CumulativeLeanChart {...props} />;
-    } else {
-      return <StandardLeanChart {...props} onRefreshRequested={() => fetchSingleChart(currentLeanChart.id)} />;
+    if (currentLeanChart?.isCumulative) {
+      return (
+        <Suspense fallback={<div className="text-center">Loading chart...</div>}>
+          <CumulativeLeanChart {...props} />
+        </Suspense>
+      );
     }
+
+    return (
+      <Suspense fallback={<div className="text-center">Loading chart...</div>}>
+        <StandardLeanChart
+          {...props}
+          onRefreshRequested={() => fetchSingleChart(currentLeanChart.id)}
+        />
+      </Suspense>
+    );
   };
 
   return (
