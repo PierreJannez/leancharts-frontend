@@ -44,6 +44,24 @@
     return user ? JSON.parse(user) : null;
   };
   
-  export function getToken() {
-    return localStorage.getItem("token");
+  function getSessionKey(): string {
+    if (!window.name) {
+      window.name = crypto.randomUUID();
+    }
+    return window.name;
+  }
+  
+  export function storeToken(token: string) {
+    const sessionKey = getSessionKey();
+    sessionStorage.setItem(`token-${sessionKey}`, token);
+  }
+  
+  export function getToken(): string | null {
+    const sessionKey = getSessionKey();
+    return sessionStorage.getItem(`token-${sessionKey}`);
+  }
+  
+  export function clearToken() {
+    const sessionKey = getSessionKey();
+    sessionStorage.removeItem(`token-${sessionKey}`);
   }

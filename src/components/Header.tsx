@@ -22,6 +22,9 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
 
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import miroIcon from "/miro.svg"
+
 const Header: React.FC<{
   onSelectBundle: (bundleId: number, bundleName: string) => void
   onLogout: () => void
@@ -33,7 +36,11 @@ const Header: React.FC<{
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null)
   const [bundles, setBundles] = useState<Bundle[]>([])
   const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(null)
+  const [iframeModalOpen, setIframeModalOpen] = useState(false)
 
+  const iframeURL = `${window.location.origin}/login`
+  const iframeCode = `<iframe src="${iframeURL}" width="75%" height="75%" style="border: none;" sandbox="allow-modals
+ allow-forms allow-scripts allow-same-origin allow-popups allow-downloads allow-popups-to-escape-sandbox"></iframe>`;  
   useEffect(() => {
     if (user?.id_service) {
       fetchTeams(user.id_service).then((t) => {
@@ -164,6 +171,10 @@ const Header: React.FC<{
                   <Settings className="w-4 h-4 mr-2 text-muted-foreground" />
                   Setup
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIframeModalOpen(true)}>
+                  <img src={miroIcon} alt="Miro" className="w-4 h-4 mr-2" />
+                  Miro Embed
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="w-4 h-4 mr-2 text-muted-foreground" />
                   Log out
@@ -173,6 +184,26 @@ const Header: React.FC<{
           )}
         </div>
       </div>
+
+      <Dialog open={iframeModalOpen} onOpenChange={setIframeModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Embed this app in Miro</DialogTitle>
+          </DialogHeader>
+          <div className="bg-gray-100 p-3 rounded text-xs font-mono overflow-auto">
+            {iframeCode}
+          </div>
+          <button
+            className="mt-4 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            onClick={() => {
+              navigator.clipboard.writeText(iframeCode)
+            }}
+          >
+            Copy iFrame Code
+          </button>
+        </DialogContent>
+      </Dialog>
+
     </header>
   )
 }
