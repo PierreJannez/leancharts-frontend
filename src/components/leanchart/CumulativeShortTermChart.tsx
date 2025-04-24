@@ -5,7 +5,6 @@ import { GenericChartInfo } from './GenericChartInfo';
 import { parse, format } from "date-fns";
 import { enUS } from "date-fns/locale";
 
-
 interface Props {
   leanChart: LeanChart;
   currentMonth: string;
@@ -17,20 +16,28 @@ const formatMonthKeyToLabel = (monthKey: string): string => {
   return format(date, "MMMM yyyy", { locale: enUS });
 };
 
-
 const CumulativeShortTermChart: React.FC<Props> = ({ leanChart, currentMonth, tickFormatter }) => {
-  // Construction des données cumulées à partir du leanChart, en conservant tous les champs ChartData
+  const type: "burnup" | "burndown" = leanChart.type === "burndown" ? "burndown" : "burnup";
+
   const cumulativeValues: ChartData[] = leanChart.shortTermData.reduce<ChartData[]>((acc, curr, index) => {
+    const delta = Number(curr.value);
     const prevValue = index === 0 ? 0 : acc[index - 1].value;
+  
+    const value =
+      type === "burnup"
+        ? prevValue + delta
+        : delta; // pas de cumul si ce n’est pas burnup
+  
     acc.push({
       date: curr.date,
-      value: Number(prevValue) + Number(curr.value),
+      value,
       target: curr.target,
       comment: curr.comment || '',
     });
+  
     return acc;
   }, []);
-
+  
   const genericChartInfo: GenericChartInfo = {
     title: `${leanChart.shortTermTitle} ${formatMonthKeyToLabel(currentMonth)}`,
     xLabel: leanChart.shortTermxLabel,
@@ -45,9 +52,9 @@ const CumulativeShortTermChart: React.FC<Props> = ({ leanChart, currentMonth, ti
   return (
     <GenericChartComponent
       genericChartInfo={genericChartInfo}
-     tickFormatter={tickFormatter}
-   />
-);
+      tickFormatter={tickFormatter}
+    />
+  );
 };
 
 export default CumulativeShortTermChart;

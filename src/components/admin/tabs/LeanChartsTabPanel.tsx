@@ -248,6 +248,7 @@ const LeanChartsTabPanel: React.FC<Props> = ({ enterpriseId }) => {
                 icon: "smile",
                 periodicity:"Daily",
                 isCumulative: false,
+                type: "Standard",
                 isPositiveColorAboveTarget: true,
                 negativeColor: "#ef4444",
                 positiveColor: "#10b981",
@@ -295,6 +296,7 @@ const LeanChartsTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       <div className="w-4/5 p-6 border-t">
         {selectedChart && (
           <LeanChartAdminPanel
+            key={selectedChart.id} // ⬅️ Ajoute cette ligne !
             leanChart={selectedChart}
             onSave={handleSaveChart}
             bundleId={selectedBundle?.id.toString() ?? ""}

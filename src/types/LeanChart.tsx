@@ -13,6 +13,7 @@ export interface LeanChart {
   icon:string;
   periodicity:string;
   isCumulative:boolean;
+  type:string;
   isPositiveColorAboveTarget:boolean;
   negativeColor:string;
   positiveColor:string;

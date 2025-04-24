@@ -57,23 +57,32 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
   };
 
   const applyBulkTarget = () => {
-    if (leanChart.isCumulative) 
-    {
+    if (leanChart.type === "burnup" || leanChart.type === "burndown") {
       const days = leanChart.shortTermData.length;
       const targetPerDay = Number((bulkTarget / days).toFixed(leanChart.nbDecimal));
       let cumulativeTarget = 0;
-      leanChart.shortTermData.forEach((entry) => {
-        cumulativeTarget += targetPerDay;
-        entry.target = cumulativeTarget;
-        onTargetChange(entry, cumulativeTarget);
-      });
+  
+      if (leanChart.type === "burnup") {
+        leanChart.shortTermData.forEach((entry) => {
+          cumulativeTarget += targetPerDay;
+          entry.target = cumulativeTarget;
+          onTargetChange(entry, cumulativeTarget);
+        });
+      } else if (leanChart.type === "burndown") {
+        cumulativeTarget = bulkTarget;
+        leanChart.shortTermData.forEach((entry) => {
+          entry.target = cumulativeTarget;
+          onTargetChange(entry, cumulativeTarget);
+          cumulativeTarget -= targetPerDay;
+        });
+      }
     } else {
         leanChart.shortTermData.forEach((entry) => {
-          entry.target = bulkTarget;
-          onTargetChange(entry, bulkTarget);
+        entry.target = bulkTarget;
+        onTargetChange(entry, bulkTarget);
       });
     }
-  }
+  };
 
   return (
     <>
@@ -166,7 +175,7 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
               className="grid gap-[3px] w-full items-center text-xs text-gray-700"
               style={{ gridTemplateColumns: `1fr repeat(${values.length}, 1fr)` }}
             >
-              <div className="text-left">Valeur</div>
+              <div className="text-left">Value</div>
               {values.map((entry) => (              
                 <div key={entry.date} className="text-center">
                   <SmartNumberInput

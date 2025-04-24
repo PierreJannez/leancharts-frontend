@@ -64,13 +64,30 @@ const WeeklyShortTermInputTable: React.FC<Props> = ({
         return parsed.getDay() === 5;
       });
   
-      for (const entry of fridays) {
-        // 👇 Mise à jour directe du champ target pour refléter le changement
-        entry.target = bulkTarget;
-        onTargetChange(entry, bulkTarget);
+      const nbFridays = fridays.length;
+      const targetPerWeek = Number((bulkTarget / nbFridays).toFixed(leanChart.nbDecimal));
+      let cumulativeTarget = 0;
+  
+      if (leanChart.type === "burnup") {
+        for (const entry of fridays) {
+          cumulativeTarget += targetPerWeek;
+          entry.target = cumulativeTarget;
+          onTargetChange(entry, cumulativeTarget);
+        }
+      } else if (leanChart.type === "burndown") {
+        cumulativeTarget = bulkTarget;
+        for (const entry of fridays) {
+          entry.target = cumulativeTarget;
+          onTargetChange(entry, cumulativeTarget);
+          cumulativeTarget -= targetPerWeek;
+        }
+      } else {
+        for (const entry of fridays) {
+          entry.target = bulkTarget;
+          onTargetChange(entry, bulkTarget);
+        }
       }
   
-      // 👇 Forcer le rafraîchissement général
       onRefreshRequested?.();
     } catch (err) {
       setBulkTarget(prev);

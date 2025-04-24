@@ -17,6 +17,9 @@ interface Props {
 }
 
 export const StandardLeanChart: React.FC<Props> = ({ leanChart, currentMonth,  onUpdateShortTerm, onUpdateLongTerm, onUpdateMainTarget, onRefreshRequested }) => {
+  console.log("StandardLeanChart periodicity=> ", leanChart.periodicity);
+  console.log("StandardLeanChart shortTermTitle=> ", leanChart.shortTermTitle);
+  console.log("StandardLeanChart shortTermTitle=> ", leanChart.name);
   return (
     <div key={leanChart.id} className="text-center">
       <div className="flex justify-center gap-4">

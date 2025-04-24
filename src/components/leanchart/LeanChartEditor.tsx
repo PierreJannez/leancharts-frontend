@@ -5,10 +5,10 @@ import { Switch } from "../ui/switch"
 import { Button } from "../ui/button"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs"
 import { LeanChart } from "@/types/LeanChart"
-import ColorPickerInput from "@/utils/ColorPickerInput";
-import IconSelect from "@/utils/IconSelect";
-import NumericInputWithNegativeSupport from "@/utils/NumericInputWithNegativeSupport";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import ColorPickerInput from "@/utils/ColorPickerInput"
+import IconSelect from "@/utils/IconSelect"
+import NumericInputWithNegativeSupport from "@/utils/NumericInputWithNegativeSupport"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 
 interface Props {
   initialLeanChart: LeanChart
@@ -16,10 +16,15 @@ interface Props {
 }
 
 const LeanChartEditorLite: React.FC<Props> = ({ initialLeanChart, onSave }) => {
-  const [form, setForm] = useState<LeanChart>(initialLeanChart)
+  const [form, setForm] = useState<LeanChart>(() => {
+    if (initialLeanChart.type !== "burnup" && initialLeanChart.type !== "burndown") {
+      return { ...initialLeanChart, type: "standard" };
+    }
+    return initialLeanChart;
+  });
 
   useEffect(() => {
-    setForm(initialLeanChart)
+    setForm((prev) => ({ ...prev, type: prev.type || "standard" }))
   }, [initialLeanChart])
 
   const handleChange = (field: keyof LeanChart, value: any) => {
@@ -78,12 +83,24 @@ const LeanChartEditorLite: React.FC<Props> = ({ initialLeanChart, onSave }) => {
               <Switch checked={form.isCumulative} onCheckedChange={(v) => handleChange("isCumulative", v)} />
             </div>
             <div className="flex items-center gap-4">
-              <Label className="text-xs text-gray-500">Green if above the target ?</Label>
-              <Switch checked={form.isPositiveColorAboveTarget} onCheckedChange={(v) => handleChange("isPositiveColorAboveTarget", v)} />
+              <Label className="text-xs text-gray-500">Type</Label>
+              <Select
+                value={form.type}
+                onValueChange={(v) => handleChange("type", v)}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select mode" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="standard">Standard</SelectItem>
+                  <SelectItem value="burnup">BurnUp</SelectItem>
+                  <SelectItem value="burndown">BurnDown</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-6 mt-4">
+          <div className="grid grid-cols-3 gap-6 mt-4 items-center">
             <div>
               <ColorPickerInput
                 label="Positive color"
@@ -97,6 +114,10 @@ const LeanChartEditorLite: React.FC<Props> = ({ initialLeanChart, onSave }) => {
                 value={form.negativeColor}
                 onChange={(newColor) => handleChange("negativeColor", newColor)}
               />
+            </div>
+            <div className="flex items-center gap-4 pt-6">
+              <Label className="text-xs text-gray-500">Green if above the target ?</Label>
+              <Switch checked={form.isPositiveColorAboveTarget} onCheckedChange={(v) => handleChange("isPositiveColorAboveTarget", v)} />
             </div>
           </div>
 

@@ -6,7 +6,6 @@ import { LeanChart, ChartData } from '../types/LeanChart';
 import { fetchLeanChartData, updateShortTermChartValue, updateLongTermChartValue } from "../services/leanChartDataService";
 import { updateLeanChart } from "../services/leanChartService";
 import { StandardLeanChart } from "./leanchart/StandardLeanChart";
-import { CumulativeLeanChart } from "./leanchart/CumulativeLeanChart";
 import { Toaster } from "sonner";
 import { ChevronLeft, ChevronRight, SquareActivity } from "lucide-react";
 import { addMonths, format } from "date-fns";
@@ -109,6 +108,7 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts, bundleTitle }) => {
 
   const updateLongTermChartField = async (chartData: ChartData, field: "value" | "target" | "comment", newValue: number | string) => {
     if (!currentLeanChart || !currentLeanChart.longTermData) return;
+
     const prevValue = chartData[field];
     const updatedValues = currentLeanChart.longTermData.map((entry) =>
       entry.date === chartData.date ? { ...entry, [field]: newValue } : entry
@@ -171,21 +171,13 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts, bundleTitle }) => {
     if (!currentLeanChart) return null;
 
     const props = {
+      key: currentLeanChart.id, // 👈 Ajoute cette ligne là où tu utilises ce composant
       leanChart: currentLeanChart,
       currentMonth: currentMonthKey,
       onUpdateShortTerm: updateShortTermChartField,
       onUpdateLongTerm: updateLongTermChartField,
       onUpdateMainTarget: updateMainTarget,
     };
-
-    if (currentLeanChart?.isCumulative) {
-      return (
-        <Suspense fallback={<div className="text-center">Loading chart...</div>}>
-          <CumulativeLeanChart {...props} />
-        </Suspense>
-      );
-    }
-
     return (
       <Suspense fallback={<div className="text-center">Loading chart...</div>}>
         <StandardLeanChart
