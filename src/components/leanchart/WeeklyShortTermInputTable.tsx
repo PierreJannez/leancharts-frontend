@@ -65,7 +65,7 @@ const WeeklyShortTermInputTable: React.FC<Props> = ({
       });
   
       const nbFridays = fridays.length;
-      const targetPerWeek = Number((bulkTarget / nbFridays).toFixed(leanChart.nbDecimal));
+      const targetPerWeek = Number((bulkTarget / nbFridays).toFixed(1));
       let cumulativeTarget = 0;
   
       if (leanChart.type === "burnup") {

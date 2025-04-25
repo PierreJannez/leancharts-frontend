@@ -57,15 +57,20 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
   };
 
   const applyBulkTarget = () => {
+    console.log("applyBulkTarget");
+    console.log("leanChart.type", leanChart.type);
+
     if (leanChart.type === "burnup" || leanChart.type === "burndown") {
       const days = leanChart.shortTermData.length;
-      const targetPerDay = Number((bulkTarget / days).toFixed(leanChart.nbDecimal));
+      const targetPerDay = Number((bulkTarget / days).toFixed(1));
       let cumulativeTarget = 0;
+      console.log("targetPerDay", targetPerDay);
   
       if (leanChart.type === "burnup") {
         leanChart.shortTermData.forEach((entry) => {
           cumulativeTarget += targetPerDay;
           entry.target = cumulativeTarget;
+          console.log("targetPerDay", targetPerDay);
           onTargetChange(entry, cumulativeTarget);
         });
       } else if (leanChart.type === "burndown") {
