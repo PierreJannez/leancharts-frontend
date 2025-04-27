@@ -7,6 +7,8 @@ import CommentModal from "./CommentModal";
 import ImportCSVModal from "../importation/ImportCSVModal";
 import { Button } from "@/components/ui/button"
 import SmartNumberInput from "@/utils/SmartNumberInput";
+import { useEffect } from "react";
+import { simulateLeanChartInput } from "@/utils/simulateLeanChartInput";
 
 interface StandardShortTermInputTableProps {
   leanChart: LeanChart | undefined;
@@ -35,9 +37,31 @@ const StandardShortTermInputTable: React.FC<StandardShortTermInputTableProps> = 
   
   const values = leanChart?.shortTermData || [];
 
+  useEffect(() => {
+    if (!leanChart) return;  // ⬅️ on sort du useEffect si leanChart n'existe pas
+  
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 's') {
+        simulateLeanChartInput({
+          entries: leanChart.shortTermData,  // ⬅️ ici leanChart est forcément défini
+          onValueChange: (entry, newValue) => handleValueChange(entry, newValue),
+          delayMs: 500,
+        });
+        console.log("🚀 Simulation de saisie lancée !");
+      }
+    };
+  
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [leanChart]);
+
   if (!leanChart) {
     return <p className="text-center text-gray-500">Aucun graphique disponible</p>;
   }
+
+  
 
   const handleValueChange = (entry: ChartData, newValue: number) => {
     onValueChange(entry, newValue);

@@ -6,7 +6,7 @@ import { Bundle } from "./types/Bundle";
 import { fetchBundles } from "./services/bundleService";
 import { BundleWrapper } from "./components/Bundle";
 import LoginPage from "./components/authentication/LoginPage";
-import CreateUserPage from "./components/authentication/CreateUserPage";
+import SignUp from "./components/authentication/CreateUserPage";
 import PrivateRoute from "./components/PrivateRoute";
 import Main from "./components/Main";
 import { useAuth } from "./contexts/AuthContext";
@@ -60,7 +60,7 @@ const AppContent: React.FC = () => {
           <div className="flex-1 flex p-4 justify-center">
             <Routes>
               <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<CreateUserPage />} />
+              <Route path="/signup" element={<SignUp />} />
               <Route
                 path="/bundle/:bundleName"
                 element={
