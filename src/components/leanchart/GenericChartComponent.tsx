@@ -10,10 +10,11 @@ import {
   ResponsiveContainer,
   Cell,
   LabelList,
+  ReferenceLine
 } from "recharts";
 import { GenericChartInfo } from "./GenericChartInfo";
 import { colord } from "colord";
-import { TooltipProps } from 'recharts'; // 👈 à ajouter en haut
+import { TooltipProps } from 'recharts';
 
 interface GenericChartComponentProps {
   genericChartInfo: GenericChartInfo;
@@ -42,8 +43,6 @@ const GenericChartComponent: React.FC<GenericChartComponentProps> = ({ genericCh
     return <p className="text-center text-gray-500">No graph available</p>;
   }
 
-  console.log(genericChartInfo);
-
   const axisTickStyle = {
     fontSize: 12,
     fontFamily: "system-ui",
@@ -64,8 +63,14 @@ const GenericChartComponent: React.FC<GenericChartComponentProps> = ({ genericCh
   const COLOR_STROKE_NEGATIVE_TARGET = colord(genericChartInfo.negativeColor).darken(0.2).toRgbString();
   const COLOR_STROKE_POSITIVE_TARGET = colord(genericChartInfo.positiveColor).darken(0.2).toRgbString();
 
-  const maxTarget = Math.max(...genericChartInfo.values.map((entry) => entry.target));
-  const yAxisMax = Math.ceil(maxTarget * 1.1);
+  const values = genericChartInfo.values.map((entry) => entry.value);
+  const minValue = Math.min(0, ...values);
+  const maxValue = Math.max(...values);
+  const yAxisDomain: [number, number] = [
+    minValue < 0 ? minValue * 1.1 : 0,
+    maxValue * 1.1,
+  ];
+
   const nbDecimal = genericChartInfo.nbDecimal ?? 1;
 
   return (
@@ -80,6 +85,8 @@ const GenericChartComponent: React.FC<GenericChartComponentProps> = ({ genericCh
             dataKey="date"
             tickFormatter={tickFormatter}
             tick={axisTickStyle}
+            axisLine={{ stroke: "#333" }}
+            tickLine={{ stroke: "#333" }}
             label={{
               value: genericChartInfo.xLabel,
               position: "insideBottom",
@@ -87,9 +94,12 @@ const GenericChartComponent: React.FC<GenericChartComponentProps> = ({ genericCh
               style: axisLabelStyle,
             }}
           />
+
           <YAxis
-            domain={[0, yAxisMax]}
+            domain={['auto', 'auto']}
             tick={axisTickStyle}
+            allowDataOverflow
+            tickFormatter={(value) => Number(value).toFixed(nbDecimal)}
             label={{
               value: genericChartInfo.yLabel,
               angle: -90,
@@ -98,12 +108,17 @@ const GenericChartComponent: React.FC<GenericChartComponentProps> = ({ genericCh
               style: axisLabelStyle,
             }}
           />
-          <Tooltip
+
+          <ReferenceLine y={0} stroke="#333" strokeWidth={2} />
+
+         <Tooltip
             content={(props) =>
               customTooltip ? CustomTooltip(props) : <CustomTooltip {...props} nbDecimal={nbDecimal} />
             }
           />
+
           <Line type="monotone" dataKey="target" stroke="red" strokeWidth={2} />
+
           <Bar dataKey="value" barSize={30}>
             <LabelList
               dataKey="value"
@@ -133,6 +148,7 @@ const GenericChartComponent: React.FC<GenericChartComponentProps> = ({ genericCh
                 );
               }}
             />
+
             {genericChartInfo.values.map((_entry, index) => {
               const isAboveTarget = index !== undefined && Number(genericChartInfo.values[index]?.value || 0) >= Number(genericChartInfo.values[index]?.target || 0);
               let fillColor = COLOR_FILL_POSITIVE_TARGET;
