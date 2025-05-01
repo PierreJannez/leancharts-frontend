@@ -63,16 +63,18 @@ const GenericChartComponent: React.FC<GenericChartComponentProps> = ({ genericCh
   const COLOR_STROKE_NEGATIVE_TARGET = colord(genericChartInfo.negativeColor).darken(0.2).toRgbString();
   const COLOR_STROKE_POSITIVE_TARGET = colord(genericChartInfo.positiveColor).darken(0.2).toRgbString();
 
-  const values = genericChartInfo.values.map((entry) => entry.value);
-  const minValue = Math.min(0, ...values);
-  const maxValue = Math.max(...values);
+  const allValues = genericChartInfo.values.flatMap((entry) => [entry.value, entry.target]);
+  const minValue = Math.min(0, ...allValues);
+  const maxValue = Math.max(...allValues);
   const yAxisDomain: [number, number] = [
     minValue < 0 ? minValue * 1.1 : 0,
     maxValue * 1.1,
   ];
-
+  
   const nbDecimal = genericChartInfo.nbDecimal ?? 1;
 
+  console.log("Chart data for Recharts:", genericChartInfo.values);
+    
   return (
     <div>
       <h2 className="text-center text-lg font-bold text-gray-700 mb-4" style={{ fontSize: 16, fontFamily: "system-ui", color: "#333" }}>
@@ -96,7 +98,7 @@ const GenericChartComponent: React.FC<GenericChartComponentProps> = ({ genericCh
           />
 
           <YAxis
-            domain={['auto', 'auto']}
+            domain={yAxisDomain}
             tick={axisTickStyle}
             allowDataOverflow
             tickFormatter={(value) => Number(value).toFixed(nbDecimal)}
@@ -106,18 +108,19 @@ const GenericChartComponent: React.FC<GenericChartComponentProps> = ({ genericCh
               position: "insideLeft",
               offset: 10,
               style: axisLabelStyle,
+              domain: yAxisDomain,
             }}
           />
 
+          <Line type="monotone" dataKey="target" stroke="red" strokeWidth={2} />
+
           <ReferenceLine y={0} stroke="#333" strokeWidth={2} />
 
-         <Tooltip
+          <Tooltip
             content={(props) =>
               customTooltip ? CustomTooltip(props) : <CustomTooltip {...props} nbDecimal={nbDecimal} />
             }
           />
-
-          <Line type="monotone" dataKey="target" stroke="red" strokeWidth={2} />
 
           <Bar dataKey="value" barSize={30}>
             <LabelList

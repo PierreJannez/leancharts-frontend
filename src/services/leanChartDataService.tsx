@@ -36,10 +36,29 @@ export const fetchLeanChartData = async (
     const response = await axios.get(`/api/leanChartData/${leanChartId}/leanChartData`, {
       params: { month }
     });
+
     const leanChartData: LeanChartData = response.data;
+
+    // Forcer la conversion en nombre pour chaque champ `value` et `target`
+    leanChartData.shortTermValues = leanChartData.shortTermValues.map((entry) => ({
+      ...entry,
+      value: Number(entry.value),
+      target: Number(entry.target),
+    }));
+
+    leanChartData.longTermValues = leanChartData.longTermValues.map((entry) => ({
+      ...entry,
+      value: Number(entry.value),
+      target: Number(entry.target),
+    }));
+
+    // Ensuite ta logique sur les mois manquants
     if (leanChartData.longTermValues.length === 0) {
       leanChartData.longTermValues = getLastThreeMonthsData();
     }
+
+console.log("leanChartDataService->fetchLeanChartData->leanChartData", leanChartData);
+
     return leanChartData;
   } catch (error) {
     console.error(`Erreur lors de la récupération des données pour le graphique ${leanChartId}:`, error);

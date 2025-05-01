@@ -26,6 +26,8 @@ const LongTermChartComponent: React.FC<LongTermChartComponentProps> = ({ leanCha
     isPositiveColorAboveTarget: leanChart.isPositiveColorAboveTarget
   };
 
+console.log("📊 genericChartInfo created in LongTermChartComponent:", genericChartInfo);
+
   return (
     <GenericChartComponent
       genericChartInfo={genericChartInfo}

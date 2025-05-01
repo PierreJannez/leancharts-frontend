@@ -179,6 +179,10 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts, bundleTitle }) => {
       onUpdateMainTarget: updateMainTarget,
     };
     return (
+
+      console.log("LeanChartsTab->leanCharts",leanCharts),
+      console.log("LeanChartsTab->currentLeanChart",currentLeanChart),
+
       <Suspense fallback={<div className="text-center">Loading chart...</div>}>
         <StandardLeanChart
           {...props}
