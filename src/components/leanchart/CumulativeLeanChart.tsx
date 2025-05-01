@@ -24,7 +24,7 @@ export const CumulativeLeanChart: React.FC<Props> = ({
     <div key={leanChart.id} className="text-center">
       <div className="flex justify-center gap-4">
         <div className="w-1/4 bg-gray-100 rounded-md shadow p-4 border-1 border-gray-300">
-          <LongTermChartComponent leanChart={leanChart} title="Last three months" />
+          <LongTermChartComponent leanChart={leanChart} />
         </div>
         <div className="w-3/4 bg-gray-100 rounded-md shadow p-4 border-1 border-gray-300">
           <CumulativeShortTermChart 
