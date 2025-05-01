@@ -31,7 +31,7 @@ const ShortTermChartComponent: React.FC<ShortTermChartComponentProps> = ({ leanC
     : leanChart.shortTermData;
 
   const genericChartInfo: GenericChartInfo = {
-    title: `${leanChart.shortTermTitle} ${formatMonthKeyToLabel(currentMonth)}`,
+    title: `${leanChart.shortTermTitle} - ${formatMonthKeyToLabel(currentMonth)}`,
     xLabel: leanChart.shortTermxLabel,
     yLabel: leanChart.shortTermyLabel,
     values,

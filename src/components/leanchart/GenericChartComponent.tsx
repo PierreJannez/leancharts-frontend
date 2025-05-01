@@ -70,7 +70,7 @@ const GenericChartComponent: React.FC<GenericChartComponentProps> = ({ genericCh
     minValue < 0 ? minValue * 1.1 : 0,
     maxValue * 1.1,
   ];
-  
+
   const nbDecimal = genericChartInfo.nbDecimal ?? 1;
 
   console.log("Chart data for Recharts:", genericChartInfo.values);
@@ -114,7 +114,7 @@ const GenericChartComponent: React.FC<GenericChartComponentProps> = ({ genericCh
 
           <Line type="monotone" dataKey="target" stroke="red" strokeWidth={2} />
 
-          <ReferenceLine y={0} stroke="#333" strokeWidth={2} />
+          <ReferenceLine y={0} stroke="#333" strokeWidth={1} />
 
           <Tooltip
             content={(props) =>
