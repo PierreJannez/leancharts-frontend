@@ -170,26 +170,17 @@ const LeanChartTabs: React.FC<TabsProps> = ({ leanCharts, bundleTitle }) => {
 
     if (!currentLeanChart) return null;
 
-    const props = {
-      key: currentLeanChart.id, // 👈 Ajoute cette ligne là où tu utilises ce composant
-      leanChart: currentLeanChart,
-      currentMonth: currentMonthKey,
-      onUpdateShortTerm: updateShortTermChartField,
-      onUpdateLongTerm: updateLongTermChartField,
-      onUpdateMainTarget: updateMainTarget,
-    };
     return (
-
-      console.log("LeanChartsTab->leanCharts",leanCharts),
-      console.log("LeanChartsTab->currentLeanChart",currentLeanChart),
-
-      <Suspense fallback={<div className="text-center">Loading chart...</div>}>
-        <StandardLeanChart
-          {...props}
-          onRefreshRequested={() => fetchSingleChart(currentLeanChart.id)}
-        />
-      </Suspense>
+      <StandardLeanChart
+        key={currentLeanChart.id} 
+        leanChart={currentLeanChart}
+        currentMonth={currentMonthKey}
+        onUpdateShortTerm={updateShortTermChartField}
+        onUpdateLongTerm={updateLongTermChartField}
+        onUpdateMainTarget={updateMainTarget}
+      />
     );
+
   };
 
   return (
