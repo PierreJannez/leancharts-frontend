@@ -24,12 +24,10 @@ export const toUser = (payload: RegisterPayload): Omit<User, "id"> => ({
 // ▶️ Inscription (création d’un utilisateur via page d’enregistrement)
 export const registerUser = async (payload: RegisterPayload): Promise<void> => {
   try {
-    console.log("userService.registerUser => ", payload)
     const res = await axios.post("/api/clients/register", payload)
-    console.log("userService.registerUser => ", res.data)
     return res.data
   } catch (error) {
-    console.error("Erreur lors de l'inscription :", error)
+      console.error("Erreur lors de l'inscription :", error)
     throw error
   }
 }
