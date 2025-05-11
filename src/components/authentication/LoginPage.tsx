@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext"; // Assurez-vous que le chemin est correct
+import { AxiosError } from "axios"; // Assurez-vous que axios est installé
 
 const LoginPage: React.FC = () => {
 
@@ -16,8 +17,15 @@ const LoginPage: React.FC = () => {
     try {
       await login(email, password); // 👈 appel réel à l'authentification
       navigate("/main");           // ✅ redirection après connexion
-    } catch (err) {
-      setError("Incorrect email or password. " + err);
+    } catch (err: unknown) {
+      const error = err as AxiosError<{ message: string }>;
+    
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "An unexpected error occurred. Please try again.";
+      console.log("Login error:", message);
+      setError(message);
     }
   };
 

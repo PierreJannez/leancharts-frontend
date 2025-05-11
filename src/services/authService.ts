@@ -22,9 +22,18 @@
     });
   
     if (!response.ok) {
-      throw new Error("Échec de la connexion");
-    }
-  
+      let errorMessage = "Échec de la connexion";
+      try {
+        const errorBody = await response.json();
+        if (errorBody?.message) {
+          errorMessage = errorBody.message;
+        }
+      } catch {
+        // ignore JSON parse error
+      }
+      throw new Error(errorMessage);
+    }  
+    
     const data: AuthResponse = await response.json();
     localStorage.setItem("token", data.token);
     localStorage.setItem("currentUser", JSON.stringify(data.user));
