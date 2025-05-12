@@ -4,8 +4,9 @@ import path from 'path';
 import tailwindcss from '@tailwindcss/vite';
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
 
-// https://vite.dev/config/
 export default defineConfig({
+
+  base: '/app/', // 👈 important pour le routing et les assets
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {
@@ -19,22 +20,24 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
-      buffer: 'buffer', // 👈 Ajout alias Buffer
+      buffer: 'buffer',
     },
   },
   optimizeDeps: {
     esbuildOptions: {
       define: {
-        global: 'globalThis', // 👈 Shim global
+        global: 'globalThis',
       },
       plugins: [
         NodeGlobalsPolyfillPlugin({
-          buffer: true, // 👈 Ajout Buffer
+          buffer: true,
         }),
       ],
     },
   },
   build: {
+    outDir: 'dist', // 👈 build directement dans la structure attendue
+    emptyOutDir: true,
     chunkSizeWarningLimit: 1000,
   },
 });
