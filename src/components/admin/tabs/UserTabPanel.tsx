@@ -7,6 +7,7 @@ import DeleteConfirmationDialog from "@/utils/DeleteConfirmationDialog"
 import { fetchUsers, createUser, updateUser, deleteUser } from "@/services/userService"
 import { fetchServices } from "@/services/serviceService"
 import { toastSuccess } from "@/utils/toastUtils"
+import { useRefresh } from "@/contexts/RefreshContext"
 
 interface Props {
   enterpriseId: number
@@ -17,7 +18,8 @@ const UserTabPanel: React.FC<Props> = ({ enterpriseId }) => {
   const [services, setServices] = useState<Service[]>([])
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-
+  const { triggerRefresh } = useRefresh()
+  
   useEffect(() => {
     fetchUsers(enterpriseId)
       .then((u) => {
@@ -42,6 +44,7 @@ const UserTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       })
       setSelectedUser(saved)
       toastSuccess("User successfully registered.")
+      triggerRefresh()
     } catch (error) {
         handleBackendError(error)
     }
@@ -55,6 +58,7 @@ const UserTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       setUsers((prev) => prev.filter((u) => u.id !== selectedUser.id))
       setSelectedUser(null)
       toastSuccess("User successfully deleted.")
+      triggerRefresh()
     } catch (error) {
         handleBackendError(error)  
     }

@@ -24,11 +24,15 @@ import {
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import miroIcon from "/miro.svg"
+import { useRefresh } from "@/contexts/RefreshContext"
 
 const Header: React.FC<{
   onSelectBundle: (bundleId: number, bundleName: string) => void
   onLogout: () => void
 }> = ({ onSelectBundle, onLogout }) => {
+
+  const { refreshKey } = useRefresh();
+
   const { isAuthenticated, logout, user } = useAuth()
   const navigate = useNavigate()
 
@@ -51,7 +55,7 @@ const Header: React.FC<{
         }
       })
     }
-  }, [user])
+  }, [user, refreshKey])
 
   useEffect(() => {
     if (selectedTeamId) {

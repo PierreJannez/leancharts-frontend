@@ -22,6 +22,8 @@ import {
   deleteBundle,
 } from "@/services/bundleService"
 import { toastError, toastSuccess } from "@/utils/toastUtils"
+import { useRefresh } from "@/contexts/RefreshContext"
+
 
 interface Props {
   enterpriseId: number
@@ -36,6 +38,8 @@ const BundleTabPanel: React.FC<Props> = ({ enterpriseId }) => {
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null)
   const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(null)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const { triggerRefresh } = useRefresh();
+  
 
   // Load services on mount
   useEffect(() => {
@@ -66,9 +70,9 @@ const BundleTabPanel: React.FC<Props> = ({ enterpriseId }) => {
         } else {
           setSelectedBundle({
             id: 0,
-            icon: "CirclePlus",
-            shortName: "",
-            longName: "",
+            icon: "home",
+            shortName: "New Bundle",
+            longName: "New Bundle",
             displayorder: 0,
           })
         }
@@ -94,6 +98,7 @@ const BundleTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       setBundles(updatedList)
       setSelectedBundle(saved)
       toastSuccess("Bundle successfully registered.")
+      triggerRefresh();      
     } catch (error) {
         handleBackendError(error)
     }
@@ -109,6 +114,7 @@ const BundleTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       setSelectedBundle(newList[0] ?? null)
       setShowDeleteDialog(false)
       toastSuccess("Bundle successfully deleted.")
+      triggerRefresh();      
     } catch (error) {
         handleBackendError(error)
     }
@@ -177,9 +183,9 @@ const BundleTabPanel: React.FC<Props> = ({ enterpriseId }) => {
             onClick={() =>
               setSelectedBundle({
                 id: 0,
-                icon: "CirclePlus",
-                shortName: "",
-                longName: "",
+                icon: "home",
+                shortName: "New Bundle",
+                longName: "New Bundle",
                 displayorder: 0,
               })
             }

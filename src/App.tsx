@@ -12,6 +12,8 @@ import Main from "./components/Main";
 import { useAuth } from "./contexts/AuthContext";
 import AdminPage from "@/components/admin/AdminPage";
 import { Toaster } from 'sonner'
+import ChartSelectionPanel from "@/components/leanchart/ChartSelectionPanel"
+
 
 const AppContent: React.FC = () => {
   const { isAuthenticated, logout, user } = useAuth();
@@ -92,6 +94,8 @@ const AppContent: React.FC = () => {
                 }
               />
               <Route path="/" element={<Navigate to="/login" replace />} />
+              <Route path="/charts-selection" element={<ChartSelectionPanel />} />
+
             </Routes>
           </div>
 

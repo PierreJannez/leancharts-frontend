@@ -14,8 +14,8 @@ interface BundleAdminPanelProps {
 const emptyBundle: Bundle = {
   id: -1, // ➕ -1 ou tout autre valeur par défaut pour indiquer une création
   icon: "home",
-  shortName: "",
-  longName: "",
+  shortName: "New Bundle",
+  longName: "New Bundle",
   displayorder: 0,
 };
 
@@ -59,7 +59,7 @@ const BundleAdminPanel: React.FC<BundleAdminPanelProps> = ({ bundle, onSave }) =
         </div>
         <div className="flex justify-end pt-4">
           <Button onClick={handleSubmit}>
-            {isNew ? "Créer le bundle" : "Enregistrer"}
+            {isNew ? "Create" : "Save"}
           </Button>
         </div>
       </CardContent>

@@ -62,15 +62,15 @@
   
   export function storeToken(token: string) {
     const sessionKey = getSessionKey();
-    sessionStorage.setItem(`token-${sessionKey}`, token);
+    localStorage.setItem(`token-${sessionKey}`, token);
   }
   
   export function getToken(): string | null {
     const sessionKey = getSessionKey();
-    return sessionStorage.getItem(`token-${sessionKey}`);
+    return localStorage.getItem(`token-${sessionKey}`);
   }
   
   export function clearToken() {
     const sessionKey = getSessionKey();
-    sessionStorage.removeItem(`token-${sessionKey}`);
+    localStorage.removeItem(`token-${sessionKey}`);
   }

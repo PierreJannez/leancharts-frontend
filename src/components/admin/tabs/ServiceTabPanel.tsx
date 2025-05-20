@@ -10,6 +10,7 @@ import {
   deleteService,
 } from "@/services/serviceService"
 import { toastSuccess } from "@/utils/toastUtils"
+import { useRefresh } from "@/contexts/RefreshContext";
 
 interface Props {
   enterpriseId: number
@@ -19,6 +20,7 @@ const ServiceTabPanel: React.FC<Props> = ({ enterpriseId }) => {
   const [services, setServices] = useState<Service[]>([])
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const { triggerRefresh } = useRefresh();
 
   useEffect(() => {
     fetchServices(enterpriseId)
@@ -40,6 +42,7 @@ const ServiceTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       })
       setSelectedService(saved)
       toastSuccess("Service successfully registered.")
+      triggerRefresh();
     } catch (error) {
         handleBackendError(error)
     }
@@ -52,6 +55,7 @@ const ServiceTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       setServices((prev) => prev.filter((s) => s.id !== selectedService.id))
       setSelectedService(null)
       toastSuccess("Service successfully removed.")
+      triggerRefresh();
     } catch (error) {
         handleBackendError(error)
     }
@@ -106,18 +110,27 @@ const ServiceTabPanel: React.FC<Props> = ({ enterpriseId }) => {
           <div className="space-y-4">
             <label className="block">
               <span className="text-sm font-medium text-gray-700">Name of the service</span>
-              <input
-                type="text"
-                className="w-full p-2 border rounded"
-                value={selectedService.name}
-                onChange={(e) =>
-                  setSelectedService({ ...selectedService, name: e.target.value })
-                }
-              />
+                <input
+                  type="text"
+                  className="w-full p-2 border rounded"
+                  value={selectedService.name || "My Service"}
+                  onChange={(e) =>
+                    setSelectedService({
+                      ...selectedService,
+                      name: e.target.value || "My Service",
+                    })
+                  }
+                />            
             </label>
             <button
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              onClick={() => handleSaveService(selectedService)}
+              onClick={() => {
+                const serviceToSave = {
+                  ...selectedService,
+                  name: selectedService.name?.trim() || "My Service",
+                };
+                handleSaveService(serviceToSave);
+              }}
             >
               Save
             </button>

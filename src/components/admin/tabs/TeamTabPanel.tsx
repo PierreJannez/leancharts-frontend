@@ -14,6 +14,7 @@ import {
 import { fetchServices } from "@/services/serviceService"
 import { fetchTeams, createTeam, updateTeam, deleteTeam } from "@/services/teamService"
 import { toastError, toastSuccess } from "@/utils/toastUtils"
+import { useRefresh } from "@/contexts/RefreshContext"
 
 interface Props {
   enterpriseId: number
@@ -25,7 +26,8 @@ const TeamTabPanel: React.FC<Props> = ({ enterpriseId }) => {
   const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null)
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-
+  const { triggerRefresh } = useRefresh();
+  
   useEffect(() => {
     fetchServices(enterpriseId)
       .then(setServices)
@@ -56,6 +58,7 @@ const TeamTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       setTeams(updatedList)
       setSelectedTeam(saved)
       toastSuccess("Team successfully registered.")
+      triggerRefresh();      
     } catch (error) {
         handleBackendError(error)
     }
@@ -69,6 +72,7 @@ const TeamTabPanel: React.FC<Props> = ({ enterpriseId }) => {
       setTeams(remaining)
       setSelectedTeam(remaining[0] ?? null)
       toastSuccess("Team successfully deleted.")
+      triggerRefresh();
     } catch (error) {
         handleBackendError(error)
     }
@@ -130,7 +134,7 @@ const TeamTabPanel: React.FC<Props> = ({ enterpriseId }) => {
               setSelectedTeam({
                 id: 0,
                 id_service: selectedServiceId,
-                name: "",
+                name: "My Team",
               })
             }}
           >
@@ -164,18 +168,23 @@ const TeamTabPanel: React.FC<Props> = ({ enterpriseId }) => {
             <input
               type="text"
               className="w-full p-2 border rounded"
-              value={selectedTeam.name}
+              value={selectedTeam.name || "My Team"}
               onChange={(e) =>
-                setSelectedTeam({ ...selectedTeam, name: e.target.value })
+                setSelectedTeam({ ...selectedTeam, name: e.target.value || "My Team" })
               }
             />
-            <button
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              onClick={handleSaveTeam}
-            >
-              Save
-            </button>
-          </div>
+          <button
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            onClick={() => {
+              if (!selectedTeam.name?.trim()) {
+                setSelectedTeam({ ...selectedTeam, name: "My Team"});
+              }
+              handleSaveTeam();
+            }}
+          >
+            Save
+          </button>
+        </div>
         )}
       </div>
     </div>

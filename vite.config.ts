@@ -1,43 +1,49 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import tailwindcss from '@tailwindcss/vite';
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd());
 
-  base: '/app/', // 👈 important pour le routing et les assets
-  plugins: [react(), tailwindcss()],
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3500',
-        changeOrigin: true,
+  return {
+    base: '/app/',
+    plugins: [react(), tailwindcss()],
+    server: {
+      proxy: {
+        '/api': {
+          target: env.VITE_API_URL || 'http://localhost:3000',
+          changeOrigin: true,
+        },
+      },
+      port: 3000,
+    },
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, 'src'),
+        buffer: 'buffer',
       },
     },
-    port: 5173,
-  },
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, 'src'),
-      buffer: 'buffer',
-    },
-  },
-  optimizeDeps: {
-    esbuildOptions: {
-      define: {
-        global: 'globalThis',
+    optimizeDeps: {
+      esbuildOptions: {
+        define: {
+          global: 'globalThis',
+        },
+        plugins: [
+          NodeGlobalsPolyfillPlugin({
+            buffer: true,
+          }),
+        ],
       },
-      plugins: [
-        NodeGlobalsPolyfillPlugin({
-          buffer: true,
-        }),
-      ],
     },
-  },
-  build: {
-    outDir: 'dist', // 👈 build directement dans la structure attendue
-    emptyOutDir: true,
-    chunkSizeWarningLimit: 1000,
-  },
+    build: {
+      outDir: './dist',
+      emptyOutDir: true,
+      chunkSizeWarningLimit: 1000,
+    },
+    define: {
+      'import.meta.env': env,
+    },
+  };
 });
